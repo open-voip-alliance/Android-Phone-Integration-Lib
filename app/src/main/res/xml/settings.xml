@@ -1,0 +1,42 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:title="Authentication"
+        app:iconSpaceReserved="false">
+
+        <EditTextPreference
+            app:icon="@drawable/ic_user"
+            app:key="username"
+            app:title="Username" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_password"
+            app:key="password"
+            app:title="Password" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_domain"
+            app:key="domain"
+            app:title="Domain" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_port"
+            app:key="port"
+            app:title="Port" />
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        app:title="Preferences"
+        app:iconSpaceReserved="false">
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_encryption"
+            app:defaultValue="true"
+            app:key="encryption"
+            app:title="Encryption"/>
+    </PreferenceCategory>
+
+
+
+</PreferenceScreen>

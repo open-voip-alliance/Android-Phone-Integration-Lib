@@ -7,19 +7,14 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="nl.vialer.voip.android.example.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:name="nl.vialer.voip.android.example.ui.home.DialerFragment"
+        android:label="@string/title_dialer"
+        tools:layout="@layout/fragment_dialer" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="nl.vialer.voip.android.example.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
+        android:name="nl.vialer.voip.android.example.ui.dashboard.SettingsFragment"
+        android:label="@string/title_settings"
         tools:layout="@layout/fragment_dashboard" />
 
-    <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="nl.vialer.voip.android.example.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
 </navigation>
