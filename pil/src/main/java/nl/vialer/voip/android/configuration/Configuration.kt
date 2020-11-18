@@ -5,7 +5,6 @@ import nl.vialer.voip.android.logging.LogCallback
 
 data class Configuration(
     val auth: Auth,
-    val eventListener: EventListener? = null,
     val log: LogCallback? = null,
 
 )

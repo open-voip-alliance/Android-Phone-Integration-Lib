@@ -1,6 +1,8 @@
 package nl.vialer.voip.android.call
 
 data class PILCall(
+    val remoteNumber: String,
+    val displayName: String,
     val state: CallState,
     val direction: CallDirection,
     val duration: Int,
@@ -10,12 +12,12 @@ data class PILCall(
 ) {
     val remotePartyHeading: String
         get() {
-            return ""
+            return remoteNumber
         }
 
     val remotePartySubheading: String
         get() {
-            return ""
+            return displayName
         }
 
     val prettyDuration: String

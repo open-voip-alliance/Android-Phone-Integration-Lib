@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".example.ui.call.CallActivity">
+
+    <LinearLayout
+        android:id="@+id/callHeadings"
+        app:layout_constraintBottom_toTopOf="@id/callActions"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="30dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/callTitle"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Steven"
+            android:textStyle="bold"
+            android:textSize="35sp"/>
+
+        <TextView
+            android:id="@+id/callSubtitle"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0800123123"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/callDuration"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="00:32"/>
+    </LinearLayout>
+
+    <TableLayout
+        android:id="@+id/callActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:paddingHorizontal="10dp"
+        android:stretchColumns="*"
+        app:layout_constraintTop_toBottomOf="@id/callHeadings">
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/muteButton"
+                android:layout_marginHorizontal="10dp"
+                android:text="Mute" />
+
+            <Button
+                android:id="@+id/speakerButton"
+                android:layout_marginHorizontal="10dp"
+                android:text="Speaker" />
+
+            <Button
+                android:id="@+id/transferButton"
+                android:layout_marginHorizontal="10dp"
+                android:text="Transfer" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/audioRouteButton"
+                android:layout_marginHorizontal="10dp"
+                android:text="Audio" />
+
+            <Space />
+
+            <Button
+                android:id="@+id/holdButton"
+                android:layout_marginHorizontal="10dp"
+                android:text="Hold" />
+        </TableRow>
+
+        <TableRow android:layout_marginTop="20dp">
+
+            <Space />
+
+            <ImageButton
+                android:id="@+id/endCallButton"
+                android:background="@color/red_500"
+                android:paddingVertical="10dp"
+                android:src="@drawable/ic_call_end"
+                android:tint="#fff" />
+
+            <Space />
+        </TableRow>
+
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/callDetailsAdvanced"
+        app:layout_constraintTop_toBottomOf="@id/callActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

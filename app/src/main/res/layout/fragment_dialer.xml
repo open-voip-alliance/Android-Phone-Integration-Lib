@@ -69,6 +69,7 @@
         <TableRow android:layout_marginTop="20dp">
             <Space/>
             <ImageButton
+                android:id="@+id/callButton"
                 android:paddingVertical="10dp"
                 android:background="@color/green_500"
                 android:tint="#fff"

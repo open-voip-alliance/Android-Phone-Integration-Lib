@@ -24,6 +24,12 @@
             app:icon="@drawable/ic_port"
             app:key="port"
             app:title="Port" />
+
+        <Preference
+            app:key="status"
+            app:title="Authentication Status"
+            app:summary="Not Authenticated">
+        </Preference>
     </PreferenceCategory>
 
 
