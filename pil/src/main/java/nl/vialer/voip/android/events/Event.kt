@@ -1,7 +1,9 @@
 package nl.vialer.voip.android.events
 
-typealias EventListener = (event: Event) -> Unit
+interface EventListener {
+    fun onEvent(event: Event)
+}
 
 enum class Event {
-    OUTGOING_CALL_STARTED, CALL_ENDED
+    OUTGOING_CALL_STARTED, INCOMING_CALL_RECEIVED, CALL_ENDED, CALL_UPDATED
 }

@@ -3,13 +3,21 @@
     package="nl.vialer.voip.android">
 
     <application
+        android:name=".example.PILExampleApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.VialerVoIPPlatformIntegrationLayer">
-        <activity android:name=".example.ui.call.CallActivity"></activity>
+        <activity
+            android:name=".example.ui.call.CallActivity"
+            android:launchMode="singleTask"
+            android:exported="true" />
+        <activity
+            android:name=".example.ui.call.IncomingCallActivity"
+            android:launchMode="singleTask"
+            android:exported="true" />
         <activity
             android:name=".example.MainActivity"
             android:label="@string/app_name">

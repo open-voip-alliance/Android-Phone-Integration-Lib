@@ -25,24 +25,24 @@ class Connection(private val voip: VoIPPIL) : AndroidConnection() {
     @SuppressLint("MissingPermission", "NewApi") // TODO fix
     override fun onCallAudioStateChanged(state: CallAudioState) {
         Log.e("TEST123", "STate==${state.route}")
-        voip.internalAudioState = AudioState(
-                when (state.route) {
-                    8 -> AudioRoute.SPEAKER
-                    2 -> AudioRoute.BLUETOOTH
-                    else -> AudioRoute.PHONE
-                }, arrayOf(AudioRoute.PHONE), state.activeBluetoothDevice?.name ?: ""
-        )
+//        voip.internalAudioState = AudioState(
+//                when (state.route) {
+//                    8 -> AudioRoute.SPEAKER
+//                    2 -> AudioRoute.BLUETOOTH
+//                    else -> AudioRoute.PHONE
+//                }, arrayOf(AudioRoute.PHONE), state.activeBluetoothDevice?.name ?: ""
+//        )
     }
 
     override fun onHold() {
-        voip.phoneLibCall?.let {
+        voip.callManager?.call?.let {
             voip.phoneLib.actions(it).hold(true)
             setOnHold()
         }
     }
 
     override fun onUnhold() {
-        voip.phoneLibCall?.let {
+        voip.callManager?.call?.let {
             voip.phoneLib.actions(it).hold(false)
             setActive()
         }
@@ -50,7 +50,7 @@ class Connection(private val voip: VoIPPIL) : AndroidConnection() {
 
     @SuppressLint("MissingPermission")
     override fun onAnswer() {
-        voip.phoneLibCall?.let {
+        voip.callManager?.call?.let {
             voip.phoneLib.actions(it).accept()
             setActive()
         }
@@ -58,14 +58,14 @@ class Connection(private val voip: VoIPPIL) : AndroidConnection() {
 
     @SuppressLint("MissingPermission")
     override fun onReject() {
-        voip.phoneLibCall?.let {
+        voip.callManager?.call?.let {
             voip.phoneLib.actions(it).decline(Reason.BUSY)
             destroy()
         }
     }
 
     override fun onDisconnect() {
-        voip.phoneLibCall?.let {
+        voip.callManager?.call?.let {
             voip.phoneLib.actions(it).end()
             setDisconnected(DisconnectCause(LOCAL))
             destroy()

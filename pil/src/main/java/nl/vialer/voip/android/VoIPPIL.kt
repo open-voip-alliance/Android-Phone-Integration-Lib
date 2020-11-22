@@ -1,93 +1,63 @@
 package nl.vialer.voip.android
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
-import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import nl.vialer.voip.android.audio.AudioRoute
-import nl.vialer.voip.android.audio.AudioState
-import nl.vialer.voip.android.call.CallDirection
-import nl.vialer.voip.android.call.CallState
+import com.takwolf.android.foreback.Foreback
+import nl.vialer.voip.android.audio.AudioManager
+import nl.vialer.voip.android.call.CallActions
 import nl.vialer.voip.android.call.PILCall
-import nl.vialer.voip.android.configuration.Configuration
+import nl.vialer.voip.android.call.PILCallFactory
+import nl.vialer.voip.android.configuration.Auth
+import nl.vialer.voip.android.configuration.UI
+import nl.vialer.voip.android.contacts.Contacts
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.EventListener
-import nl.vialer.voip.android.exception.RegistrationFailedException
+import nl.vialer.voip.android.events.EventsManager
+import nl.vialer.voip.android.exception.NoAuthenticationCredentialsException
+import nl.vialer.voip.android.logging.LogCallback
 import nl.vialer.voip.android.logging.LogLevel
+import nl.vialer.voip.android.push.Middleware
 import nl.vialer.voip.android.telecom.AndroidTelecomManager
 import nl.vialer.voip.android.telecom.Connection
 import org.openvoipalliance.phonelib.PhoneLib
-import org.openvoipalliance.phonelib.config.Auth
 import org.openvoipalliance.phonelib.config.Config
-import org.openvoipalliance.phonelib.model.Call
 import org.openvoipalliance.phonelib.model.Codec
-import org.openvoipalliance.phonelib.model.Direction
-import org.openvoipalliance.phonelib.model.RegistrationState
-import org.openvoipalliance.phonelib.model.RegistrationState.*
-import org.openvoipalliance.phonelib.repository.initialise.CallListener
-import org.openvoipalliance.phonelib.repository.initialise.LogLevel as LibraryLogLevel
-import org.openvoipalliance.phonelib.repository.initialise.LogLevel.*
+import org.openvoipalliance.phonelib.model.RegistrationState.FAILED
+import org.openvoipalliance.phonelib.model.RegistrationState.REGISTERED
 import org.openvoipalliance.phonelib.repository.initialise.LogListener
-import java.util.*
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.properties.Delegates
 
-class VoIPPIL(private var config: Configuration, private val context: Context) {
+class VoIPPIL internal constructor(internal val context: Context, internal val logger: LogCallback) {
 
-    val state = PILState.INACTIVE
+    internal val callManager = CallManager(this)
+    internal val logManager = LogManager(this)
+    internal val androidManager = AndroidManager(this)
+    internal val callFactory = PILCallFactory(this, Contacts(context))
 
     val call: PILCall?
-        get() {
-            if (phoneLibCall == null) return null
+        get() = callManager.call?.let { callFactory.make(it) }
 
-            return PILCall(
-                phoneLibCall!!.phoneNumber,
-                phoneLibCall!!.displayName,
-                CallState.CONNECTED,
-                if (phoneLibCall!!.direction == Direction.INCOMING) CallDirection.INBOUND else CallDirection.OUTBOUND,
-                phoneLibCall!!.duration,
-                false,
-                UUID.randomUUID().toString(),
-                phoneLibCall!!.quality.average
-            )
-        }
+    internal var auth: Auth? = null
+    internal lateinit var ui: UI
 
-    val transferTarget: String? = null
+    internal val phoneLib by lazy { PhoneLib.getInstance(context) }
 
-    val audioState
-        get() = internalAudioState ?: AudioState(AudioRoute.PHONE, arrayOf(AudioRoute.PHONE, AudioRoute.SPEAKER), null)
-
-    internal var internalAudioState: AudioState? = null
-
-    internal val phoneLib = PhoneLib.getInstance(context)
-
-    val isMuted
-        get() = phoneLib.microphoneMuted
-
-    internal val telecomManager = AndroidTelecomManager(context, context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager)
-
-    internal var connection: Connection? = null
-
-    internal var phoneLibCall: Call? = null
-
-    var eventListener: EventListener? = null
+    val actions = CallActions(this, phoneLib, callManager)
+    val audio = AudioManager(this, phoneLib, callManager)
+    val events = EventsManager(this)
+    var middlewareHandler: Middleware? = null
 
     init {
-        Log.e("TEST123", "aeasdasd")
         instance = this
-    }
 
-    @SuppressLint("MissingPermission")
-    fun call(number: String) {
-
-        telecomManager.placeCall(number)
-
-
+        arrayOf<EventListener>(callFactory).forEach {
+            events.listen(it)
+        }
     }
 
     /**
@@ -97,14 +67,20 @@ class VoIPPIL(private var config: Configuration, private val context: Context) {
      */
     suspend fun canAuthenticate(): Boolean = suspendCoroutine { continuation ->
         try {
-            initialiseWithConfig()
+            if (auth?.isValid == false) {
+                continuation.resume(false)
+                return@suspendCoroutine
+            }
+
+            initialise()
             phoneLib.register { registrationState ->
                 when (registrationState) {
                     REGISTERED, FAILED -> {
                         continuation.resume(registrationState == REGISTERED)
                         phoneLib.destroy()
                     }
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -112,73 +88,72 @@ class VoIPPIL(private var config: Configuration, private val context: Context) {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    fun call(number: String) {
+        initialise()
+
+        register { phoneLib.callTo(number) }
+    }
+
     fun endCall() {
-        connection?.let { it.onDisconnect() }
+        callManager.call?.let { phoneLib.actions(it).end() }
     }
 
-    fun swapConfig(callback: (currentConfig: Configuration) -> Configuration) {
-        this.config = callback.invoke(this.config)
-    }
-
-    internal fun initialiseWithConfig() {
-        Log.e("TEST123", "Initialising... on ${Thread.currentThread()}")
-        phoneLib.initialise(Config(
-            auth = Auth(config.auth.username, config.auth.password, config.auth.domain, config.auth.port),
-            callListener = listener,
-            encryption = true,
-            logListener = listener,
-            codecs = arrayOf(Codec.OPUS)
-        ))
-    }
-
-    internal fun broadcast(event: Event) {
-        Log.e("TEST123", "Broadcasting ${event.name}")
-        eventListener?.invoke(event)
-    }
-
-    internal object listener : LogListener, CallListener {
-
-        override fun onLogMessageWritten(lev: LibraryLogLevel, message: String) {
-            Log.i("LINPHONE", message)
-//            config.log?.invoke(when(lev) {
-//                DEBUG -> LogLevel.DEBUG
-//                TRACE -> LogLevel.DEBUG
-//                MESSAGE -> LogLevel.INFO
-//                WARNING -> LogLevel.WARNING
-//                ERROR -> LogLevel.ERROR
-//                FATAL -> LogLevel.ERROR
-//            }, message)
+    internal fun initialise() {
+        if (phoneLib.isInitialised) {
+            Log.e("TEST123", "isInitialised nothing")
+            return
         }
 
-        override fun incomingCallReceived(call: Call) {
-            if (instance.phoneLibCall == null) {
-                instance.telecomManager.addNewIncomingCall()
-                instance.phoneLibCall = call
-            }
+        auth?.let {
+            phoneLib.initialise(
+                Config(
+                    auth = org.openvoipalliance.phonelib.config.Auth(
+                        it.username,
+                        it.password,
+                        it.domain,
+                        it.port
+                    ),
+                    callListener = callManager,
+                    encryption = it.secure,
+                    logListener = logManager,
+                    codecs = arrayOf(Codec.OPUS)
+                )
+            )
+        }
+    }
+
+    internal fun register(callback: () -> Unit) {
+        if (auth?.isValid == false) {
+            writeLog("Unable to register without valid authentication", LogLevel.ERROR)
+            return
         }
 
-        override fun outgoingCallCreated(call: Call) {
-            if (instance.phoneLibCall == null) {
-                instance.connection?.let {
-                    Log.e("TEST123", "Setting connection to active")
-                    it.setActive()
-                }
-                instance.phoneLibCall = call
-                instance.broadcast(Event.OUTGOING_CALL_STARTED)
-            }
+        if (phoneLib.isRegistered) {
+            Log.e("TEST123", "isReady nothing")
+            callback.invoke()
+            return
         }
 
-        override fun callEnded(call: Call) {
-            instance.connection?.let {
-                Log.e("TEST123", "Got connection, destroying it!")
-                it.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
-                it.destroy()
+        phoneLib.register {
+            if (it == REGISTERED) {
+                callback.invoke()
             }
-            instance.connection = null
-            instance.phoneLibCall = null
-            instance.broadcast(Event.CALL_ENDED)
-            instance.phoneLib.destroy()
-            instance.context.stopVoipService()
+        }
+    }
+
+    internal fun writeLog(message: String, level: LogLevel = LogLevel.INFO) {
+        logger.invoke(level, message)
+    }
+
+    fun start(callback: (() -> Unit)? = null) {
+        initialise()
+
+        auth?.let {
+            register {
+                writeLog("We have started the voip pil and registered!")
+                callback?.invoke()
+            }
         }
     }
 

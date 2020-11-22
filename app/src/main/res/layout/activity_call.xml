@@ -39,6 +39,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="00:32"/>
+
+        <TextView
+            android:id="@+id/callStatus"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Connecting"/>
     </LinearLayout>
 
     <TableLayout

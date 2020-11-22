@@ -4,13 +4,18 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.WindowManager
 import kotlinx.android.synthetic.main.activity_call.*
+import kotlinx.android.synthetic.main.activity_call.callSubtitle
+import kotlinx.android.synthetic.main.activity_call.callTitle
+import kotlinx.android.synthetic.main.activity_call.endCallButton
+import kotlinx.android.synthetic.main.activity_incoming_call.*
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.VoIPPIL
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.EventListener
 
-class CallActivity : AppCompatActivity(), EventListener {
+class IncomingCallActivity : AppCompatActivity(), EventListener {
 
     private val voip by lazy { VoIPPIL.instance }
 
@@ -20,18 +25,21 @@ class CallActivity : AppCompatActivity(), EventListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_call)
+        setContentView(R.layout.activity_incoming_call)
 
-        endCallButton.setOnClickListener {
+        answerCallButton.setOnClickListener {
+
+        }
+
+        declineCallButton.setOnClickListener {
             voip.endCall()
         }
 
-        holdButton.setOnClickListener {
-            voip.actions.toggleHold()
-        }
-
-        muteButton.setOnClickListener {
-            voip.audio.toggleMute()
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        } else {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
         }
     }
 
@@ -56,12 +64,6 @@ class CallActivity : AppCompatActivity(), EventListener {
 
         callTitle.text = call.remotePartyHeading
         callSubtitle.text = call.remotePartySubheading
-        callDuration.text = call.prettyDuration
-
-        holdButton.text = if (call.isOnHold) "unhold" else "hold"
-        muteButton.text = if (voip.audio.isMicrophoneMuted) "unmute" else "mute"
-
-        callStatus.text = call.state.name
 
         Handler().postDelayed(renderUi, 1000)
     }

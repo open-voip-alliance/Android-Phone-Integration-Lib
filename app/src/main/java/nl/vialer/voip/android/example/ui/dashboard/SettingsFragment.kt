@@ -1,29 +1,26 @@
 package nl.vialer.voip.android.example.ui.dashboard
 
-import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.preference.PreferenceFragment
 import android.text.InputType
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.preference.EditTextPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
+import android.widget.Toast
+import androidx.preference.*
+import com.android.volley.Request
+import com.android.volley.toolbox.HttpHeaderParser
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.VoIPPIL
-import nl.vialer.voip.android.configuration.Auth
-import nl.vialer.voip.android.configuration.Configuration
+import nl.vialer.voip.android.example.ui.VoIPGRIDMiddleware
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody
+import org.json.JSONObject
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -31,15 +28,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         PreferenceManager.getDefaultSharedPreferences(activity)
     }
 
-    private val voip: VoIPPIL
-        get() = VoIPPIL(Configuration(
-            auth = Auth(
-                prefs.getString("username", "") ?: "",
-                prefs.getString("password", "") ?: "",
-                prefs.getString("domain", "") ?: "",
-                (prefs.getString("port", "0") ?: "0").toInt()
-            ),
-        ), requireActivity())
+    private val voip by lazy { VoIPPIL.instance }
+
+    private val voIPGRIDMiddleware by lazy { VoIPGRIDMiddleware(requireActivity()) }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
@@ -47,18 +38,42 @@ class SettingsFragment : PreferenceFragmentCompat() {
             prefs.getString("username", "")
         }
 
+        findPreference<Preference>("voipgrid_middleware_token")?.summaryProvider = Preference.SummaryProvider<Preference> {
+            VoIPGRIDMiddleware.token
+        }
+
+        findPreference<EditTextPreference>("voipgrid_username")?.summaryProvider = Preference.SummaryProvider<EditTextPreference> {
+            prefs.getString("voipgrid_username", "")
+        }
+
         findPreference<EditTextPreference>("password")?.apply {
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
-            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString("password", "") }
+            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString(
+                "password",
+                ""
+            ) }
+        }
+
+        findPreference<EditTextPreference>("voipgrid_password")?.apply {
+            setOnBindEditTextListener {
+                it.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString(
+                "voipgrid_password",
+                ""
+            ) }
         }
 
         findPreference<EditTextPreference>("domain")?.apply {
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_TEXT_VARIATION_URI
             }
-            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString("domain", "") }
+            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString(
+                "domain",
+                ""
+            ) }
 
         }
 
@@ -66,7 +81,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_CLASS_NUMBER
             }
-            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString("port", "") }
+            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString(
+                "port",
+                ""
+            ) }
         }
 
         arrayOf("username", "password", "domain", "port").forEach {
@@ -78,9 +96,75 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
+        arrayOf("voipgrid_username", "voipgrid_password").forEach {
+            findPreference<EditTextPreference>(it)?.setOnPreferenceChangeListener { _, _ ->
+                Handler().postDelayed({
+                    activity?.runOnUiThread { updateVoipgridAuthenticationStatus() }
+                }, 1000)
+                true
+            }
+        }
+
         findPreference<Preference>("status")?.setOnPreferenceClickListener {
             updateAuthenticationStatus()
             true
+        }
+
+        findPreference<Preference>("voipgrid_middleware_register")?.setOnPreferenceClickListener {
+            GlobalScope.launch {
+                val message = if (voIPGRIDMiddleware.register()) "Registered!" else "Registration failed..."
+                requireActivity().runOnUiThread { Toast.makeText(requireActivity(), message, Toast.LENGTH_LONG).show() }
+            }
+            true
+        }
+
+        findPreference<Preference>("voipgrid_middleware_unregister")?.setOnPreferenceClickListener {
+            GlobalScope.launch {
+                val message = if (voIPGRIDMiddleware.unregister()) "Unregistered!" else "Unregistration failed..."
+                requireActivity().runOnUiThread { Toast.makeText(requireActivity(), message, Toast.LENGTH_LONG).show() }
+            }
+            true
+        }
+    }
+
+    private fun updateVoipgridAuthenticationStatus() {
+        val queue = Volley.newRequestQueue(requireActivity())
+
+        val url = "https://partner.voipgrid.nl/api/permission/apitoken/"
+
+        val requestData = JSONObject().apply {
+            put("email", prefs.getString("voipgrid_username", ""))
+            put("password", prefs.getString("voipgrid_password", ""))
+        }
+
+        val request = JsonObjectRequest(Request.Method.POST, url, requestData, { response ->
+            val apiToken = response.getString("api_token")
+            updateVoipgridSummary(true, apiToken)
+            prefs.edit().putString("voipgrid_api_token", apiToken).apply()
+        }, { error ->
+            Toast.makeText(
+                requireContext(),
+                error.networkResponse.statusCode.toString(),
+                Toast.LENGTH_LONG
+            ).show()
+            updateVoipgridSummary(false)
+            prefs.edit().remove("voipgrid_api_token").apply()
+        }
+        )
+
+        queue.add(request)
+    }
+
+    private fun updateVoipgridSummary(authenticated: Boolean, token: String? = null) {
+        val summary = if (authenticated) "Authenticated (${token})" else "Authentication failed"
+
+        activity?.runOnUiThread {
+            findPreference<Preference>("voipgrid_status")?.summaryProvider = Preference.SummaryProvider<Preference> {
+                summary
+            }
+
+            findPreference<Preference>("voipgrid_middleware_register")?.isEnabled = authenticated
+            findPreference<Preference>("voipgrid_middleware_unregister")?.isEnabled = authenticated
         }
     }
 
@@ -107,5 +191,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onResume() {
         super.onResume()
         updateAuthenticationStatus()
+        updateVoipgridAuthenticationStatus()
     }
 }

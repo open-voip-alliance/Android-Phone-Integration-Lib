@@ -23,26 +23,19 @@ import kotlinx.coroutines.launch
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.VoIPPIL
 import nl.vialer.voip.android.configuration.Auth
-import nl.vialer.voip.android.configuration.Configuration
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.Event.*
+import nl.vialer.voip.android.events.EventListener
 import nl.vialer.voip.android.example.ui.call.CallActivity
 
-class DialerFragment : Fragment() {
+class DialerFragment : Fragment(), EventListener {
 
     private val prefs by lazy {
         PreferenceManager.getDefaultSharedPreferences(activity)
     }
 
     private val voip by lazy {
-        VoIPPIL(Configuration(
-            auth = Auth(
-                prefs.getString("username", "") ?: "",
-                prefs.getString("password", "") ?: "",
-                prefs.getString("domain", "") ?: "",
-                (prefs.getString("port", "0") ?: "0").toInt()
-            ),
-        ), requireActivity())
+        VoIPPIL.instance
     }
 
     override fun onCreateView(
@@ -56,17 +49,24 @@ class DialerFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        voip.eventListener = { event ->
-            when (event) {
-                OUTGOING_CALL_STARTED -> startActivity(Intent(requireActivity(), CallActivity::class.java))
-                CALL_ENDED -> {}
-            }
-        }
+        voip.events.listen(this)
         requestCallingPermissions()
     }
 
+    override fun onPause() {
+        super.onPause()
+        voip.events.stopListening(this)
+    }
+
+    override fun onEvent(event: Event) {
+        when (event) {
+            OUTGOING_CALL_STARTED -> startActivity(Intent(requireActivity(), CallActivity::class.java))
+            CALL_ENDED -> {}
+        }
+    }
+
     private fun requestCallingPermissions() {
-        val requiredPermissions = arrayOf(Manifest.permission.CALL_PHONE, Manifest.permission.RECORD_AUDIO)
+        val requiredPermissions = arrayOf(Manifest.permission.CALL_PHONE, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_CONTACTS)
 
         requiredPermissions.forEach { permission ->
             if (ContextCompat.checkSelfPermission(requireActivity(), permission) == PERMISSION_DENIED) {
@@ -104,8 +104,7 @@ class DialerFragment : Fragment() {
         callButton.setOnClickListener {
             val number = digitEntryWindow.text
 
-                voip.call(number = number as String)
-
+            voip.call(number = number as String)
         }
     }
 

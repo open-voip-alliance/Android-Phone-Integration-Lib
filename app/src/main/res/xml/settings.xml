@@ -32,6 +32,44 @@
         </Preference>
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:title="VoIPGRID"
+        app:iconSpaceReserved="false"
+        app:summary="To log into the Middleware for incoming calls">
+        <EditTextPreference
+            app:icon="@drawable/ic_user"
+            app:key="voipgrid_username"
+            app:title="Username" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_password"
+            app:key="voipgrid_password"
+            app:title="Password" />
+
+        <Preference
+            app:key="voipgrid_middleware_token"
+            app:title="Middleware Token"
+            app:summary="None">
+        </Preference>
+
+        <Preference
+            app:key="voipgrid_status"
+            app:title="Authentication Status"
+            app:summary="Not Authenticated">
+        </Preference>
+
+        <Preference
+            app:key="voipgrid_middleware_register"
+            app:title="Register with Middleware"
+            app:enabled="false">
+        </Preference>
+
+        <Preference
+            app:key="voipgrid_middleware_unregister"
+            app:title="Unregister with Middleware"
+            app:enabled="false">
+        </Preference>
+    </PreferenceCategory>
 
     <PreferenceCategory
         app:title="Preferences"
@@ -42,7 +80,5 @@
             app:key="encryption"
             app:title="Encryption"/>
     </PreferenceCategory>
-
-
 
 </PreferenceScreen>

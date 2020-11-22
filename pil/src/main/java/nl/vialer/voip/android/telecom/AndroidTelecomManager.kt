@@ -9,6 +9,7 @@ import android.telecom.PhoneAccount
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.telecom.VideoProfile
+import android.util.Log
 import nl.vialer.voip.android.BuildConfig
 
 /**
@@ -31,7 +32,7 @@ internal class AndroidTelecomManager(private val context: Context, private val t
     @SuppressLint("MissingPermission")
     internal fun placeCall(number: String) {
         telecomManager.registerPhoneAccount(phoneAccount)
-
+Log.e("TEST123", "Placing call...")
         telecomManager.placeCall(
             Uri.fromParts("", number, null),
             Bundle().apply {
