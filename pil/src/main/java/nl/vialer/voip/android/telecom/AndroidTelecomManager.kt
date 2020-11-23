@@ -29,10 +29,14 @@ internal class AndroidTelecomManager(private val context: Context, private val t
         ).build()
     }
 
+    val isInCall: Boolean
+        @SuppressLint("MissingPermission")
+        get() = telecomManager.isInCall
+
     @SuppressLint("MissingPermission")
-    internal fun placeCall(number: String) {
+    fun placeCall(number: String) {
         telecomManager.registerPhoneAccount(phoneAccount)
-Log.e("TEST123", "Placing call...")
+
         telecomManager.placeCall(
             Uri.fromParts("", number, null),
             Bundle().apply {
@@ -43,7 +47,7 @@ Log.e("TEST123", "Placing call...")
         )
     }
 
-    internal fun addNewIncomingCall() {
+    fun addNewIncomingCall() {
         telecomManager.addNewIncomingCall(handle, Bundle())
     }
 

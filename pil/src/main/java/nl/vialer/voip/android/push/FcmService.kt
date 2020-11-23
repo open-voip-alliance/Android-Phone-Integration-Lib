@@ -11,6 +11,12 @@ class FcmService: FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+
+        if (pil.androidTelecomManager.isInCall) {
+            pil.middlewareHandler?.respond(remoteMessage, false)
+            return
+        }
+
         pil.start {
             pil.middlewareHandler?.respond(remoteMessage, true)
         }
