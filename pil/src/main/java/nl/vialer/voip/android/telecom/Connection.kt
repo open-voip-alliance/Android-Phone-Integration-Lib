@@ -9,64 +9,58 @@ import android.util.Log
 import nl.vialer.voip.android.VoIPPIL
 import nl.vialer.voip.android.audio.AudioRoute
 import nl.vialer.voip.android.audio.AudioState
+import nl.vialer.voip.android.service.VoIPService
+import nl.vialer.voip.android.service.startVoipService
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.Reason
 import android.telecom.Connection as AndroidConnection
 
-class Connection(private val voip: VoIPPIL) : AndroidConnection() {
+class Connection(private val pil: VoIPPIL) : AndroidConnection() {
 
-    init {
-        Log.e("TEST123", "INIT")
-    }
     override fun onShowIncomingCallUi() {
-        super.onShowIncomingCallUi()
+        if (!VoIPService.isRunning) {
+            pil.context.startVoipService()
+        }
     }
 
     @SuppressLint("MissingPermission", "NewApi") // TODO fix
     override fun onCallAudioStateChanged(state: CallAudioState) {
         Log.e("TEST123", "STate==${state.route}")
-//        voip.internalAudioState = AudioState(
-//                when (state.route) {
-//                    8 -> AudioRoute.SPEAKER
-//                    2 -> AudioRoute.BLUETOOTH
-//                    else -> AudioRoute.PHONE
-//                }, arrayOf(AudioRoute.PHONE), state.activeBluetoothDevice?.name ?: ""
-//        )
     }
 
     override fun onHold() {
-        voip.callManager?.call?.let {
-            voip.phoneLib.actions(it).hold(true)
+        pil.callManager?.call?.let {
+            pil.phoneLib.actions(it).hold(true)
             setOnHold()
         }
     }
 
     override fun onUnhold() {
-        voip.callManager?.call?.let {
-            voip.phoneLib.actions(it).hold(false)
+        pil.callManager?.call?.let {
+            pil.phoneLib.actions(it).hold(false)
             setActive()
         }
     }
 
     @SuppressLint("MissingPermission")
     override fun onAnswer() {
-        voip.callManager?.call?.let {
-            voip.phoneLib.actions(it).accept()
+        pil.callManager?.call?.let {
+            pil.phoneLib.actions(it).accept()
             setActive()
         }
     }
 
     @SuppressLint("MissingPermission")
     override fun onReject() {
-        voip.callManager?.call?.let {
-            voip.phoneLib.actions(it).decline(Reason.BUSY)
+        pil.callManager?.call?.let {
+            pil.phoneLib.actions(it).decline(Reason.BUSY)
             destroy()
         }
     }
 
     override fun onDisconnect() {
-        voip.callManager?.call?.let {
-            voip.phoneLib.actions(it).end()
+        pil.callManager?.call?.let {
+            pil.phoneLib.actions(it).end()
             setDisconnected(DisconnectCause(LOCAL))
             destroy()
         }

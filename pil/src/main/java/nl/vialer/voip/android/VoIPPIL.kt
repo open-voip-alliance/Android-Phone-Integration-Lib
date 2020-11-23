@@ -34,10 +34,12 @@ import kotlin.properties.Delegates
 
 class VoIPPIL internal constructor(internal val context: Context, internal val logger: LogCallback) {
 
+    internal var connection: Connection? = null
     internal val callManager = CallManager(this)
     internal val logManager = LogManager(this)
     internal val androidManager = AndroidManager(this)
     internal val callFactory = PILCallFactory(this, Contacts(context))
+    internal val androidTelecomManager: AndroidTelecomManager = AndroidTelecomManager(context, context.getSystemService(TelecomManager::class.java))
 
     val call: PILCall?
         get() = callManager.call?.let { callFactory.make(it) }
@@ -92,7 +94,9 @@ class VoIPPIL internal constructor(internal val context: Context, internal val l
     fun call(number: String) {
         initialise()
 
-        register { phoneLib.callTo(number) }
+        register {
+            androidTelecomManager.placeCall(number)
+        }
     }
 
     fun endCall() {

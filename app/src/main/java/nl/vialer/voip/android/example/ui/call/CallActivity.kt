@@ -1,5 +1,6 @@
 package nl.vialer.voip.android.example.ui.call
 
+import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -7,6 +8,7 @@ import android.util.Log
 import kotlinx.android.synthetic.main.activity_call.*
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.audio.AudioRoute
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.EventListener
 
@@ -32,6 +34,18 @@ class CallActivity : AppCompatActivity(), EventListener {
 
         muteButton.setOnClickListener {
             voip.audio.toggleMute()
+        }
+
+        earpieceButton.setOnClickListener {
+            voip.audio.routeAudio(AudioRoute.PHONE)
+        }
+
+        speakerButton.setOnClickListener {
+            voip.audio.routeAudio(AudioRoute.SPEAKER)
+        }
+
+        bluetoothButton.setOnClickListener {
+            voip.audio.routeAudio(AudioRoute.BLUETOOTH)
         }
     }
 
@@ -62,6 +76,17 @@ class CallActivity : AppCompatActivity(), EventListener {
         muteButton.text = if (voip.audio.isMicrophoneMuted) "unmute" else "mute"
 
         callStatus.text = call.state.name
+
+        callDetailsAdvanced.text = ""
+
+        earpieceButton.isEnabled = voip.audio.state.availableRoutes.contains(AudioRoute.PHONE)
+        speakerButton.isEnabled = voip.audio.state.availableRoutes.contains(AudioRoute.SPEAKER)
+        bluetoothButton.isEnabled = voip.audio.state.availableRoutes.contains(AudioRoute.BLUETOOTH)
+
+        earpieceButton.setTypeface(null, if (voip.audio.state.currentRoute == AudioRoute.PHONE) Typeface.BOLD else Typeface.NORMAL)
+        speakerButton.setTypeface(null, if (voip.audio.state.currentRoute == AudioRoute.SPEAKER) Typeface.BOLD else Typeface.NORMAL)
+        bluetoothButton.setTypeface(null, if (voip.audio.state.currentRoute == AudioRoute.BLUETOOTH) Typeface.BOLD else Typeface.NORMAL)
+        bluetoothButton.text = voip.audio.state.bluetoothDeviceName ?: "Bluetooth"
 
         Handler().postDelayed(renderUi, 1000)
     }

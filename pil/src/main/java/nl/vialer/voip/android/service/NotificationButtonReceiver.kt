@@ -18,6 +18,8 @@ class NotificationButtonReceiver: BroadcastReceiver() {
 
         when (action) {
             HANG_UP -> pil.endCall()
+            ANSWER -> pil.actions.answer()
+            DECLINE -> pil.actions.decline()
         }
     }
 
@@ -26,6 +28,6 @@ class NotificationButtonReceiver: BroadcastReceiver() {
     }
 
     enum class Action {
-        HANG_UP
+        HANG_UP, ANSWER, DECLINE
     }
 }

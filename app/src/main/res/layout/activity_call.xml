@@ -66,9 +66,10 @@
                 android:text="Mute" />
 
             <Button
-                android:id="@+id/speakerButton"
+                android:id="@+id/holdButton"
                 android:layout_marginHorizontal="10dp"
-                android:text="Speaker" />
+                android:text="Hold" />
+
 
             <Button
                 android:id="@+id/transferButton"
@@ -79,16 +80,23 @@
         <TableRow>
 
             <Button
-                android:id="@+id/audioRouteButton"
+                android:id="@+id/speakerButton"
                 android:layout_marginHorizontal="10dp"
-                android:text="Audio" />
-
-            <Space />
+                android:text="Speaker"
+                android:enabled="false"/>
 
             <Button
-                android:id="@+id/holdButton"
+                android:id="@+id/earpieceButton"
                 android:layout_marginHorizontal="10dp"
-                android:text="Hold" />
+                android:text="Earpiece"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/bluetoothButton"
+                android:layout_marginHorizontal="10dp"
+                android:text="Bluetooth"
+                android:enabled="false"/>
+
         </TableRow>
 
         <TableRow android:layout_marginTop="20dp">

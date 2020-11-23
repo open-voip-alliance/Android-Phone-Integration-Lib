@@ -80,15 +80,14 @@ class VoIPService : Service(), EventListener {
                 R.drawable.ic_service,
                 getString(R.string.notification_answer_action),
                 createActionIntent(
-                    NotificationButtonReceiver.Action.HANG_UP
+                    NotificationButtonReceiver.Action.ANSWER
                 )
             )
-
             addAction(
                 R.drawable.ic_service,
                 getString(R.string.notification_decline_action),
                 createActionIntent(
-                    NotificationButtonReceiver.Action.HANG_UP
+                    NotificationButtonReceiver.Action.DECLINE
                 )
             )
         }.build()
@@ -183,6 +182,7 @@ class VoIPService : Service(), EventListener {
     }
 
     override fun onEvent(event: Event) {
+        Log.e("TEST123", "Service received event ${event.name}")
         updateNotificationBasedOnCallStatus()
     }
 

@@ -10,6 +10,7 @@ import nl.vialer.voip.android.logging.LogLevel
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.AttendedTransferSession
 import org.openvoipalliance.phonelib.model.Call
+import org.openvoipalliance.phonelib.model.Reason
 
 class CallActions internal constructor(private val pil: VoIPPIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
 
@@ -47,6 +48,22 @@ class CallActions internal constructor(private val pil: VoIPPIL, private val pho
     fun completeAttendedTransfer() {
         callManager.transferSession?.let {
             phoneLib.actions(it.from).finishAttendedTransfer(it)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun answer() {
+        Log.e("TEST123", "Answering..")
+        callExists {
+            phoneLib.actions(it).accept()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun decline() {
+        Log.e("TEST123", "Declining..")
+        callExists {
+            phoneLib.actions(it).decline(Reason.BUSY)
         }
     }
 

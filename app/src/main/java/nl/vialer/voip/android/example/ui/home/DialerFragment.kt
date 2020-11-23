@@ -59,10 +59,6 @@ class DialerFragment : Fragment(), EventListener {
     }
 
     override fun onEvent(event: Event) {
-        when (event) {
-            OUTGOING_CALL_STARTED -> startActivity(Intent(requireActivity(), CallActivity::class.java))
-            CALL_ENDED -> {}
-        }
     }
 
     private fun requestCallingPermissions() {
