@@ -5,12 +5,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.View
+import androidx.appcompat.app.AlertDialog
 import kotlinx.android.synthetic.main.activity_call.*
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.VoIPPIL
 import nl.vialer.voip.android.audio.AudioRoute
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.EventListener
+import nl.vialer.voip.android.example.ui.TransferDialog
 
 class CallActivity : AppCompatActivity(), EventListener {
 
@@ -47,6 +50,20 @@ class CallActivity : AppCompatActivity(), EventListener {
         bluetoothButton.setOnClickListener {
             voip.audio.routeAudio(AudioRoute.BLUETOOTH)
         }
+
+        transferButton.setOnClickListener {
+            TransferDialog(this).apply {
+                onTransferListener = TransferDialog.OnTransferListener { number ->
+                    voip.actions.beginAttendedTransfer(number)
+                    dismiss()
+                }
+                show(supportFragmentManager, "")
+            }
+        }
+
+        transferMergeButton.setOnClickListener {
+            voip.actions.completeAttendedTransfer()
+        }
     }
 
     override fun onResume() {
@@ -67,6 +84,16 @@ class CallActivity : AppCompatActivity(), EventListener {
 
     private fun displayCall() {
         val call = voip.call ?: return
+
+        if (voip.isInTransfer) {
+            transferCallInformation.text = voip.transferCall?.remotePartyHeading
+            if (voip.transferCall?.remotePartySubheading?.isNotBlank() == true) {
+                transferCallInformation.text = "${transferCallInformation.text} (${voip.transferCall?.remotePartySubheading})"
+            }
+            transferContainer.visibility = View.VISIBLE
+        } else {
+            transferContainer.visibility = View.GONE
+        }
 
         callTitle.text = call.remotePartyHeading
         callSubtitle.text = call.remotePartySubheading
@@ -93,7 +120,11 @@ class CallActivity : AppCompatActivity(), EventListener {
 
     override fun onEvent(event: Event) {
         if (event == Event.CALL_ENDED) {
-            finish()
+            if (voip.call == null) {
+                finish()
+            } else {
+                displayCall()
+            }
         }
 
         if (event == Event.CALL_UPDATED) {

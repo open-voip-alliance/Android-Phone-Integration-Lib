@@ -1,14 +1,11 @@
-package nl.vialer.voip.android.example.ui.dashboard
+package nl.vialer.voip.android.example.ui.settings
 
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.text.InputType
-import android.util.Log
 import android.widget.Toast
 import androidx.preference.*
 import com.android.volley.Request
-import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.coroutines.Dispatchers
@@ -16,10 +13,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.VoIPPIL
-import nl.vialer.voip.android.example.ui.VoIPGRIDMiddleware
-import okhttp3.FormBody
-import okhttp3.OkHttpClient
-import okhttp3.RequestBody
+import nl.vialer.voip.android.example.VoIPGRIDMiddleware
 import org.json.JSONObject
 
 class SettingsFragment : PreferenceFragmentCompat() {

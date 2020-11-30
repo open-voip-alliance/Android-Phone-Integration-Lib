@@ -72,7 +72,11 @@ class CallActions internal constructor(private val pil: VoIPPIL, private val pho
      *
      */
     private fun callExists(callback: (call: Call) -> Unit) {
-        val call = callManager.call ?: return
+        var call = callManager.call ?: return
+
+        callManager.transferSession?.let {
+            call = it.to
+        }
 
         callback.invoke(call)
         pil.events.broadcast(Event.CALL_UPDATED)

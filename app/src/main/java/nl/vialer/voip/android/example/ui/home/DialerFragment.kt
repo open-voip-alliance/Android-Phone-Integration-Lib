@@ -26,6 +26,8 @@ import nl.vialer.voip.android.configuration.Auth
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.Event.*
 import nl.vialer.voip.android.events.EventListener
+import nl.vialer.voip.android.example.ui.Dialer
+import nl.vialer.voip.android.example.ui.TransferDialog
 import nl.vialer.voip.android.example.ui.call.CallActivity
 
 class DialerFragment : Fragment(), EventListener {
@@ -62,7 +64,7 @@ class DialerFragment : Fragment(), EventListener {
     }
 
     private fun requestCallingPermissions() {
-        val requiredPermissions = arrayOf(Manifest.permission.CALL_PHONE, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_CONTACTS)
+        val requiredPermissions = arrayOf(Manifest.permission.CALL_PHONE, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_PHONE_STATE)
 
         requiredPermissions.forEach { permission ->
             if (ContextCompat.checkSelfPermission(requireActivity(), permission) == PERMISSION_DENIED) {
@@ -75,37 +77,8 @@ class DialerFragment : Fragment(), EventListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        keypad.children.forEach {
-            (it as ViewGroup).forEach {
-                if (it is Button) {
-                    it.setOnClickListener {
-                        val button = it as Button
-                        changeDigits("${digitEntryWindow.text}${button.text}")
-                    }
-                }
-            }
+        dialer.onCallListener = Dialer.OnCallListener { number ->
+            voip.call(number)
         }
-
-        backspace.setOnClickListener {
-            if (digitEntryWindow.text.isNotBlank()) {
-                changeDigits(digitEntryWindow.text.substring(0, digitEntryWindow.text.length - 1))
-            }
-        }
-
-        backspace.setOnLongClickListener {
-            changeDigits("")
-            true
-        }
-
-        callButton.setOnClickListener {
-            val number = digitEntryWindow.text
-
-            voip.call(number = number as String)
-        }
-    }
-
-    fun changeDigits(digits: String) {
-        digitEntryWindow.text = digits
-        backspace.visibility = if (digitEntryWindow.text.isNotBlank()) View.VISIBLE else View.GONE
     }
 }

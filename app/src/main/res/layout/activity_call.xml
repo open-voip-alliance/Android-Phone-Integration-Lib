@@ -47,6 +47,43 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Connecting"/>
+
+        <LinearLayout
+            android:visibility="visible"
+            android:id="@+id/transferContainer"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="10dp"
+            android:background="@color/teal_200"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/transferCallInformation"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Chris (0123455680)"
+                android:textStyle="bold"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="On Hold" />
+
+            <ImageButton
+                android:id="@+id/transferMergeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/teal_700"
+                android:src="@drawable/ic_call_merge"/>
+        </LinearLayout>
     </LinearLayout>
 
     <TableLayout
@@ -116,6 +153,7 @@
     </TableLayout>
 
     <TextView
+        android:visibility="gone"
         android:id="@+id/callDetailsAdvanced"
         app:layout_constraintTop_toBottomOf="@id/callActions"
         android:layout_width="match_parent"

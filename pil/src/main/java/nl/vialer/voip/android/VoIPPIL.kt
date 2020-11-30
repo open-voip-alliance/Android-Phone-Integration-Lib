@@ -42,7 +42,20 @@ class VoIPPIL internal constructor(internal val context: Context, internal val l
     internal val androidTelecomManager: AndroidTelecomManager = AndroidTelecomManager(context, context.getSystemService(TelecomManager::class.java))
 
     val call: PILCall?
-        get() = callManager.call?.let { callFactory.make(it) }
+        get() = run {
+            if (isInTransfer) {
+                return@run callFactory.make(callManager.transferSession?.to)
+            }
+
+            callManager.call?.let { callFactory.make(it) }
+        }
+
+    val transferCall: PILCall?
+        get() = callManager.transferSession?.let { callFactory.make(it.from) }
+
+    val isInTransfer: Boolean
+        get() = callManager.transferSession != null
+
 
     internal var auth: Auth? = null
     internal lateinit var ui: UI

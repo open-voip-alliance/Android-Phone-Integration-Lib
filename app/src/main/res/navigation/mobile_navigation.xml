@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="nl.vialer.voip.android.example.ui.dashboard.SettingsFragment"
+        android:name="nl.vialer.voip.android.example.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_dashboard" />
 

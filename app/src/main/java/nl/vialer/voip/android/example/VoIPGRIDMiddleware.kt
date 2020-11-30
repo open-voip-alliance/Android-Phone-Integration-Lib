@@ -1,14 +1,11 @@
-package nl.vialer.voip.android.example.ui
+package nl.vialer.voip.android.example
 
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import nl.vialer.voip.android.push.Middleware
 import okhttp3.*
@@ -82,7 +79,7 @@ class VoIPGRIDMiddleware(private val context: Context): Middleware {
     }
 
     override fun tokenReceived(token: String) {
-        VoIPGRIDMiddleware.token = token
+        Companion.token = token
     }
 
     companion object {

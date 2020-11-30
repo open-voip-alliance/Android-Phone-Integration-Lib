@@ -17,6 +17,9 @@ internal class CallManager(private val pil: VoIPPIL) : CallListener {
     internal var call: Call? = null
     internal var transferSession: AttendedTransferSession? = null
 
+    val isInCall
+        get() = this.call != null
+
     override fun incomingCallReceived(call: Call) {
         if (!isInCall) {
             this.call = call
@@ -34,6 +37,7 @@ internal class CallManager(private val pil: VoIPPIL) : CallListener {
     override fun outgoingCallCreated(call: Call) {
         Log.e("TEST123", "outgoingCallCreated")
         if (!isInCall) {
+            Log.e("TEST123", "Setting call...")
             this.call = call
             pil.events.broadcast(Event.OUTGOING_CALL_STARTED)
             pil.connection?.setActive()
@@ -46,19 +50,19 @@ internal class CallManager(private val pil: VoIPPIL) : CallListener {
     }
 
     override fun callEnded(call: Call) {
-        this.call = null
+        if (this.transferSession == null) {
+            Log.e("TEST123", "Setting to null")
+            this.call = null
+            pil.context.stopVoipService()
+            pil.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
+            pil.connection?.destroy()
+        }
+
         pil.events.broadcast(Event.CALL_ENDED)
-        pil.context.stopVoipService()
-        pil.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
-        pil.connection?.destroy()
+        transferSession = null
     }
 
     override fun error(call: Call) {
         callEnded(call)
     }
-
-    val isInCall: Boolean = this.call != null
 }
-
-//val call: PILCall?
-//        get() { return PILCall.fromLibraryCall(phoneLibCall ?: return null) }
