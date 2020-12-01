@@ -23,6 +23,7 @@ internal class CallManager(private val pil: VoIPPIL) : CallListener {
     override fun incomingCallReceived(call: Call) {
         if (!isInCall) {
             this.call = call
+            pil.connection?.setCallerDisplayName(pil.call?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
             pil.events.broadcast(Event.INCOMING_CALL_RECEIVED)
             pil.androidTelecomManager.addNewIncomingCall()
         }
@@ -30,14 +31,11 @@ internal class CallManager(private val pil: VoIPPIL) : CallListener {
 
     override fun callConnected(call: Call) {
         super.callConnected(call)
-        Log.e("TEST123", "callConnected")
         pil.events.broadcast(Event.CALL_CONNECTED)
     }
 
     override fun outgoingCallCreated(call: Call) {
-        Log.e("TEST123", "outgoingCallCreated")
         if (!isInCall) {
-            Log.e("TEST123", "Setting call...")
             this.call = call
             pil.events.broadcast(Event.OUTGOING_CALL_STARTED)
             pil.connection?.setActive()
@@ -50,8 +48,7 @@ internal class CallManager(private val pil: VoIPPIL) : CallListener {
     }
 
     override fun callEnded(call: Call) {
-        if (this.transferSession == null) {
-            Log.e("TEST123", "Setting to null")
+        if (call == this.call) {
             this.call = null
             pil.context.stopVoipService()
             pil.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))

@@ -28,11 +28,11 @@ class IncomingCallActivity : AppCompatActivity(), EventListener {
         setContentView(R.layout.activity_incoming_call)
 
         answerCallButton.setOnClickListener {
-
+            voip.actions.answer()
         }
 
         declineCallButton.setOnClickListener {
-            voip.endCall()
+            voip.actions.decline()
         }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {

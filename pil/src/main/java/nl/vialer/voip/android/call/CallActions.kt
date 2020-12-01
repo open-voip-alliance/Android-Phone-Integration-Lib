@@ -7,6 +7,7 @@ import nl.vialer.voip.android.VoIPPIL
 import nl.vialer.voip.android.audio.AudioRoute
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.logging.LogLevel
+import nl.vialer.voip.android.telecom.Connection
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.AttendedTransferSession
 import org.openvoipalliance.phonelib.model.Call
@@ -15,20 +16,20 @@ import org.openvoipalliance.phonelib.model.Reason
 class CallActions internal constructor(private val pil: VoIPPIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
 
     fun hold() {
-        callExists {
-            phoneLib.actions(it).hold(true)
+        connection {
+            it.onHold()
         }
     }
 
     fun unhold() {
-        callExists {
-            phoneLib.actions(it).hold(false)
+        connection {
+            it.onUnhold()
         }
     }
 
     fun toggleHold() {
-        callExists {
-            phoneLib.actions(it).hold(!it.isOnHold)
+        connection {
+            it.toggleHold()
         }
     }
 
@@ -53,18 +54,30 @@ class CallActions internal constructor(private val pil: VoIPPIL, private val pho
 
     @SuppressLint("MissingPermission")
     fun answer() {
-        Log.e("TEST123", "Answering..")
-        callExists {
-            phoneLib.actions(it).accept()
+        connection {
+            it.onAnswer()
         }
     }
 
     @SuppressLint("MissingPermission")
     fun decline() {
-        Log.e("TEST123", "Declining..")
-        callExists {
-            phoneLib.actions(it).decline(Reason.BUSY)
+        connection {
+            it.onReject()
         }
+    }
+
+    fun end() {
+        connection {
+            it.onDisconnect()
+        }
+    }
+
+    private fun connection(callback: (connection: Connection) -> Unit) {
+        val connection = pil.connection ?: return
+
+        callback.invoke(connection)
+
+        pil.events.broadcast(Event.CALL_UPDATED)
     }
 
     /**

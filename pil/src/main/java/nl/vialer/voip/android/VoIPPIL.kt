@@ -112,10 +112,6 @@ class VoIPPIL internal constructor(internal val context: Context, internal val l
         }
     }
 
-    fun endCall() {
-        callManager.call?.let { phoneLib.actions(it).end() }
-    }
-
     internal fun initialise() {
         if (phoneLib.isInitialised) {
             Log.e("TEST123", "isInitialised nothing")

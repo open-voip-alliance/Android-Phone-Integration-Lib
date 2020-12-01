@@ -17,7 +17,7 @@ class NotificationButtonReceiver: BroadcastReceiver() {
         val action = valueOf(actionString)
 
         when (action) {
-            HANG_UP -> pil.endCall()
+            HANG_UP -> pil.actions.end()
             ANSWER -> pil.actions.answer()
             DECLINE -> pil.actions.decline()
         }

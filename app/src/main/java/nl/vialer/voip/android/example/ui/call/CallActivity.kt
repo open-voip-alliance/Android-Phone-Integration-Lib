@@ -28,7 +28,7 @@ class CallActivity : AppCompatActivity(), EventListener {
         setContentView(R.layout.activity_call)
 
         endCallButton.setOnClickListener {
-            voip.endCall()
+            voip.actions.end()
         }
 
         holdButton.setOnClickListener {
@@ -83,7 +83,10 @@ class CallActivity : AppCompatActivity(), EventListener {
     }
 
     private fun displayCall() {
-        val call = voip.call ?: return
+        val call = voip.call ?: run {
+            finish()
+            return
+        }
 
         if (voip.isInTransfer) {
             transferCallInformation.text = voip.transferCall?.remotePartyHeading
