@@ -65,7 +65,6 @@ class VoIPService : Service(), EventListener {
         intent.setClass(this, incomingCallActivity)
         val pendingIntent = PendingIntent.getActivity(this, 1, intent, 0)
 
-
         val notification = Notification.Builder(this, INCOMING_CALLS_CHANNEL_ID).apply {
             setOngoing(true)
             setPriority(Notification.PRIORITY_HIGH)
@@ -79,16 +78,12 @@ class VoIPService : Service(), EventListener {
             addAction(
                 R.drawable.ic_service,
                 getString(R.string.notification_answer_action),
-                createActionIntent(
-                    NotificationButtonReceiver.Action.ANSWER
-                )
+                createActionIntent(NotificationButtonReceiver.Action.ANSWER)
             )
             addAction(
                 R.drawable.ic_service,
                 getString(R.string.notification_decline_action),
-                createActionIntent(
-                    NotificationButtonReceiver.Action.DECLINE
-                )
+                createActionIntent(NotificationButtonReceiver.Action.DECLINE)
             )
         }.build()
         notification.flags = notification.flags or Notification.FLAG_INSISTENT
@@ -110,10 +105,7 @@ class VoIPService : Service(), EventListener {
         this,
         0,
         Intent(application, NotificationButtonReceiver::class.java).apply {
-            putExtra(
-                NotificationButtonReceiver.CALL_ACTION_EXTRA,
-                action
-            )
+            setAction(action.name)
         },
         0
     )

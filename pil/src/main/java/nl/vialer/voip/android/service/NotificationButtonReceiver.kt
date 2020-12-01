@@ -3,7 +3,6 @@ package nl.vialer.voip.android.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import nl.vialer.voip.android.VoIPPIL
 import nl.vialer.voip.android.service.NotificationButtonReceiver.Action.*
 
@@ -12,19 +11,21 @@ class NotificationButtonReceiver: BroadcastReceiver() {
     private val pil by lazy { VoIPPIL.instance }
 
     override fun onReceive(context: Context, intent: Intent) {
-        val actionString = intent.getStringExtra(CALL_ACTION_EXTRA) ?: return
+        try {
+            val action = valueOf(intent.action ?: "")
 
-        val action = valueOf(actionString)
+            pil.writeLog("Received notification button press with action: $action")
 
-        when (action) {
-            HANG_UP -> pil.actions.end()
-            ANSWER -> pil.actions.answer()
-            DECLINE -> pil.actions.decline()
+            when (action) {
+                HANG_UP -> pil.actions.end()
+                ANSWER -> pil.actions.answer()
+                DECLINE -> pil.actions.decline()
+            }
+
+        } catch (e: IllegalArgumentException) {
+            pil.writeLog("Unable to handle broadcast sent to NotificationButtonReceiver: ${intent.action}")
+            return
         }
-    }
-
-    companion object {
-        const val CALL_ACTION_EXTRA = "CALL_ACTION_EXTRA"
     }
 
     enum class Action {

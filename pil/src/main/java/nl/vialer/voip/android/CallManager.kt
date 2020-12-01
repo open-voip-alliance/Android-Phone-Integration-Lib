@@ -48,7 +48,7 @@ internal class CallManager(private val pil: VoIPPIL) : CallListener {
     }
 
     override fun callEnded(call: Call) {
-        if (call == this.call) {
+        if (!pil.isInTransfer) {
             this.call = null
             pil.context.stopVoipService()
             pil.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
