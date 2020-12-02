@@ -13,6 +13,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
+import nl.vialer.voip.android.configuration.Auth
 import nl.vialer.voip.android.example.VoIPGRIDMiddleware
 import org.json.JSONObject
 
@@ -22,7 +23,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         PreferenceManager.getDefaultSharedPreferences(activity)
     }
 
-    private val voip by lazy { PIL.instance }
+    private val pil by lazy { PIL.instance }
 
     private val voIPGRIDMiddleware by lazy { VoIPGRIDMiddleware(requireActivity()) }
 
@@ -171,8 +172,23 @@ class SettingsFragment : PreferenceFragmentCompat() {
             "Checking authentication..."
         }
 
+        val username = prefs.getString("username", "") ?: ""
+        val password = prefs.getString("password", "") ?: ""
+        val domain = prefs.getString("domain", "") ?: ""
+        val port = (prefs.getString("port", "0") ?: "0").toInt()
+
+        if (username.isNotBlank() && password.isNotBlank() && domain.isNotBlank() && port != 0) {
+            pil.auth = Auth(
+                username = username,
+                password = password,
+                domain = domain,
+                port = port,
+                secure = true
+            )
+        }
+
         GlobalScope.launch(Dispatchers.IO) {
-            val summary = if (voip.performRegistrationCheck()) "Authenticated" else "Authentication failed"
+            val summary = if (pil.performRegistrationCheck()) "Authenticated" else "Authentication failed"
 
             activity?.runOnUiThread {
                 findPreference<Preference>("status")?.summaryProvider = Preference.SummaryProvider<Preference> {

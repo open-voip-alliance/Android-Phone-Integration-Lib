@@ -8,5 +8,5 @@ data class Auth(
     val secure: Boolean
 ) {
     val isValid: Boolean
-        get() = username.isNotBlank() && password.isNotBlank() && domain.isNotBlank()
+        get() = username.isNotBlank() && password.isNotBlank() && domain.isNotBlank() && port != 0
 }

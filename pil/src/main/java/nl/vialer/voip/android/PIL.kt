@@ -40,13 +40,18 @@ class PIL internal constructor(internal val application: ApplicationSetup) {
     val events = EventsManager(this)
 
     var preferences: Preferences = Preferences.DEFAULT
-        set(auth) {
-            field = auth
+        set(preferences) {
+            field = preferences
             start(forceInitialize = true, forceReregister = true)
         }
 
     var auth: Auth? = null
         set(auth) {
+            if (auth?.isValid != true) {
+                writeLog("Attempting to set an invalid auth object", LogLevel.ERROR)
+                return
+            }
+
             field = auth
             start(forceInitialize = false, forceReregister = true)
         }
@@ -120,6 +125,8 @@ class PIL internal constructor(internal val application: ApplicationSetup) {
      */
     fun start(forceInitialize: Boolean = false, forceReregister: Boolean = false, callback: (() -> Unit)? = null) {
         val auth = auth ?: throw NoAuthenticationCredentialsException()
+
+        if (!auth.isValid) throw NoAuthenticationCredentialsException()
 
         if (forceInitialize) {
             phoneLib.destroy()

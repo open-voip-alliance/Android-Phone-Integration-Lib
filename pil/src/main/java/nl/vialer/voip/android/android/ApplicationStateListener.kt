@@ -22,7 +22,9 @@ internal class ApplicationStateListener(private val pil: PIL): Foreback.Listener
 
     override fun onApplicationEnterBackground(activity: Activity?) {
         if (!VoIPService.isRunning) {
-            pil.phoneLib.destroy()
+            if (pil.phoneLib.isInitialised) {
+                pil.phoneLib.destroy()
+            }
         }
     }
 }
