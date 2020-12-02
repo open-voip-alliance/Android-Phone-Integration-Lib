@@ -15,10 +15,16 @@ data class ApplicationSetup(
     val activities: Activities,
 
     /**
-     * Provide a middleware if it is required to
+     * Provide a middleware if it is required to receive incoming calls
+     * in your infrastructure.
      *
      */
     val middleware: Middleware? = null,
+
+    /**
+     * Receive logs from the PIL.
+     *
+     */
     val logger: Logger? = null,
 
     /**
@@ -27,7 +33,13 @@ data class ApplicationSetup(
      * opened when the user interacts with the call notification.
      *
      */
-    val automaticallyStartCallActivity: Boolean = true
+    val automaticallyStartCallActivity: Boolean = true,
+
+    /**
+     * The user-agent that will be used when making SIP calls.
+     *
+     */
+    val userAgent: String = "AndroidPIL",
 ) {
     data class Activities(val call: Class<out Activity>?, val incomingCall: Class<out Activity>?)
 }

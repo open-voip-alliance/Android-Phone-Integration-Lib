@@ -30,7 +30,8 @@ internal class PhoneLibHelper(private val pil: PIL) {
                 callListener = pil.callManager,
                 encryption = auth.secure,
                 logListener = voipLibraryLogListener,
-                codecs = arrayOf(Codec.OPUS)
+                codecs = arrayOf(Codec.OPUS),
+                userAgent = pil.application.userAgent
             )
         )
     }

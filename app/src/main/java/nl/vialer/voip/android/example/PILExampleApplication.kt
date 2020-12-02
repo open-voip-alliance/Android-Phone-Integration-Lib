@@ -17,7 +17,8 @@ class PILExampleApplication: Application() {
                 applicationClass = this@PILExampleApplication,
                 activities = ApplicationSetup.Activities(call = CallActivity::class.java, incomingCall = IncomingCallActivity::class.java),
                 middleware = VoIPGRIDMiddleware(this@PILExampleApplication),
-                logger = { message, _ -> Log.i("PIL-Logger", message) }
+                logger = { message, _ -> Log.i("PIL-Logger", message) },
+                userAgent = "Android-PIL-Example-Application"
             )
         }
     }

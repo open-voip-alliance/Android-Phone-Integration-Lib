@@ -69,11 +69,9 @@ class VoIPGRIDMiddleware(private val context: Context): Middleware {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("TEST123", "Failure: ${e.message}")
             }
 
             override fun onResponse(call: Call, response: Response) {
-                Log.e("TEST123", "Success!!")
             }
         })
     }
