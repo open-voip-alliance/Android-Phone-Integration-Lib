@@ -183,6 +183,10 @@ pil.audio.mute()
 pil.audio.routeAudio(AudioRoute.BLUETOOTH)
 ```
 
+## Customizing
+
+The library contains colors.xml and strings.xml, your Application should override these if you wish to change the text and color of notifications.
+
 ## TODO
 
 These are the long-term goals for the library:
