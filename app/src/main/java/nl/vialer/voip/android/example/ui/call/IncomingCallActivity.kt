@@ -3,21 +3,18 @@ package nl.vialer.voip.android.example.ui.call
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.WindowManager
-import kotlinx.android.synthetic.main.activity_call.*
 import kotlinx.android.synthetic.main.activity_call.callSubtitle
 import kotlinx.android.synthetic.main.activity_call.callTitle
-import kotlinx.android.synthetic.main.activity_call.endCallButton
 import kotlinx.android.synthetic.main.activity_incoming_call.*
 import nl.vialer.voip.android.R
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.events.Event
-import nl.vialer.voip.android.events.EventListener
+import nl.vialer.voip.android.events.PILEventListener
 
-class IncomingCallActivity : AppCompatActivity(), EventListener {
+class IncomingCallActivity : AppCompatActivity(), PILEventListener {
 
-    private val voip by lazy { VoIPPIL.instance }
+    private val pil by lazy { PIL.instance }
 
     private val renderUi = {
         displayCall()
@@ -28,11 +25,11 @@ class IncomingCallActivity : AppCompatActivity(), EventListener {
         setContentView(R.layout.activity_incoming_call)
 
         answerCallButton.setOnClickListener {
-            voip.actions.answer()
+            pil.actions.answer()
         }
 
         declineCallButton.setOnClickListener {
-            voip.actions.decline()
+            pil.actions.decline()
         }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
@@ -48,19 +45,19 @@ class IncomingCallActivity : AppCompatActivity(), EventListener {
 
         displayCall()
 
-        voip.events.listen(this)
+        pil.events.listen(this)
 
         Handler().postDelayed(renderUi, 1000)
     }
 
     override fun onPause() {
         super.onPause()
-        voip.events.stopListening(this)
+        pil.events.stopListening(this)
         Handler().removeCallbacks(renderUi)
     }
 
     private fun displayCall() {
-        val call = voip.call ?: return
+        val call = pil.call ?: return
 
         callTitle.text = call.remotePartyHeading
         callSubtitle.text = call.remotePartySubheading

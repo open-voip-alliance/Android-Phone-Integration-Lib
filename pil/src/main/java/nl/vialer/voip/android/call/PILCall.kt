@@ -3,6 +3,7 @@ package nl.vialer.voip.android.call
 import android.content.Context
 import android.text.format.DateUtils
 import nl.vialer.voip.android.CallManager
+import nl.vialer.voip.android.contacts.Contact
 import nl.vialer.voip.android.contacts.Contacts
 import org.openvoipalliance.phonelib.model.Call
 import org.openvoipalliance.phonelib.model.Direction
@@ -17,7 +18,7 @@ data class PILCall(
     val isOnHold: Boolean,
     val uuid: String,
     val mos: Float,
-    val contact: Contacts.Contact?
+    val contact: Contact?
 ) {
     val remotePartyHeading: String
         get() {

@@ -8,21 +8,20 @@ import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.takwolf.android.foreback.Foreback
 import nl.vialer.voip.android.R
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.call.CallDirection
 import nl.vialer.voip.android.call.CallState
 import nl.vialer.voip.android.events.Event
-import nl.vialer.voip.android.events.EventListener
+import nl.vialer.voip.android.events.PILEventListener
 import java.util.*
 
 
-class VoIPService : Service(), EventListener {
+internal class VoIPService : Service(), PILEventListener {
 
-    private val pil by lazy { VoIPPIL.instance }
+    private val pil by lazy { PIL.instance }
 
     private val notificationManager by lazy { getSystemService(NotificationManager::class.java) }
 
@@ -30,8 +29,12 @@ class VoIPService : Service(), EventListener {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         isRunning = true
 
+        pil.writeLog("Starting the VoIP Service and creating notification channels")
+
         createNotificationChannel()
         createIncomingCallsNotificationChannel()
+
+        pil.writeLog("Transitioning to a foreground service")
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             startForeground(
@@ -49,15 +52,17 @@ class VoIPService : Service(), EventListener {
 
         pil.call?.let {
             if (it.state == CallState.INITIALIZING && it.direction == CallDirection.INBOUND) {
-                beginIncomingCallRinger()
+                notifyUserOfIncomingCall()
             }
         }
 
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun beginIncomingCallRinger() {
-        val incomingCallActivity = pil.ui.incomingCall ?: return
+    private fun notifyUserOfIncomingCall() {
+        pil.writeLog("Notifying the user of an incoming call")
+
+        val incomingCallActivity = pil.application.activities.incomingCall ?: return
         val call = pil.call ?: return
 
         val intent = Intent(Intent.ACTION_MAIN, null)
@@ -72,7 +77,7 @@ class VoIPService : Service(), EventListener {
             setFullScreenIntent(pendingIntent, true)
             setSmallIcon(R.drawable.ic_service)
             setContentTitle(call.remoteNumber)
-            setContentText("Ringing....")
+            setContentText(getString(R.string.notification_incoming_context_text))
             setColor(getColor(R.color.notification_background))
             setColorized(true)
             addAction(
@@ -111,7 +116,7 @@ class VoIPService : Service(), EventListener {
     )
 
     private fun createNotification(): NotificationCompat.Builder {
-        val notificationIntent = Intent(this, pil.ui.call)
+        val notificationIntent = Intent(this, pil.application.activities.call)
         val pendingIntent = PendingIntent.getActivity(
             this,
             0, notificationIntent, 0
@@ -174,7 +179,6 @@ class VoIPService : Service(), EventListener {
     }
 
     override fun onEvent(event: Event) {
-        Log.e("TEST123", "Service received event ${event.name}")
         updateNotificationBasedOnCallStatus()
     }
 
@@ -195,4 +199,14 @@ fun Context.startVoipService() {
 
 fun Context.stopVoipService() {
     stopService((Intent(this, VoIPService::class.java)))
+}
+
+fun Context.startCallActivity() {
+    if (!PIL.instance.application.automaticallyStartCallActivity) return
+
+    PIL.instance.application.applicationClass.startActivity(
+        Intent(PIL.instance.application.applicationClass, PIL.instance.application.activities.call).apply { flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+    )
 }

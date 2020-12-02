@@ -2,12 +2,11 @@ package nl.vialer.voip.android.audio
 
 import android.telecom.CallAudioState.*
 import nl.vialer.voip.android.CallManager
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.audio.AudioRoute.*
-import org.linphone.core.AudioDevice
 import org.openvoipalliance.phonelib.PhoneLib
 
-class AudioManager internal constructor(private val pil: VoIPPIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
+class AudioManager internal constructor(private val pil: PIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
 
     val isMicrophoneMuted: Boolean
         get() = phoneLib.microphoneMuted

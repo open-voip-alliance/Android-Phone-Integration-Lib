@@ -1,3 +1,3 @@
 package nl.vialer.voip.android.exception
 
-class RegistrationFailedException : Exception()
+class RegistrationFailedException internal constructor(): Exception()

@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.vialer.voip.android.R
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.example.VoIPGRIDMiddleware
 import org.json.JSONObject
 
@@ -22,7 +22,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         PreferenceManager.getDefaultSharedPreferences(activity)
     }
 
-    private val voip by lazy { VoIPPIL.instance }
+    private val voip by lazy { PIL.instance }
 
     private val voIPGRIDMiddleware by lazy { VoIPGRIDMiddleware(requireActivity()) }
 
@@ -172,7 +172,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         GlobalScope.launch(Dispatchers.IO) {
-            val summary = if (voip.canAuthenticate()) "Authenticated" else "Authentication failed"
+            val summary = if (voip.performRegistrationCheck()) "Authenticated" else "Authentication failed"
 
             activity?.runOnUiThread {
                 findPreference<Preference>("status")?.summaryProvider = Preference.SummaryProvider<Preference> {

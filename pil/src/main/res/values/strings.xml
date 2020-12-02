@@ -11,4 +11,6 @@
     <string name="notification_answer_action">Answer</string>
     <string name="notification_hang_up_action">Hang Up</string>
     <string name="notification_decline_action">Decline</string>
+
+    <string name="notification_incoming_context_text">Ringing...</string>
 </resources>

@@ -1,30 +1,29 @@
 package nl.vialer.voip.android.push
 
-import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
 
-class FcmService: FirebaseMessagingService() {
+internal class FcmService: FirebaseMessagingService() {
 
-    private val pil by lazy { VoIPPIL.instance }
+    private val pil by lazy { PIL.instance }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
         if (pil.androidTelecomManager.isInCall) {
-            pil.middlewareHandler?.respond(remoteMessage, false)
+            pil.application.middleware?.respond(remoteMessage, false)
             return
         }
 
         pil.start {
-            pil.middlewareHandler?.respond(remoteMessage, true)
+            pil.application.middleware?.respond(remoteMessage, true)
         }
 
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        pil.middlewareHandler?.tokenReceived(token)
+        pil.application.middleware?.tokenReceived(token)
     }
 }

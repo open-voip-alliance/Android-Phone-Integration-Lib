@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
 
-class Contacts(private val context: Context) {
+internal class Contacts(private val context: Context) {
 
     suspend fun find(number: String): Contact? = withContext(Dispatchers.IO) {
         if (!hasPermission) return@withContext null
@@ -28,6 +28,6 @@ class Contacts(private val context: Context) {
 
     private val hasPermission: Boolean
         get() = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PERMISSION_GRANTED
-
-    data class Contact(val name: String, val imageUri: Uri)
 }
+
+data class Contact(val name: String, val imageUri: Uri)

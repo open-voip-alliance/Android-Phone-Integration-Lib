@@ -1,6 +1,6 @@
 package nl.vialer.voip.android.events
 
-interface EventListener {
+interface PILEventListener {
     fun onEvent(event: Event)
 }
 

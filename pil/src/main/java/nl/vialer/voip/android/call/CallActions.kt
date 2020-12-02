@@ -1,19 +1,14 @@
 package nl.vialer.voip.android.call
 
 import android.annotation.SuppressLint
-import android.util.Log
 import nl.vialer.voip.android.CallManager
-import nl.vialer.voip.android.VoIPPIL
-import nl.vialer.voip.android.audio.AudioRoute
+import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.events.Event
-import nl.vialer.voip.android.logging.LogLevel
 import nl.vialer.voip.android.telecom.Connection
 import org.openvoipalliance.phonelib.PhoneLib
-import org.openvoipalliance.phonelib.model.AttendedTransferSession
 import org.openvoipalliance.phonelib.model.Call
-import org.openvoipalliance.phonelib.model.Reason
 
-class CallActions internal constructor(private val pil: VoIPPIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
+class CallActions internal constructor(private val pil: PIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
 
     fun hold() {
         connection {

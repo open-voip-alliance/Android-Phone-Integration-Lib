@@ -6,12 +6,12 @@ import android.telecom.ConnectionRequest
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.widget.Toast
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
 import android.telecom.ConnectionService as AndroidConnectionService
 
-class ConnectionService : AndroidConnectionService() {
+internal class ConnectionService : AndroidConnectionService() {
 
-    private val pil by lazy { VoIPPIL.instance }
+    private val pil by lazy { PIL.instance }
 
     private val baseConnection: Connection
         get() = Connection(pil).apply {

@@ -1,3 +1,5 @@
 package nl.vialer.voip.android.logging
 
-typealias LogCallback = (logLevel: LogLevel, message: String) -> Unit
+fun interface Logger {
+    fun onLogReceived(message: String, level: LogLevel)
+}

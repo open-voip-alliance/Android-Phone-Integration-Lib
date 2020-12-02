@@ -3,17 +3,17 @@ package nl.vialer.voip.android.events
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
 
-class EventsManager(private val pil: VoIPPIL) {
+class EventsManager internal constructor(private val pil: PIL) {
 
-    private var eventListeners = mutableListOf<EventListener>()
+    private var eventListeners = mutableListOf<PILEventListener>()
 
-    fun listen(listener: EventListener) {
+    fun listen(listener: PILEventListener) {
         eventListeners.add(listener)
     }
 
-    fun stopListening(listener: EventListener) {
+    fun stopListening(listener: PILEventListener) {
         eventListeners.remove(listener)
     }
 

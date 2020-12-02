@@ -3,12 +3,12 @@ package nl.vialer.voip.android.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.service.NotificationButtonReceiver.Action.*
 
-class NotificationButtonReceiver: BroadcastReceiver() {
+internal class NotificationButtonReceiver: BroadcastReceiver() {
 
-    private val pil by lazy { VoIPPIL.instance }
+    private val pil by lazy { PIL.instance }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {

@@ -2,19 +2,20 @@ package nl.vialer.voip.android.call
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
+import nl.vialer.voip.android.contacts.Contact
 import nl.vialer.voip.android.contacts.Contacts
 import nl.vialer.voip.android.events.Event
-import nl.vialer.voip.android.events.EventListener
+import nl.vialer.voip.android.events.PILEventListener
 import org.openvoipalliance.phonelib.model.Call
 import org.openvoipalliance.phonelib.model.CallState
 import org.openvoipalliance.phonelib.model.CallState.*
 import org.openvoipalliance.phonelib.model.Direction
 import java.util.*
 
-internal class PILCallFactory(private val pil: VoIPPIL, private val contacts: Contacts): EventListener {
+internal class PILCallFactory(private val pil: PIL, private val contacts: Contacts): PILEventListener {
 
-    private val cachedContacts = mutableMapOf<Call, Contacts.Contact>()
+    private val cachedContacts = mutableMapOf<Call, Contact>()
 
     fun make(libraryCall: Call?): PILCall? {
         val call = libraryCall ?: return null

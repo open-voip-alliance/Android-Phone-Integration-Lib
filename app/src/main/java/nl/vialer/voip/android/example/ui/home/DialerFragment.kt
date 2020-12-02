@@ -1,43 +1,30 @@
 package nl.vialer.voip.android.example.ui.home
 
 import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_DENIED
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.core.content.ContextCompat
-import androidx.core.view.children
-import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.fragment_dialer.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import nl.vialer.voip.android.R
-import nl.vialer.voip.android.VoIPPIL
+import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.configuration.Auth
 import nl.vialer.voip.android.events.Event
-import nl.vialer.voip.android.events.Event.*
-import nl.vialer.voip.android.events.EventListener
+import nl.vialer.voip.android.events.PILEventListener
 import nl.vialer.voip.android.example.ui.Dialer
-import nl.vialer.voip.android.example.ui.TransferDialog
-import nl.vialer.voip.android.example.ui.call.CallActivity
 
-class DialerFragment : Fragment(), EventListener {
+class DialerFragment : Fragment(), PILEventListener {
 
     private val prefs by lazy {
         PreferenceManager.getDefaultSharedPreferences(activity)
     }
 
-    private val voip by lazy {
-        VoIPPIL.instance
+    private val pil by lazy {
+        PIL.instance
     }
 
     override fun onCreateView(
@@ -51,13 +38,26 @@ class DialerFragment : Fragment(), EventListener {
 
     override fun onResume() {
         super.onResume()
-        voip.events.listen(this)
+        pil.events.listen(this)
         requestCallingPermissions()
+
+        val username = prefs.getString("username", "") ?: ""
+        val password = prefs.getString("password", "") ?: ""
+        val domain = prefs.getString("domain", "") ?: ""
+        val port = (prefs.getString("port", "0") ?: "0").toInt()
+
+        pil.auth = Auth(
+            username = username,
+            password = password,
+            domain = domain,
+            port = port,
+            secure = true
+        )
     }
 
     override fun onPause() {
         super.onPause()
-        voip.events.stopListening(this)
+        pil.events.stopListening(this)
     }
 
     override fun onEvent(event: Event) {
@@ -78,7 +78,7 @@ class DialerFragment : Fragment(), EventListener {
         super.onViewCreated(view, savedInstanceState)
 
         dialer.onCallListener = Dialer.OnCallListener { number ->
-            voip.call(number)
+            pil.call(number)
         }
     }
 }

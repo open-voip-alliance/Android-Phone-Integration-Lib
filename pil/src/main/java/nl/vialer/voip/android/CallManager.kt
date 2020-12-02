@@ -1,10 +1,11 @@
 package nl.vialer.voip.android
 
+import android.content.Intent
 import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
-import android.util.Log
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.service.VoIPService
+import nl.vialer.voip.android.service.startCallActivity
 import nl.vialer.voip.android.service.startVoipService
 import nl.vialer.voip.android.service.stopVoipService
 import org.openvoipalliance.phonelib.model.AttendedTransferSession
@@ -12,7 +13,7 @@ import org.openvoipalliance.phonelib.model.Call
 import org.openvoipalliance.phonelib.repository.initialise.CallListener
 
 
-internal class CallManager(private val pil: VoIPPIL) : CallListener {
+internal class CallManager(private val pil: PIL) : CallListener {
 
     internal var call: Call? = null
     internal var transferSession: AttendedTransferSession? = null
@@ -32,6 +33,7 @@ internal class CallManager(private val pil: VoIPPIL) : CallListener {
     override fun callConnected(call: Call) {
         super.callConnected(call)
         pil.events.broadcast(Event.CALL_CONNECTED)
+        pil.application.applicationClass.startCallActivity()
     }
 
     override fun outgoingCallCreated(call: Call) {
@@ -40,17 +42,18 @@ internal class CallManager(private val pil: VoIPPIL) : CallListener {
             pil.events.broadcast(Event.OUTGOING_CALL_STARTED)
             pil.connection?.setActive()
             pil.connection?.setCallerDisplayName(pil.call?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
+            pil.application.applicationClass.startCallActivity()
         }
 
         if (!VoIPService.isRunning) {
-            pil.context.startVoipService()
+            pil.application.applicationClass.startVoipService()
         }
     }
 
     override fun callEnded(call: Call) {
         if (!pil.isInTransfer) {
             this.call = null
-            pil.context.stopVoipService()
+            pil.application.applicationClass.stopVoipService()
             pil.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             pil.connection?.destroy()
         }
