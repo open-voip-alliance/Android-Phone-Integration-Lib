@@ -48,6 +48,8 @@ internal class AndroidTelecomManager(private val context: Context, private val t
     }
 
     fun addNewIncomingCall() {
+        telecomManager.registerPhoneAccount(phoneAccount)
+
         telecomManager.addNewIncomingCall(handle, Bundle())
     }
 

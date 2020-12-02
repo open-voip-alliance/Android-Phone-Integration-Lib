@@ -19,7 +19,6 @@ internal class FcmService: FirebaseMessagingService() {
         pil.start {
             pil.application.middleware?.respond(remoteMessage, true)
         }
-
     }
 
     override fun onNewToken(token: String) {
