@@ -4,15 +4,22 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.takwolf.android.foreback.Foreback
 import nl.vialer.voip.android.android.ApplicationStateListener
 import nl.vialer.voip.android.configuration.ApplicationSetup
+import nl.vialer.voip.android.configuration.Auth
+import nl.vialer.voip.android.configuration.Preferences
 import nl.vialer.voip.android.push.Middleware
 
-internal class Builder {
+class Builder {
+
+    var preferences: Preferences = Preferences.DEFAULT
+    var auth: Auth? = null
 
     internal fun start(applicationSetup: ApplicationSetup): PIL {
         val pil = PIL(applicationSetup)
 
         applicationSetup.middleware?.let { setupFcmWithMiddleware(it) }
         setupApplicationBackgroundListeners(pil)
+        pil.preferences = this.preferences
+        auth?.let { pil.auth = it }
 
         return pil
     }
@@ -39,10 +46,10 @@ internal class Builder {
  * Initialise the Android PIL, this should be called in your Application's onCreate method.
  *
  */
-fun startAndroidPIL(init: () -> ApplicationSetup): PIL {
+fun startAndroidPIL(init: Builder.() -> ApplicationSetup): PIL {
     val builder = Builder()
 
-    val applicationSetup = init.invoke()
+    val applicationSetup = init.invoke(builder)
 
     return builder.start(applicationSetup)
 }

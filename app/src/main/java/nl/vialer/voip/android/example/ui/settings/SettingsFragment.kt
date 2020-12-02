@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.configuration.Auth
+import nl.vialer.voip.android.configuration.Preferences
 import nl.vialer.voip.android.example.VoIPGRIDMiddleware
 import org.json.JSONObject
 
@@ -118,6 +119,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val message = if (voIPGRIDMiddleware.unregister()) "Unregistered!" else "Unregistration failed..."
                 requireActivity().runOnUiThread { Toast.makeText(requireActivity(), message, Toast.LENGTH_LONG).show() }
             }
+            true
+        }
+
+        findPreference<SwitchPreferenceCompat>("use_application_provided_ringtone")?.setOnPreferenceChangeListener { _, newValue ->
+            PIL.instance.preferences = PIL.instance.preferences.copy(useApplicationProvidedRingtone = newValue as Boolean)
             true
         }
     }

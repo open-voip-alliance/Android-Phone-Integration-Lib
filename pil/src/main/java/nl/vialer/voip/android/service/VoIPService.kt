@@ -7,8 +7,11 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toFile
 import com.takwolf.android.foreback.Foreback
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
@@ -70,7 +73,7 @@ internal class VoIPService : Service(), PILEventListener {
         intent.setClass(this, incomingCallActivity)
         val pendingIntent = PendingIntent.getActivity(this, 1, intent, 0)
 
-        val notification = Notification.Builder(this, INCOMING_CALLS_CHANNEL_ID).apply {
+        val notification = Notification.Builder(this, incomingCallsChannelId).apply {
             setOngoing(true)
             setPriority(Notification.PRIORITY_HIGH)
             setContentIntent(pendingIntent)
@@ -147,21 +150,30 @@ internal class VoIPService : Service(), PILEventListener {
         )
     }
 
+    private val incomingCallsChannelId
+        get() = if (pil.preferences.useApplicationProvidedRingtone) INCOMING_CALLS_APP_RING_CHANNEL_ID else INCOMING_CALLS_CHANNEL_ID
+
+    private val ringtone: Uri
+        get() = if (pil.preferences.useApplicationProvidedRingtone) {
+            Uri.parse("android.resource://${pil.application.applicationClass.packageName}/raw/ringtone")
+        } else {
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+        }
+
     @SuppressLint("WrongConstant")
     private fun createIncomingCallsNotificationChannel() {
         val channel = NotificationChannel(
-            INCOMING_CALLS_CHANNEL_ID,
+            incomingCallsChannelId,
             getString(R.string.notification_incoming_calls_channel_name),
             NotificationManager.IMPORTANCE_MAX
         ).apply {
             setSound(
-                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE),
+                ringtone,
                 AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build()
             )
-
         }
 
         notificationManager.createNotificationChannel(channel)
@@ -188,6 +200,7 @@ internal class VoIPService : Service(), PILEventListener {
         const val NOTIFICATION_ID = 341
         const val CHANNEL_ID = "VoIP"
         const val INCOMING_CALLS_CHANNEL_ID = "VoIP Incoming Calls"
+        const val INCOMING_CALLS_APP_RING_CHANNEL_ID = "VoIP Incoming Calls (App Ring)"
 
         internal var isRunning = false
     }

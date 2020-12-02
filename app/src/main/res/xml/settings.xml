@@ -79,6 +79,11 @@
             app:defaultValue="true"
             app:key="encryption"
             app:title="Encryption"/>
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_ring"
+            app:defaultValue="false"
+            app:key="use_application_provided_ringtone"
+            app:title="Use Application Ringtone"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

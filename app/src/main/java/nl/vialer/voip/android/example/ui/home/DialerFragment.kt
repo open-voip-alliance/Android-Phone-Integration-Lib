@@ -19,9 +19,7 @@ import nl.vialer.voip.android.example.ui.Dialer
 
 class DialerFragment : Fragment(), PILEventListener {
 
-    private val prefs by lazy {
-        PreferenceManager.getDefaultSharedPreferences(activity)
-    }
+
 
     private val pil by lazy {
         PIL.instance
@@ -40,19 +38,6 @@ class DialerFragment : Fragment(), PILEventListener {
         super.onResume()
         pil.events.listen(this)
         requestCallingPermissions()
-
-        val username = prefs.getString("username", "") ?: ""
-        val password = prefs.getString("password", "") ?: ""
-        val domain = prefs.getString("domain", "") ?: ""
-        val port = (prefs.getString("port", "0") ?: "0").toInt()
-
-        pil.auth = Auth(
-            username = username,
-            password = password,
-            domain = domain,
-            port = port,
-            secure = true
-        )
     }
 
     override fun onPause() {

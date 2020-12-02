@@ -73,7 +73,16 @@ pil.auth = Auth(username = "", password = "" ...)
 
 Where you decide to place this depends on the structure of your application and how the authentication details are recovered, but it is worth keeping in mind that updating the Auth object will trigger a re-registration so you probably do not want to update this constantly.
 
-The recommended approach would be to include it in your Application's onCreate method if you already have the authentication information, and then to also call it when you receive the authentication info.
+If you have the authentication details when starting the PIL, you should provide them in the application's onCreate method:
+
+```kotlin
+val pil = startAndroidPIL {
+	auth = Auth(username = "", password = "" ...)
+	ApplicationSetup (
+  	applicationClass = this@Application
+  )
+}
+```
 
 ### Permissions
 
@@ -183,9 +192,33 @@ pil.audio.mute()
 pil.audio.routeAudio(AudioRoute.BLUETOOTH)
 ```
 
+## Preferences
+
+Preferences are intended to be options that may be configurable by the user. You can set preferences simply by replacing the Preferences object on the PIL instance. However, because it contains sensible defaults, it is recommended to make use of Kotlin's copy feature:
+
+```kotlin
+pil.preferences = pil.preferences.copy(useApplicationProvidedRingtone = true)
+```
+
+This means that you do not need to update all preferences when you make a change. 
+
+These preferences are not stored and will need to be loaded whenever the PIL is started, this can be done in the startAndroidPIL method:
+
+```kotlin
+val pil = startAndroidPIL {
+	auth = Auth(username = "", password = "" ...)
+	preferences = preferences.copy(useApplicationProvidedRingtone = prefs.getBoolean("use_application_provided_ringtone", false))
+	ApplicationSetup (
+  	applicationClass = this@Application
+  )
+}
+```
+
 ## Customizing
 
 The library contains colors.xml and strings.xml, your Application should override these if you wish to change the text and color of notifications.
+
+The app ringtone can be changed by adding a sound file resource in the raw directory with the filename of "ringtone" (e.g. raw/ringtone.ogg).
 
 ## TODO
 

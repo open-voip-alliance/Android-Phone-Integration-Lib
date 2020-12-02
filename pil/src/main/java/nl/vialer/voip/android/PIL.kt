@@ -42,6 +42,8 @@ class PIL internal constructor(internal val application: ApplicationSetup) {
     var preferences: Preferences = Preferences.DEFAULT
         set(preferences) {
             field = preferences
+            if (!phoneLib.isInitialised) return
+
             start(forceInitialize = true, forceReregister = true)
         }
 
