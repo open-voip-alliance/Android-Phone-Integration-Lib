@@ -143,8 +143,6 @@ class PIL internal constructor(internal val application: ApplicationSetup) {
         }
     }
 
-    val availableCodecs = arrayOf(Codec.OPUS)
-
     private fun performPermissionCheck() {
         if (ContextCompat.checkSelfPermission(application.applicationClass, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_DENIED) {
             throw PermissionException(Manifest.permission.CALL_PHONE)

@@ -34,6 +34,13 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    splits {
+        abi {
+            enable true
+            universalApk false
+        }
+    }
 }
 
 dependencies {

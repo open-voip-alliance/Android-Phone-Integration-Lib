@@ -5,8 +5,11 @@ import nl.vialer.voip.android.CallManager
 import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.audio.AudioRoute.*
 import org.openvoipalliance.phonelib.PhoneLib
+import org.openvoipalliance.phonelib.model.Codec
 
 class AudioManager internal constructor(private val pil: PIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
+
+    val availableCodecs = arrayOf(Codec.OPUS, Codec.ILBC, Codec.G729, Codec.SPEEX)
 
     val isMicrophoneMuted: Boolean
         get() = phoneLib.microphoneMuted

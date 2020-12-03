@@ -2,7 +2,6 @@ package nl.vialer.voip.android
 
 import org.openvoipalliance.phonelib.config.Auth
 import org.openvoipalliance.phonelib.config.Config
-import org.openvoipalliance.phonelib.model.Codec
 import org.openvoipalliance.phonelib.model.RegistrationState
 import org.openvoipalliance.phonelib.repository.initialise.LogLevel
 import org.openvoipalliance.phonelib.repository.initialise.LogListener
@@ -30,7 +29,7 @@ internal class PhoneLibHelper(private val pil: PIL) {
                 callListener = pil.callManager,
                 encryption = auth.secure,
                 logListener = voipLibraryLogListener,
-                codecs = arrayOf(Codec.OPUS),
+                codecs = pil.preferences.codecs,
                 userAgent = pil.application.userAgent
             )
         )
