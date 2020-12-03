@@ -3,6 +3,7 @@ package nl.vialer.voip.android.example.ui.call
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.PowerManager
 import android.view.WindowManager
 import kotlinx.android.synthetic.main.activity_call.callSubtitle
 import kotlinx.android.synthetic.main.activity_call.callTitle
@@ -24,6 +25,9 @@ class IncomingCallActivity : AppCompatActivity(), PILEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_incoming_call)
 
+
+        pil.events.listen(this)
+
         answerCallButton.setOnClickListener {
             pil.actions.answer()
         }
@@ -32,28 +36,12 @@ class IncomingCallActivity : AppCompatActivity(), PILEventListener {
             pil.actions.decline()
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
-            setShowWhenLocked(true)
-            setTurnScreenOn(true)
-        } else {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
-        }
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
     }
 
     override fun onResume() {
         super.onResume()
-
         displayCall()
-
-        pil.events.listen(this)
-
-        Handler().postDelayed(renderUi, 1000)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        pil.events.stopListening(this)
-        Handler().removeCallbacks(renderUi)
     }
 
     private fun displayCall() {
@@ -63,6 +51,11 @@ class IncomingCallActivity : AppCompatActivity(), PILEventListener {
         callSubtitle.text = call.remotePartySubheading
 
         Handler().postDelayed(renderUi, 1000)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        pil.events.stopListening(this)
     }
 
     override fun onEvent(event: Event) {

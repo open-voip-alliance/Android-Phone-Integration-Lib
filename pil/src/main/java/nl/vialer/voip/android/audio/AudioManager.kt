@@ -39,6 +39,10 @@ class AudioManager internal constructor(private val pil: PIL, private val phoneL
 
         val connection = pil.connection ?: return default
 
+        if (connection?.callAudioState == null) {
+            return default
+        }
+
         val currentRoute = nativeRouteToPilRoute(connection.callAudioState.route)
 
         val routes = arrayOf(ROUTE_BLUETOOTH, ROUTE_EARPIECE, ROUTE_WIRED_HEADSET, ROUTE_WIRED_OR_EARPIECE, ROUTE_SPEAKER)

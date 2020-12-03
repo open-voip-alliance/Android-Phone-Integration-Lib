@@ -3,14 +3,19 @@ package nl.vialer.voip.android.android
 import android.app.Activity
 import com.takwolf.android.foreback.Foreback
 import nl.vialer.voip.android.PIL
+import nl.vialer.voip.android.call.CallState
 import nl.vialer.voip.android.service.VoIPService
 import nl.vialer.voip.android.service.startCallActivity
 
 internal class ApplicationStateListener(private val pil: PIL): Foreback.Listener {
 
     override fun onApplicationEnterForeground(activity: Activity?) {
-        if (VoIPService.isRunning) {
-            pil.app.application.startCallActivity()
+        pil.writeLog("Application has entered the foreground")
+
+        if (VoIPService.isRunning && pil.app.automaticallyStartCallActivity) {
+            if (pil.call?.state == CallState.CONNECTED) {
+                pil.app.application.startCallActivity()
+            }
         }
 
         try {
@@ -21,10 +26,6 @@ internal class ApplicationStateListener(private val pil: PIL): Foreback.Listener
     }
 
     override fun onApplicationEnterBackground(activity: Activity?) {
-        if (!VoIPService.isRunning) {
-            if (pil.phoneLib.isInitialised) {
-                pil.phoneLib.destroy()
-            }
-        }
+        pil.writeLog("Application has entered the background")
     }
 }

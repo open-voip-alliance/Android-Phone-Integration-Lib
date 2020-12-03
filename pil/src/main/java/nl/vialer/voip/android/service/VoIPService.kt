@@ -10,6 +10,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import com.takwolf.android.foreback.Foreback
 import nl.vialer.voip.android.R
@@ -27,8 +28,10 @@ internal class VoIPService : Service(), PILEventListener {
     private val pil by lazy { PIL.instance }
 
     private val notificationManager by lazy { getSystemService(NotificationManager::class.java) }
+    private val powerManager by lazy { getSystemService(PowerManager::class.java) }
 
     private var timer: Timer? = null
+    private var wakeLock: PowerManager.WakeLock? = null
 
     private val isIncomingRinging
         get() = kotlin.run {
@@ -84,6 +87,8 @@ internal class VoIPService : Service(), PILEventListener {
 
     private fun notifyUserOfIncomingCall() {
         pil.writeLog("Notifying the user of an incoming call")
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP, "Vialer::IncomingCallWakelock")
+        wakeLock?.acquire(30000)
 
         val incomingCallActivity = pil.app.activities.incomingCall ?: return
         val call = pil.call ?: return
@@ -207,12 +212,15 @@ internal class VoIPService : Service(), PILEventListener {
         super.onDestroy()
         isRunning = false
         timer?.cancel()
+        wakeLock?.let {
+            if (it.isHeld) {
+                it.release()
+            }
+
+            wakeLock = null
+        }
 
         pil.events.stopListening(this)
-
-        if (Foreback.isApplicationInTheBackground()) {
-            pil.phoneLib.destroy()
-        }
     }
 
     override fun onEvent(event: Event) {

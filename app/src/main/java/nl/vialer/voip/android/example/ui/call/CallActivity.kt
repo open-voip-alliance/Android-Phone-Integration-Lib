@@ -20,6 +20,7 @@ class CallActivity : AppCompatActivity(), PILEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_call)
+        pil.events.listen(this)
 
         endCallButton.setOnClickListener {
             pil.actions.end()
@@ -62,14 +63,15 @@ class CallActivity : AppCompatActivity(), PILEventListener {
 
     override fun onResume() {
         super.onResume()
-
         render()
-
-        pil.events.listen(this)
     }
 
     override fun onPause() {
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         pil.events.stopListening(this)
     }
 
