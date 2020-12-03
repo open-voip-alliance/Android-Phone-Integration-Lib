@@ -6,7 +6,7 @@ import nl.vialer.voip.android.logging.Logger
 import nl.vialer.voip.android.push.Middleware
 
 data class ApplicationSetup(
-    val applicationClass: Application,
+    val application: Application,
 
     /**
      * References to activities that will be opened by notifications.

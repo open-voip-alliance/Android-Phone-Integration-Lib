@@ -15,7 +15,7 @@ class Connection internal constructor(private val pil: PIL) : AndroidConnection(
 
     override fun onShowIncomingCallUi() {
         if (!VoIPService.isRunning) {
-            pil.application.applicationClass.startVoipService()
+            pil.app.application.startVoipService()
         }
     }
 

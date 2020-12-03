@@ -10,7 +10,7 @@ internal class ApplicationStateListener(private val pil: PIL): Foreback.Listener
 
     override fun onApplicationEnterForeground(activity: Activity?) {
         if (VoIPService.isRunning) {
-            pil.application.applicationClass.startCallActivity()
+            pil.app.application.startCallActivity()
         }
 
         try {

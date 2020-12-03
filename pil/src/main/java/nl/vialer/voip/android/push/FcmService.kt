@@ -12,17 +12,17 @@ internal class FcmService: FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
 
         if (pil.androidTelecomManager.isInCall) {
-            pil.application.middleware?.respond(remoteMessage, false)
+            pil.app.middleware?.respond(remoteMessage, false)
             return
         }
 
         pil.start {
-            pil.application.middleware?.respond(remoteMessage, true)
+            pil.app.middleware?.respond(remoteMessage, true)
         }
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        pil.application.middleware?.tokenReceived(token)
+        pil.app.middleware?.tokenReceived(token)
     }
 }

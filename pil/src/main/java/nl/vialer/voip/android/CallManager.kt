@@ -1,6 +1,5 @@
 package nl.vialer.voip.android
 
-import android.content.Intent
 import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
 import nl.vialer.voip.android.events.Event
@@ -33,7 +32,7 @@ internal class CallManager(private val pil: PIL) : CallListener {
     override fun callConnected(call: Call) {
         super.callConnected(call)
         pil.events.broadcast(Event.CALL_CONNECTED)
-        pil.application.applicationClass.startCallActivity()
+        pil.app.application.startCallActivity()
     }
 
     override fun outgoingCallCreated(call: Call) {
@@ -42,11 +41,11 @@ internal class CallManager(private val pil: PIL) : CallListener {
             pil.events.broadcast(Event.OUTGOING_CALL_STARTED)
             pil.connection?.setActive()
             pil.connection?.setCallerDisplayName(pil.call?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
-            pil.application.applicationClass.startCallActivity()
+            pil.app.application.startCallActivity()
         }
 
         if (!VoIPService.isRunning) {
-            pil.application.applicationClass.startVoipService()
+            pil.app.application.startVoipService()
         }
     }
 
@@ -55,7 +54,7 @@ internal class CallManager(private val pil: PIL) : CallListener {
 
         if (!pil.isInTransfer) {
             this.call = null
-            pil.application.applicationClass.stopVoipService()
+            pil.app.application.stopVoipService()
             pil.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             pil.connection?.destroy()
         }

@@ -25,7 +25,7 @@ class Builder {
     }
 
     private fun setupApplicationBackgroundListeners(pil: PIL) {
-        Foreback.init(pil.application.applicationClass)
+        Foreback.init(pil.app.application)
         Foreback.registerListener(ApplicationStateListener(pil))
     }
 

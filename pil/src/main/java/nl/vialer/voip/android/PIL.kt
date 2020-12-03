@@ -20,19 +20,18 @@ import nl.vialer.voip.android.logging.LogLevel
 import nl.vialer.voip.android.telecom.AndroidTelecomManager
 import nl.vialer.voip.android.telecom.Connection
 import org.openvoipalliance.phonelib.PhoneLib
-import org.openvoipalliance.phonelib.model.Codec
 import org.openvoipalliance.phonelib.model.RegistrationState.FAILED
 import org.openvoipalliance.phonelib.model.RegistrationState.REGISTERED
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class PIL internal constructor(internal val application: ApplicationSetup) {
+class PIL internal constructor(internal val app: ApplicationSetup) {
 
-    private val callFactory = PILCallFactory(this, Contacts(application.applicationClass))
+    private val callFactory = PILCallFactory(this, Contacts(app.application))
     internal var connection: Connection? = null
     internal val callManager = CallManager(this)
-    internal val androidTelecomManager: AndroidTelecomManager = AndroidTelecomManager(application.applicationClass, application.applicationClass.getSystemService(TelecomManager::class.java))
-    internal val phoneLib by lazy { PhoneLib.getInstance(application.applicationClass) }
+    internal val androidTelecomManager: AndroidTelecomManager = AndroidTelecomManager(app.application, app.application.getSystemService(TelecomManager::class.java))
+    internal val phoneLib by lazy { PhoneLib.getInstance(app.application) }
     private val phoneLibHelper = PhoneLibHelper(this)
 
     val actions = CallActions(this, phoneLib, callManager)
@@ -144,13 +143,13 @@ class PIL internal constructor(internal val application: ApplicationSetup) {
     }
 
     private fun performPermissionCheck() {
-        if (ContextCompat.checkSelfPermission(application.applicationClass, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_DENIED) {
+        if (ContextCompat.checkSelfPermission(app.application, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_DENIED) {
             throw PermissionException(Manifest.permission.CALL_PHONE)
         }
     }
 
     internal fun writeLog(message: String, level: LogLevel = LogLevel.INFO) {
-        application.logger?.onLogReceived(message, level)
+        app.logger?.onLogReceived(message, level)
     }
 
     companion object {

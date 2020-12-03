@@ -9,12 +9,8 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.net.toFile
 import com.takwolf.android.foreback.Foreback
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
@@ -89,7 +85,7 @@ internal class VoIPService : Service(), PILEventListener {
     private fun notifyUserOfIncomingCall() {
         pil.writeLog("Notifying the user of an incoming call")
 
-        val incomingCallActivity = pil.application.activities.incomingCall ?: return
+        val incomingCallActivity = pil.app.activities.incomingCall ?: return
         val call = pil.call ?: return
 
         val intent = Intent(Intent.ACTION_MAIN, null)
@@ -147,7 +143,7 @@ internal class VoIPService : Service(), PILEventListener {
     )
 
     private fun createNotification(): NotificationCompat.Builder {
-        val notificationIntent = Intent(this, pil.application.activities.call)
+        val notificationIntent = Intent(this, pil.app.activities.call)
         val pendingIntent = PendingIntent.getActivity(
             this,
             0, notificationIntent, 0
@@ -183,7 +179,7 @@ internal class VoIPService : Service(), PILEventListener {
 
     private val ringtone: Uri
         get() = if (pil.preferences.useApplicationProvidedRingtone) {
-            Uri.parse("android.resource://${pil.application.applicationClass.packageName}/raw/ringtone")
+            Uri.parse("android.resource://${pil.app.application.packageName}/raw/ringtone")
         } else {
             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
         }
@@ -246,10 +242,10 @@ fun Context.stopVoipService() {
 }
 
 fun Context.startCallActivity() {
-    if (!PIL.instance.application.automaticallyStartCallActivity) return
+    if (!PIL.instance.app.automaticallyStartCallActivity) return
 
-    PIL.instance.application.applicationClass.startActivity(
-        Intent(PIL.instance.application.applicationClass, PIL.instance.application.activities.call).apply { flags =
+    PIL.instance.app.application.startActivity(
+        Intent(PIL.instance.app.application, PIL.instance.app.activities.call).apply { flags =
             Intent.FLAG_ACTIVITY_NEW_TASK
         }
     )

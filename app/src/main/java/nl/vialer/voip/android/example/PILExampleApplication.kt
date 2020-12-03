@@ -36,7 +36,7 @@ class PILExampleApplication: Application() {
             auth = if (userAuth.isValid) userAuth else null
 
             ApplicationSetup(
-                applicationClass = this@PILExampleApplication,
+                application = this@PILExampleApplication,
                 activities = ApplicationSetup.Activities(call = CallActivity::class.java, incomingCall = IncomingCallActivity::class.java),
                 middleware = VoIPGRIDMiddleware(this@PILExampleApplication),
                 logger = { message, _ -> Log.i("PIL-Logger", message) },

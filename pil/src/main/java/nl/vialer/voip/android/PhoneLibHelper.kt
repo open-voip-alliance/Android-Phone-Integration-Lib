@@ -30,7 +30,7 @@ internal class PhoneLibHelper(private val pil: PIL) {
                 encryption = auth.secure,
                 logListener = voipLibraryLogListener,
                 codecs = pil.preferences.codecs,
-                userAgent = pil.application.userAgent
+                userAgent = pil.app.userAgent
             )
         )
     }
@@ -66,7 +66,7 @@ internal class PhoneLibHelper(private val pil: PIL) {
 
     private val voipLibraryLogListener = object : LogListener {
         override fun onLogMessageWritten(lev: LogLevel, message: String) {
-            pil.application.logger?.onLogReceived(message, when(lev) {
+            pil.app.logger?.onLogReceived(message, when(lev) {
                 LogLevel.DEBUG -> nl.vialer.voip.android.logging.LogLevel.DEBUG
                 LogLevel.TRACE -> nl.vialer.voip.android.logging.LogLevel.DEBUG
                 LogLevel.MESSAGE -> nl.vialer.voip.android.logging.LogLevel.INFO
