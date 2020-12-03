@@ -3,7 +3,6 @@ package nl.vialer.voip.android.example.ui.call
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import kotlinx.android.synthetic.main.activity_call.*
 import nl.vialer.voip.android.R
@@ -17,10 +16,6 @@ import nl.vialer.voip.android.example.ui.TransferDialog
 class CallActivity : AppCompatActivity(), PILEventListener {
 
     private val pil by lazy { PIL.instance }
-
-    private val renderUi = {
-        displayCall()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,20 +63,17 @@ class CallActivity : AppCompatActivity(), PILEventListener {
     override fun onResume() {
         super.onResume()
 
-        displayCall()
+        render()
 
         pil.events.listen(this)
-
-        Handler().postDelayed(renderUi, 1000)
     }
 
     override fun onPause() {
         super.onPause()
         pil.events.stopListening(this)
-        Handler().removeCallbacks(renderUi)
     }
 
-    private fun displayCall() {
+    private fun render() {
         val call = pil.call ?: run {
             finish()
             return
@@ -116,8 +108,6 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         speakerButton.setTypeface(null, if (pil.audio.state.currentRoute == AudioRoute.SPEAKER) Typeface.BOLD else Typeface.NORMAL)
         bluetoothButton.setTypeface(null, if (pil.audio.state.currentRoute == AudioRoute.BLUETOOTH) Typeface.BOLD else Typeface.NORMAL)
         bluetoothButton.text = pil.audio.state.bluetoothDeviceName ?: "Bluetooth"
-
-        Handler().postDelayed(renderUi, 1000)
     }
 
     override fun onEvent(event: Event) = when(event) {
@@ -125,10 +115,10 @@ class CallActivity : AppCompatActivity(), PILEventListener {
             if (pil.call == null) {
                 finish()
             } else {
-                displayCall()
+                render()
             }
         }
-        CALL_UPDATED -> displayCall()
+        CALL_UPDATED -> render()
         else -> {}
     }
 }

@@ -51,6 +51,8 @@ internal class CallManager(private val pil: PIL) : CallListener {
     }
 
     override fun callEnded(call: Call) {
+        pil.writeLog("EVENT RECEIVED: callEnded")
+
         if (!pil.isInTransfer) {
             this.call = null
             pil.application.applicationClass.stopVoipService()

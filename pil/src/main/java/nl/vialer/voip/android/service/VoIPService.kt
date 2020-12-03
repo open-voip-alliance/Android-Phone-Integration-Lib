@@ -8,7 +8,10 @@ import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
+import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toFile
@@ -20,6 +23,7 @@ import nl.vialer.voip.android.call.CallState
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.PILEventListener
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 
 internal class VoIPService : Service(), PILEventListener {
@@ -28,9 +32,21 @@ internal class VoIPService : Service(), PILEventListener {
 
     private val notificationManager by lazy { getSystemService(NotificationManager::class.java) }
 
+    private var timer: Timer? = null
+
+    private val isIncomingRinging
+        get() = kotlin.run {
+            pil.call?.let {
+                return@run it.state == CallState.INITIALIZING && it.direction == CallDirection.INBOUND
+            }
+
+            false
+        }
+
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         isRunning = true
+        pil.events.listen(this)
 
         pil.writeLog("Starting the VoIP Service and creating notification channels")
 
@@ -39,7 +55,27 @@ internal class VoIPService : Service(), PILEventListener {
 
         pil.writeLog("Transitioning to a foreground service")
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+        startForeground()
+
+        updateNotificationBasedOnCallStatus()
+
+        if (isIncomingRinging) {
+            notifyUserOfIncomingCall()
+        }
+
+        timer = fixedRateTimer(TIMER_NAME, true, 0L, REPEAT_MS) {
+            if (pil.call != null) {
+                pil.events.broadcast(Event.CALL_UPDATED)
+            } else {
+                stopSelf()
+            }
+        }
+
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun startForeground() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(
                 NOTIFICATION_ID,
                 createNotification().build(),
@@ -48,18 +84,6 @@ internal class VoIPService : Service(), PILEventListener {
         } else {
             startForeground(NOTIFICATION_ID, createNotification().build())
         }
-
-        pil.events.listen(this)
-
-        updateNotificationBasedOnCallStatus()
-
-        pil.call?.let {
-            if (it.state == CallState.INITIALIZING && it.direction == CallDirection.INBOUND) {
-                notifyUserOfIncomingCall()
-            }
-        }
-
-        return super.onStartCommand(intent, flags, startId)
     }
 
     private fun notifyUserOfIncomingCall() {
@@ -99,6 +123,10 @@ internal class VoIPService : Service(), PILEventListener {
     }
 
     private fun updateNotificationBasedOnCallStatus() {
+        if (isIncomingRinging) return
+
+        pil.writeLog("Updating call notification")
+
         val call = pil.call ?: return
 
         val notification = createNotification()
@@ -182,6 +210,7 @@ internal class VoIPService : Service(), PILEventListener {
     override fun onDestroy() {
         super.onDestroy()
         isRunning = false
+        timer?.cancel()
 
         pil.events.stopListening(this)
 
@@ -201,6 +230,8 @@ internal class VoIPService : Service(), PILEventListener {
         const val CHANNEL_ID = "VoIP"
         const val INCOMING_CALLS_CHANNEL_ID = "VoIP Incoming Calls"
         const val INCOMING_CALLS_APP_RING_CHANNEL_ID = "VoIP Incoming Calls (App Ring)"
+        const val REPEAT_MS = 500L
+        const val TIMER_NAME = "call-update"
 
         internal var isRunning = false
     }
