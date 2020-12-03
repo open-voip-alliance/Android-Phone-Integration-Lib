@@ -8,7 +8,7 @@ import nl.vialer.voip.android.configuration.Auth
 import nl.vialer.voip.android.configuration.Preferences
 import nl.vialer.voip.android.push.Middleware
 
-class Builder {
+class Builder internal constructor() {
 
     var preferences: Preferences = Preferences.DEFAULT
     var auth: Auth? = null
