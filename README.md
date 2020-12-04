@@ -142,6 +142,22 @@ override fun onEvent(event: Event) = when(event) {
 }
 ```
 
+### Activity Helper
+
+There is a PIL class that can provide common call screen functionality that has been implemented as a LifecycleObserver.
+
+ It will handle:
+
+- Proximity, to hide the screen if the user puts the phone close to their face.
+- Turning on the screen when it is locked for an incoming call.
+- Automatically registering events (as long as the Activity you provide implements the PILCallListener interface)
+
+In your activities onCreate method simply add:
+
+```kotlin
+lifecycle.addObserver(CallScreenLifecycleObserver(this))
+```
+
 ### Audio State
 
 The audio state can be requested by querying:

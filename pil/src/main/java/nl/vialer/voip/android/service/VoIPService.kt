@@ -9,10 +9,10 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
-import com.takwolf.android.foreback.Foreback
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.call.CallDirection
@@ -20,7 +20,6 @@ import nl.vialer.voip.android.call.CallState
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.PILEventListener
 import java.util.*
-import kotlin.concurrent.fixedRateTimer
 
 
 internal class VoIPService : Service(), PILEventListener {
@@ -42,6 +41,19 @@ internal class VoIPService : Service(), PILEventListener {
             false
         }
 
+    private val handler = Handler()
+
+    val callEventLoop = object: Runnable {
+        override fun run() {
+            if (pil.call != null)
+                pil.events.broadcast(Event.CALL_UPDATED)
+            else
+                stopSelf()
+
+            handler.postDelayed(this, REPEAT_MS)
+        }
+    }
+
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         isRunning = true
@@ -62,13 +74,7 @@ internal class VoIPService : Service(), PILEventListener {
             notifyUserOfIncomingCall()
         }
 
-        timer = fixedRateTimer(TIMER_NAME, true, 0L, REPEAT_MS) {
-            if (pil.call != null) {
-                pil.events.broadcast(Event.CALL_UPDATED)
-            } else {
-                stopSelf()
-            }
-        }
+        handler.post(callEventLoop)
 
         return super.onStartCommand(intent, flags, startId)
     }
@@ -210,6 +216,8 @@ internal class VoIPService : Service(), PILEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        pil.writeLog("Stopping VoIPService")
+
         isRunning = false
         timer?.cancel()
         wakeLock?.let {

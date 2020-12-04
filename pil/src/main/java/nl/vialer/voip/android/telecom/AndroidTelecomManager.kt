@@ -47,10 +47,13 @@ internal class AndroidTelecomManager(private val context: Context, private val t
         )
     }
 
-    fun addNewIncomingCall() {
+    fun addNewIncomingCall(from: String) {
         telecomManager.registerPhoneAccount(phoneAccount)
 
-        telecomManager.addNewIncomingCall(handle, Bundle())
+        telecomManager.addNewIncomingCall(handle, Bundle().apply {
+            putParcelable(TelecomManager.EXTRA_INCOMING_CALL_ADDRESS, Uri.fromParts(PhoneAccount.SCHEME_TEL, from, null))
+            putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
+        })
     }
 
 

@@ -10,23 +10,19 @@ import kotlinx.android.synthetic.main.activity_call.callTitle
 import kotlinx.android.synthetic.main.activity_incoming_call.*
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
+import nl.vialer.voip.android.android.CallScreenLifecycleObserver
 import nl.vialer.voip.android.events.Event
+import nl.vialer.voip.android.events.Event.*
 import nl.vialer.voip.android.events.PILEventListener
 
 class IncomingCallActivity : AppCompatActivity(), PILEventListener {
 
     private val pil by lazy { PIL.instance }
 
-    private val renderUi = {
-        displayCall()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_incoming_call)
-
-
-        pil.events.listen(this)
+        lifecycle.addObserver(CallScreenLifecycleObserver(this))
 
         answerCallButton.setOnClickListener {
             pil.actions.answer()
@@ -35,8 +31,6 @@ class IncomingCallActivity : AppCompatActivity(), PILEventListener {
         declineCallButton.setOnClickListener {
             pil.actions.decline()
         }
-
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
     }
 
     override fun onResume() {
@@ -49,22 +43,13 @@ class IncomingCallActivity : AppCompatActivity(), PILEventListener {
 
         callTitle.text = call.remotePartyHeading
         callSubtitle.text = call.remotePartySubheading
-
-        Handler().postDelayed(renderUi, 1000)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        pil.events.stopListening(this)
     }
 
     override fun onEvent(event: Event) {
-        if (event == Event.CALL_ENDED) {
-            finish()
-        }
-
-        if (event == Event.CALL_UPDATED) {
-            displayCall()
+        when (event) {
+            CALL_ENDED -> finish()
+            CALL_UPDATED -> displayCall()
+            else -> {}
         }
     }
 }

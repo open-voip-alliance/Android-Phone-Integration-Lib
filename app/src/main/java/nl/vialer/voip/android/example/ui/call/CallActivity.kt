@@ -7,6 +7,7 @@ import android.view.View
 import kotlinx.android.synthetic.main.activity_call.*
 import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
+import nl.vialer.voip.android.android.CallScreenLifecycleObserver
 import nl.vialer.voip.android.audio.AudioRoute
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.Event.*
@@ -20,7 +21,7 @@ class CallActivity : AppCompatActivity(), PILEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_call)
-        pil.events.listen(this)
+        lifecycle.addObserver(CallScreenLifecycleObserver(this))
 
         endCallButton.setOnClickListener {
             pil.actions.end()
@@ -64,10 +65,6 @@ class CallActivity : AppCompatActivity(), PILEventListener {
     override fun onResume() {
         super.onResume()
         render()
-    }
-
-    override fun onPause() {
-        super.onPause()
     }
 
     override fun onDestroy() {

@@ -19,8 +19,6 @@ import nl.vialer.voip.android.example.ui.Dialer
 
 class DialerFragment : Fragment(), PILEventListener {
 
-
-
     private val pil by lazy {
         PIL.instance
     }

@@ -23,14 +23,14 @@ internal class CallManager(private val pil: PIL) : CallListener {
     override fun incomingCallReceived(call: Call) {
         if (!isInCall) {
             this.call = call
-            pil.connection?.setCallerDisplayName(pil.call?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
             pil.events.broadcast(Event.INCOMING_CALL_RECEIVED)
-            pil.androidTelecomManager.addNewIncomingCall()
+            pil.androidTelecomManager.addNewIncomingCall(call.phoneNumber)
         }
     }
 
     override fun callConnected(call: Call) {
         super.callConnected(call)
+        pil.writeLog("EVENT RECEIVED: callConnected")
         pil.events.broadcast(Event.CALL_CONNECTED)
         pil.app.application.startCallActivity()
     }

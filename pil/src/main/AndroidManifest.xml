@@ -26,7 +26,7 @@
             </intent-filter>
         </service>
 
-        <service android:name=".service.VoIPService"></service>
+        <service android:name=".service.VoIPService" android:foregroundServiceType="phoneCall"></service>
 
         <receiver android:name=".service.NotificationButtonReceiver" android:exported="true" android:enabled="true"></receiver>
 

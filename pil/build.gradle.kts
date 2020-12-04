@@ -42,7 +42,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
     implementation("com.takwolf.android:foreback:0.1.1")
     implementation("com.tomash:androidcontacts:1.14.0")
-    api("org.openvoipalliance:AndroidPhoneLib:0.6.19")
+    api("org.openvoipalliance:AndroidPhoneLib:0.6.20")
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
     implementation("com.google.firebase:firebase-messaging")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
 }
