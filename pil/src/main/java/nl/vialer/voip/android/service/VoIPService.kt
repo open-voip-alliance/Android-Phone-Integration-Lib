@@ -13,14 +13,13 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
-import nl.vialer.voip.android.R
+import java.util.*
 import nl.vialer.voip.android.PIL
+import nl.vialer.voip.android.R
 import nl.vialer.voip.android.call.CallDirection
 import nl.vialer.voip.android.call.CallState
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.PILEventListener
-import java.util.*
-
 
 internal class VoIPService : Service(), PILEventListener {
 
@@ -43,7 +42,7 @@ internal class VoIPService : Service(), PILEventListener {
 
     private val handler = Handler()
 
-    val callEventLoop = object: Runnable {
+    val callEventLoop = object : Runnable {
         override fun run() {
             if (pil.call != null)
                 pil.events.broadcast(Event.CALL_UPDATED)
@@ -93,7 +92,10 @@ internal class VoIPService : Service(), PILEventListener {
 
     private fun notifyUserOfIncomingCall() {
         pil.writeLog("Notifying the user of an incoming call")
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP, "Vialer::IncomingCallWakelock")
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "Vialer::IncomingCallWakelock"
+        )
         wakeLock?.acquire(30000)
 
         val incomingCallActivity = pil.app.activities.incomingCall ?: return
@@ -157,7 +159,9 @@ internal class VoIPService : Service(), PILEventListener {
         val notificationIntent = Intent(this, pil.app.activities.call)
         val pendingIntent = PendingIntent.getActivity(
             this,
-            0, notificationIntent, 0
+            0,
+            notificationIntent,
+            0
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
@@ -171,8 +175,13 @@ internal class VoIPService : Service(), PILEventListener {
             .setOngoing(true)
             .setAutoCancel(false)
             .setColor(getColor(R.color.notification_background))
-            .addAction(R.drawable.ic_service, getString(R.string.notification_hang_up_action), createActionIntent(
-                NotificationButtonReceiver.Action.HANG_UP))
+            .addAction(
+                R.drawable.ic_service,
+                getString(R.string.notification_hang_up_action),
+                createActionIntent(
+                    NotificationButtonReceiver.Action.HANG_UP
+                )
+            )
     }
 
     private fun createNotificationChannel() {
@@ -261,8 +270,9 @@ fun Context.startCallActivity() {
     if (!PIL.instance.app.automaticallyStartCallActivity) return
 
     PIL.instance.app.application.startActivity(
-        Intent(PIL.instance.app.application, PIL.instance.app.activities.call).apply { flags =
-            Intent.FLAG_ACTIVITY_NEW_TASK
+        Intent(PIL.instance.app.application, PIL.instance.app.activities.call).apply {
+            flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK
         }
     )
 }

@@ -1,15 +1,12 @@
 package nl.vialer.voip.android.example.ui.call
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.PowerManager
-import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_call.callSubtitle
 import kotlinx.android.synthetic.main.activity_call.callTitle
 import kotlinx.android.synthetic.main.activity_incoming_call.*
-import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
+import nl.vialer.voip.android.R
 import nl.vialer.voip.android.android.CallScreenLifecycleObserver
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.Event.*

@@ -10,7 +10,7 @@ import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.fragment_dialer.*
 import nl.vialer.voip.android.R
 
-class TransferDialog(context: Context): DialogFragment() {
+class TransferDialog(context: Context) : DialogFragment() {
 
     var onTransferListener: OnTransferListener? = null
 

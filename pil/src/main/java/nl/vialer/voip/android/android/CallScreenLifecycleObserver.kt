@@ -1,7 +1,6 @@
 package nl.vialer.voip.android.android
 
 import android.app.Activity
-import android.content.Context
 import android.media.AudioManager
 import android.os.PowerManager
 import android.os.PowerManager.*
@@ -22,13 +21,16 @@ class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObs
     fun begin() {
         wakeLock = powerManager.newWakeLock(
             PROXIMITY_SCREEN_OFF_WAKE_LOCK or ACQUIRE_CAUSES_WAKEUP,
-            "${activity.packageName}:call")
+            "${activity.packageName}:call"
+        )
             .apply {
                 acquire(10 * 60 * 1000L)
             }
 
         activity.apply {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+            )
             volumeControlStream = AudioManager.STREAM_VOICE_CALL
         }
 

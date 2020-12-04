@@ -9,7 +9,7 @@ import nl.vialer.voip.android.example.ui.call.CallActivity
 import nl.vialer.voip.android.example.ui.call.IncomingCallActivity
 import nl.vialer.voip.android.startAndroidPIL
 
-class PILExampleApplication: Application() {
+class PILExampleApplication : Application() {
 
     private val prefs by lazy {
         PreferenceManager.getDefaultSharedPreferences(this)

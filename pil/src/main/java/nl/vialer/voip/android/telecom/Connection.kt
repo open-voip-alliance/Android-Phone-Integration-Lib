@@ -1,6 +1,7 @@
 package nl.vialer.voip.android.telecom
 
 import android.annotation.SuppressLint
+import android.telecom.Connection as AndroidConnection
 import android.telecom.DisconnectCause
 import android.telecom.DisconnectCause.LOCAL
 import nl.vialer.voip.android.PIL
@@ -9,7 +10,6 @@ import nl.vialer.voip.android.service.VoIPService
 import nl.vialer.voip.android.service.startVoipService
 import org.openvoipalliance.phonelib.model.Call
 import org.openvoipalliance.phonelib.model.Reason
-import android.telecom.Connection as AndroidConnection
 
 class Connection internal constructor(private val pil: PIL) : AndroidConnection() {
 

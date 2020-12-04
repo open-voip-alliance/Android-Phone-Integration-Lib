@@ -11,10 +11,9 @@ import com.android.volley.toolbox.Volley
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
+import nl.vialer.voip.android.R
 import nl.vialer.voip.android.configuration.Auth
-import nl.vialer.voip.android.configuration.Preferences
 import nl.vialer.voip.android.example.VoIPGRIDMiddleware
 import org.json.JSONObject
 
@@ -46,57 +45,70 @@ class SettingsFragment : PreferenceFragmentCompat() {
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
-            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString(
-                "password",
-                ""
-            ) }
+            summaryProvider = Preference.SummaryProvider<EditTextPreference> {
+                prefs.getString(
+                    "password",
+                    ""
+                )
+            }
         }
 
         findPreference<EditTextPreference>("voipgrid_password")?.apply {
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
-            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString(
-                "voipgrid_password",
-                ""
-            ) }
+            summaryProvider = Preference.SummaryProvider<EditTextPreference> {
+                prefs.getString(
+                    "voipgrid_password",
+                    ""
+                )
+            }
         }
 
         findPreference<EditTextPreference>("domain")?.apply {
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_TEXT_VARIATION_URI
             }
-            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString(
-                "domain",
-                ""
-            ) }
-
+            summaryProvider = Preference.SummaryProvider<EditTextPreference> {
+                prefs.getString(
+                    "domain",
+                    ""
+                )
+            }
         }
 
         findPreference<EditTextPreference>("port")?.apply {
             setOnBindEditTextListener {
                 it.inputType = InputType.TYPE_CLASS_NUMBER
             }
-            summaryProvider = Preference.SummaryProvider<EditTextPreference> { prefs.getString(
-                "port",
-                ""
-            ) }
+            summaryProvider = Preference.SummaryProvider<EditTextPreference> {
+                prefs.getString(
+                    "port",
+                    ""
+                )
+            }
         }
 
         arrayOf("username", "password", "domain", "port").forEach {
             findPreference<EditTextPreference>(it)?.setOnPreferenceChangeListener { _, _ ->
-                Handler().postDelayed({
-                    activity?.runOnUiThread { updateAuthenticationStatus() }
-                }, 1000)
+                Handler().postDelayed(
+                    {
+                        activity?.runOnUiThread { updateAuthenticationStatus() }
+                    },
+                    1000
+                )
                 true
             }
         }
 
         arrayOf("voipgrid_username", "voipgrid_password").forEach {
             findPreference<EditTextPreference>(it)?.setOnPreferenceChangeListener { _, _ ->
-                Handler().postDelayed({
-                    activity?.runOnUiThread { updateVoipgridAuthenticationStatus() }
-                }, 1000)
+                Handler().postDelayed(
+                    {
+                        activity?.runOnUiThread { updateVoipgridAuthenticationStatus() }
+                    },
+                    1000
+                )
                 true
             }
         }
@@ -138,26 +150,31 @@ class SettingsFragment : PreferenceFragmentCompat() {
             put("password", prefs.getString("voipgrid_password", ""))
         }
 
-        val request = JsonObjectRequest(Request.Method.POST, url, requestData, { response ->
-            val apiToken = response.getString("api_token")
-            updateVoipgridSummary(true, apiToken)
-            prefs.edit().putString("voipgrid_api_token", apiToken).apply()
-        }, { error ->
-            Toast.makeText(
-                requireContext(),
-                error.networkResponse.statusCode.toString(),
-                Toast.LENGTH_LONG
-            ).show()
-            updateVoipgridSummary(false)
-            prefs.edit().remove("voipgrid_api_token").apply()
-        }
+        val request = JsonObjectRequest(
+            Request.Method.POST,
+            url,
+            requestData,
+            { response ->
+                val apiToken = response.getString("api_token")
+                updateVoipgridSummary(true, apiToken)
+                prefs.edit().putString("voipgrid_api_token", apiToken).apply()
+            },
+            { error ->
+                Toast.makeText(
+                    requireContext(),
+                    error.networkResponse.statusCode.toString(),
+                    Toast.LENGTH_LONG
+                ).show()
+                updateVoipgridSummary(false)
+                prefs.edit().remove("voipgrid_api_token").apply()
+            }
         )
 
         queue.add(request)
     }
 
     private fun updateVoipgridSummary(authenticated: Boolean, token: String? = null) {
-        val summary = if (authenticated) "Authenticated (${token})" else "Authentication failed"
+        val summary = if (authenticated) "Authenticated ($token)" else "Authentication failed"
 
         activity?.runOnUiThread {
             findPreference<Preference>("voipgrid_status")?.summaryProvider = Preference.SummaryProvider<Preference> {

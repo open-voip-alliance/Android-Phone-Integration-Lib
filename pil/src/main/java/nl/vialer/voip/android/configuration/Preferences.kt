@@ -7,4 +7,3 @@ data class Preferences(val codecs: Array<Codec>, val useApplicationProvidedRingt
         val DEFAULT = Preferences(arrayOf(Codec.OPUS), false)
     }
 }
-

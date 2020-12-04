@@ -8,7 +8,11 @@ import nl.vialer.voip.android.telecom.Connection
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.Call
 
-class CallActions internal constructor(private val pil: PIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
+class CallActions internal constructor(
+    private val pil: PIL,
+    private val phoneLib: PhoneLib,
+    private val callManager: CallManager
+) {
 
     fun hold() {
         connection {

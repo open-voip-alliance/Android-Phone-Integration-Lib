@@ -4,7 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import nl.vialer.voip.android.PIL
 
-internal class FcmService: FirebaseMessagingService() {
+internal class FcmService : FirebaseMessagingService() {
 
     private val pil by lazy { PIL.instance }
 

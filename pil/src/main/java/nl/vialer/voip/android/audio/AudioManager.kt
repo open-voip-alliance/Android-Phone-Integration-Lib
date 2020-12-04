@@ -7,7 +7,11 @@ import nl.vialer.voip.android.audio.AudioRoute.*
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.Codec
 
-class AudioManager internal constructor(private val pil: PIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
+class AudioManager internal constructor(
+    private val pil: PIL,
+    private val phoneLib: PhoneLib,
+    private val callManager: CallManager
+) {
 
     val availableCodecs = arrayOf(Codec.OPUS, Codec.ILBC, Codec.G729, Codec.SPEEX)
 
@@ -45,7 +49,13 @@ class AudioManager internal constructor(private val pil: PIL, private val phoneL
 
         val currentRoute = nativeRouteToPilRoute(connection.callAudioState.route)
 
-        val routes = arrayOf(ROUTE_BLUETOOTH, ROUTE_EARPIECE, ROUTE_WIRED_HEADSET, ROUTE_WIRED_OR_EARPIECE, ROUTE_SPEAKER)
+        val routes = arrayOf(
+            ROUTE_BLUETOOTH,
+            ROUTE_EARPIECE,
+            ROUTE_WIRED_HEADSET,
+            ROUTE_WIRED_OR_EARPIECE,
+            ROUTE_SPEAKER
+        )
 
         val supportedRoutes = mutableListOf<AudioRoute>()
 
@@ -64,14 +74,14 @@ class AudioManager internal constructor(private val pil: PIL, private val phoneL
         return AudioState(currentRoute, supportedRoutes.toTypedArray(), bluetoothName)
     }
 
-    private fun nativeRouteToPilRoute(nativeRoute: Int) = when(nativeRoute) {
+    private fun nativeRouteToPilRoute(nativeRoute: Int) = when (nativeRoute) {
         ROUTE_BLUETOOTH -> BLUETOOTH
         ROUTE_EARPIECE, ROUTE_WIRED_HEADSET, ROUTE_WIRED_OR_EARPIECE -> PHONE
         ROUTE_SPEAKER -> SPEAKER
         else -> PHONE
     }
 
-    private fun pilRouteToNativeRoute(pilRoute: AudioRoute) = when(pilRoute) {
+    private fun pilRouteToNativeRoute(pilRoute: AudioRoute) = when (pilRoute) {
         SPEAKER -> ROUTE_SPEAKER
         PHONE -> ROUTE_WIRED_OR_EARPIECE
         BLUETOOTH -> ROUTE_BLUETOOTH

@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TableLayout
 import androidx.core.view.children
 import androidx.core.view.forEach
@@ -20,7 +19,8 @@ class Dialer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = 
     var onCallListener: OnCallListener? = null
 
     var digits: String by Delegates.observable("") {
-        _, _, new -> digitEntryWindow.text = new
+        _, _, new ->
+        digitEntryWindow.text = new
         backspace.visibility = if (new.isNotBlank()) View.VISIBLE else View.GONE
     }
         private set
@@ -63,4 +63,3 @@ class Dialer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = 
         fun onCall(number: String)
     }
 }
-

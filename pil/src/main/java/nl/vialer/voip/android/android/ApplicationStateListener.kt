@@ -7,7 +7,7 @@ import nl.vialer.voip.android.call.CallState
 import nl.vialer.voip.android.service.VoIPService
 import nl.vialer.voip.android.service.startCallActivity
 
-internal class ApplicationStateListener(private val pil: PIL): Foreback.Listener {
+internal class ApplicationStateListener(private val pil: PIL) : Foreback.Listener {
 
     override fun onApplicationEnterForeground(activity: Activity?) {
         pil.writeLog("Application has entered the foreground")

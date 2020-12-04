@@ -26,7 +26,7 @@ internal class PhoneLibHelper(private val pil: PIL) {
 
         pil.phoneLib.initialise(
             Config(
-                auth = Auth("","" , "", 0),
+                auth = Auth("", "", "", 0),
                 callListener = pil.callManager,
                 encryption = auth.secure,
                 logListener = voipLibraryLogListener,
@@ -41,13 +41,21 @@ internal class PhoneLibHelper(private val pil: PIL) {
      *
      *
      */
-    fun register(auth: nl.vialer.voip.android.configuration.Auth, forceReRegistration: Boolean = false, callback: () -> Unit) {
-        pil.phoneLib.swapConfig(pil.phoneLib.currentConfig.copy(auth = Auth(
-            auth.username,
-            auth.password,
-            auth.domain,
-            auth.port
-        )))
+    fun register(
+        auth: nl.vialer.voip.android.configuration.Auth,
+        forceReRegistration: Boolean = false,
+        callback: () -> Unit
+    ) {
+        pil.phoneLib.swapConfig(
+            pil.phoneLib.currentConfig.copy(
+                auth = Auth(
+                    auth.username,
+                    auth.password,
+                    auth.domain,
+                    auth.port
+                )
+            )
+        )
 
         if (pil.phoneLib.isRegistered && !forceReRegistration) {
             pil.writeLog("We are already registered!")
@@ -67,14 +75,17 @@ internal class PhoneLibHelper(private val pil: PIL) {
 
     private val voipLibraryLogListener = object : LogListener {
         override fun onLogMessageWritten(lev: LogLevel, message: String) {
-            pil.app.logger?.onLogReceived(message, when(lev) {
-                LogLevel.DEBUG -> nl.vialer.voip.android.logging.LogLevel.DEBUG
-                LogLevel.TRACE -> nl.vialer.voip.android.logging.LogLevel.DEBUG
-                LogLevel.MESSAGE -> nl.vialer.voip.android.logging.LogLevel.INFO
-                LogLevel.WARNING -> nl.vialer.voip.android.logging.LogLevel.WARNING
-                LogLevel.ERROR -> nl.vialer.voip.android.logging.LogLevel.ERROR
-                LogLevel.FATAL -> nl.vialer.voip.android.logging.LogLevel.ERROR
-            })
+            pil.app.logger?.onLogReceived(
+                message,
+                when (lev) {
+                    LogLevel.DEBUG -> nl.vialer.voip.android.logging.LogLevel.DEBUG
+                    LogLevel.TRACE -> nl.vialer.voip.android.logging.LogLevel.DEBUG
+                    LogLevel.MESSAGE -> nl.vialer.voip.android.logging.LogLevel.INFO
+                    LogLevel.WARNING -> nl.vialer.voip.android.logging.LogLevel.WARNING
+                    LogLevel.ERROR -> nl.vialer.voip.android.logging.LogLevel.ERROR
+                    LogLevel.FATAL -> nl.vialer.voip.android.logging.LogLevel.ERROR
+                }
+            )
         }
     }
 }

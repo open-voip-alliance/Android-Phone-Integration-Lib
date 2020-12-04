@@ -11,7 +11,6 @@ import org.openvoipalliance.phonelib.model.AttendedTransferSession
 import org.openvoipalliance.phonelib.model.Call
 import org.openvoipalliance.phonelib.repository.initialise.CallListener
 
-
 internal class CallManager(private val pil: PIL) : CallListener {
 
     internal var call: Call? = null
@@ -40,7 +39,10 @@ internal class CallManager(private val pil: PIL) : CallListener {
             this.call = call
             pil.events.broadcast(Event.OUTGOING_CALL_STARTED)
             pil.connection?.setActive()
-            pil.connection?.setCallerDisplayName(pil.call?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
+            pil.connection?.setCallerDisplayName(
+                pil.call?.remotePartyHeading,
+                TelecomManager.PRESENTATION_ALLOWED
+            )
             pil.app.application.startCallActivity()
         }
 

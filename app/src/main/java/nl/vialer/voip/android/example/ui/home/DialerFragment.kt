@@ -8,11 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.fragment_dialer.*
-import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
-import nl.vialer.voip.android.configuration.Auth
+import nl.vialer.voip.android.R
 import nl.vialer.voip.android.events.Event
 import nl.vialer.voip.android.events.PILEventListener
 import nl.vialer.voip.android.example.ui.Dialer
@@ -24,9 +22,9 @@ class DialerFragment : Fragment(), PILEventListener {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_dialer, container, false)
         return root

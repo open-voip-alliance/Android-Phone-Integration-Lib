@@ -2,7 +2,6 @@ package nl.vialer.voip.android.example
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.preference.PreferenceManager
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.Dispatchers
@@ -11,7 +10,7 @@ import nl.vialer.voip.android.push.Middleware
 import okhttp3.*
 import java.io.IOException
 
-class VoIPGRIDMiddleware(private val context: Context): Middleware {
+class VoIPGRIDMiddleware(private val context: Context) : Middleware {
 
     private val prefs by lazy {
         PreferenceManager.getDefaultSharedPreferences(context)
@@ -67,13 +66,15 @@ class VoIPGRIDMiddleware(private val context: Context): Middleware {
             .post(data)
             .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-            }
+        client.newCall(request).enqueue(
+            object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                }
 
-            override fun onResponse(call: Call, response: Response) {
+                override fun onResponse(call: Call, response: Response) {
+                }
             }
-        })
+        )
     }
 
     override fun tokenReceived(token: String) {

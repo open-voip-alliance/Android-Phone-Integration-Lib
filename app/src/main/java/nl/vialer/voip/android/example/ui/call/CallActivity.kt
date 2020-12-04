@@ -1,12 +1,12 @@
 package nl.vialer.voip.android.example.ui.call
 
 import android.graphics.Typeface
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_call.*
-import nl.vialer.voip.android.R
 import nl.vialer.voip.android.PIL
+import nl.vialer.voip.android.R
 import nl.vialer.voip.android.android.CallScreenLifecycleObserver
 import nl.vialer.voip.android.audio.AudioRoute
 import nl.vialer.voip.android.events.Event
@@ -109,7 +109,7 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         bluetoothButton.text = pil.audio.state.bluetoothDeviceName ?: "Bluetooth"
     }
 
-    override fun onEvent(event: Event) = when(event) {
+    override fun onEvent(event: Event) = when (event) {
         CALL_ENDED -> {
             if (pil.call == null) {
                 finish()

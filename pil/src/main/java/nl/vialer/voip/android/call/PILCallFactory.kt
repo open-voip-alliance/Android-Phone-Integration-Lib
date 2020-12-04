@@ -1,5 +1,6 @@
 package nl.vialer.voip.android.call
 
+import java.util.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.vialer.voip.android.PIL
@@ -11,9 +12,8 @@ import org.openvoipalliance.phonelib.model.Call
 import org.openvoipalliance.phonelib.model.CallState
 import org.openvoipalliance.phonelib.model.CallState.*
 import org.openvoipalliance.phonelib.model.Direction
-import java.util.*
 
-internal class PILCallFactory(private val pil: PIL, private val contacts: Contacts): PILEventListener {
+internal class PILCallFactory(private val pil: PIL, private val contacts: Contacts) : PILEventListener {
 
     private val cachedContacts = mutableMapOf<Call, Contact>()
 
@@ -33,7 +33,7 @@ internal class PILCallFactory(private val pil: PIL, private val contacts: Contac
         )
     }
 
-    private fun convertCallState(state: CallState): nl.vialer.voip.android.call.CallState = when(state) {
+    private fun convertCallState(state: CallState): nl.vialer.voip.android.call.CallState = when (state) {
         Idle, IncomingReceived, OutgoingInit -> nl.vialer.voip.android.call.CallState.INITIALIZING
         OutgoingProgress, OutgoingRinging -> nl.vialer.voip.android.call.CallState.RINGING
         Pausing, Paused -> nl.vialer.voip.android.call.CallState.HELD_BY_LOCAL

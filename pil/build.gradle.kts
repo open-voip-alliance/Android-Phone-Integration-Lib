@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 android {
@@ -28,6 +29,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+ktlint {
+    android.set(true)
 }
 
 dependencies {

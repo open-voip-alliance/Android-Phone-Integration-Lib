@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.telecom.TelecomManager
 import androidx.core.content.ContextCompat
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import nl.vialer.voip.android.audio.AudioManager
 import nl.vialer.voip.android.call.CallActions
 import nl.vialer.voip.android.call.PILCall
@@ -12,8 +14,8 @@ import nl.vialer.voip.android.configuration.ApplicationSetup
 import nl.vialer.voip.android.configuration.Auth
 import nl.vialer.voip.android.configuration.Preferences
 import nl.vialer.voip.android.contacts.Contacts
-import nl.vialer.voip.android.events.PILEventListener
 import nl.vialer.voip.android.events.EventsManager
+import nl.vialer.voip.android.events.PILEventListener
 import nl.vialer.voip.android.exception.NoAuthenticationCredentialsException
 import nl.vialer.voip.android.exception.PermissionException
 import nl.vialer.voip.android.logging.LogLevel
@@ -22,15 +24,16 @@ import nl.vialer.voip.android.telecom.Connection
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.RegistrationState.FAILED
 import org.openvoipalliance.phonelib.model.RegistrationState.REGISTERED
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class PIL internal constructor(internal val app: ApplicationSetup) {
 
     private val callFactory = PILCallFactory(this, Contacts(app.application))
     internal var connection: Connection? = null
     internal val callManager = CallManager(this)
-    internal val androidTelecomManager: AndroidTelecomManager = AndroidTelecomManager(app.application, app.application.getSystemService(TelecomManager::class.java))
+    internal val androidTelecomManager: AndroidTelecomManager = AndroidTelecomManager(
+        app.application,
+        app.application.getSystemService(TelecomManager::class.java)
+    )
     internal val phoneLib by lazy { PhoneLib.getInstance(app.application) }
     private val phoneLibHelper = PhoneLibHelper(this)
 
@@ -124,7 +127,11 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
      * Start the PIL, unless the force options are provided, the method will not restart or re-register.
      *
      */
-    fun start(forceInitialize: Boolean = false, forceReregister: Boolean = false, callback: (() -> Unit)? = null) {
+    fun start(
+        forceInitialize: Boolean = false,
+        forceReregister: Boolean = false,
+        callback: (() -> Unit)? = null
+    ) {
         val auth = auth ?: throw NoAuthenticationCredentialsException()
 
         if (!auth.isValid) throw NoAuthenticationCredentialsException()

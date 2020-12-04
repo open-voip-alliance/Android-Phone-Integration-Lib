@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import com.tomash.androidcontacts.contactgetter.main.FieldType
 import com.tomash.androidcontacts.contactgetter.main.contactsGetter.ContactsGetterBuilder
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
 
 internal class Contacts(private val context: Context) {

@@ -1,13 +1,8 @@
 package nl.vialer.voip.android.call
 
-import android.content.Context
 import android.text.format.DateUtils
-import nl.vialer.voip.android.CallManager
-import nl.vialer.voip.android.contacts.Contact
-import nl.vialer.voip.android.contacts.Contacts
-import org.openvoipalliance.phonelib.model.Call
-import org.openvoipalliance.phonelib.model.Direction
 import java.util.*
+import nl.vialer.voip.android.contacts.Contact
 
 data class PILCall(
     val remoteNumber: String,

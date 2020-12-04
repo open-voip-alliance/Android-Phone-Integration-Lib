@@ -9,7 +9,6 @@ import android.telecom.PhoneAccount
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.telecom.VideoProfile
-import android.util.Log
 import nl.vialer.voip.android.BuildConfig
 
 /**
@@ -17,10 +16,16 @@ import nl.vialer.voip.android.BuildConfig
  * and less verbose.
  *
  */
-internal class AndroidTelecomManager(private val context: Context, private val telecomManager: TelecomManager) {
+internal class AndroidTelecomManager(
+    private val context: Context,
+    private val telecomManager: TelecomManager
+) {
 
     private val handle: PhoneAccountHandle by lazy {
-        PhoneAccountHandle(ComponentName(context, ConnectionService::class.java), PHONE_ACCOUNT_HANDLE_ID)
+        PhoneAccountHandle(
+            ComponentName(context, ConnectionService::class.java),
+            PHONE_ACCOUNT_HANDLE_ID
+        )
     }
 
     private val phoneAccount: PhoneAccount by lazy {
@@ -41,7 +46,10 @@ internal class AndroidTelecomManager(private val context: Context, private val t
             Uri.fromParts("", number, null),
             Bundle().apply {
                 putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, false)
-                putInt(TelecomManager.EXTRA_START_CALL_WITH_VIDEO_STATE, VideoProfile.STATE_AUDIO_ONLY)
+                putInt(
+                    TelecomManager.EXTRA_START_CALL_WITH_VIDEO_STATE,
+                    VideoProfile.STATE_AUDIO_ONLY
+                )
                 putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
             }
         )
@@ -50,12 +58,17 @@ internal class AndroidTelecomManager(private val context: Context, private val t
     fun addNewIncomingCall(from: String) {
         telecomManager.registerPhoneAccount(phoneAccount)
 
-        telecomManager.addNewIncomingCall(handle, Bundle().apply {
-            putParcelable(TelecomManager.EXTRA_INCOMING_CALL_ADDRESS, Uri.fromParts(PhoneAccount.SCHEME_TEL, from, null))
-            putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
-        })
+        telecomManager.addNewIncomingCall(
+            handle,
+            Bundle().apply {
+                putParcelable(
+                    TelecomManager.EXTRA_INCOMING_CALL_ADDRESS,
+                    Uri.fromParts(PhoneAccount.SCHEME_TEL, from, null)
+                )
+                putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
+            }
+        )
     }
-
 
     companion object {
         private const val PHONE_ACCOUNT_HANDLE_ID = BuildConfig.LIBRARY_PACKAGE_NAME

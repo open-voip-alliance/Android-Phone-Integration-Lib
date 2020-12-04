@@ -53,4 +53,3 @@ fun startAndroidPIL(init: Builder.() -> ApplicationSetup): PIL {
 
     return builder.start(applicationSetup)
 }
-

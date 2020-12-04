@@ -6,7 +6,7 @@ import android.content.Intent
 import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.service.NotificationButtonReceiver.Action.*
 
-internal class NotificationButtonReceiver: BroadcastReceiver() {
+internal class NotificationButtonReceiver : BroadcastReceiver() {
 
     private val pil by lazy { PIL.instance }
 
@@ -21,9 +21,10 @@ internal class NotificationButtonReceiver: BroadcastReceiver() {
                 ANSWER -> pil.actions.answer()
                 DECLINE -> pil.actions.decline()
             }
-
         } catch (e: IllegalArgumentException) {
-            pil.writeLog("Unable to handle broadcast sent to NotificationButtonReceiver: ${intent.action}")
+            pil.writeLog(
+                "Unable to handle broadcast sent to NotificationButtonReceiver: ${intent.action}"
+            )
             return
         }
     }
