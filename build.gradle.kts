@@ -17,16 +17,17 @@ buildscript {
     }
 }
 
-apply(plugin = "org.jlleitschuh.gradle.ktlint-idea")
+//apply(plugin = "org.jlleitschuh.gradle.ktlint-idea")
 
-subprojects {
-    apply(plugin = "org.jlleitschuh.gradle.ktlint-idea")
-}
+//subprojects {
+//    //apply(plugin = "org.jlleitschuh.gradle.ktlint-idea")
+//}
 
 allprojects {
     repositories {
         google()
         jcenter()
+        mavenCentral()
     }
 }
 

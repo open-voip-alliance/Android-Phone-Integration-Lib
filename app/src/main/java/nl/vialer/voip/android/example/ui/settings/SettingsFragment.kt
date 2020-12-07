@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import nl.vialer.voip.android.PIL
-import nl.vialer.voip.android.R
+import nl.vialer.voip.android.example.R
 import nl.vialer.voip.android.configuration.Auth
 import nl.vialer.voip.android.example.VoIPGRIDMiddleware
 import org.json.JSONObject

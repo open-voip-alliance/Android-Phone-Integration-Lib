@@ -4,7 +4,7 @@ plugins {
     kotlin("android.extensions")
     kotlin("kapt")
     id("com.google.gms.google-services")
-    id("org.jlleitschuh.gradle.ktlint")
+//    id("org.jlleitschuh.gradle.ktlint")
 }
 
 android {

@@ -11,7 +11,7 @@ import androidx.core.view.forEach
 import kotlinx.android.synthetic.main.dialer.view.*
 import kotlinx.android.synthetic.main.fragment_dialer.*
 import kotlinx.android.synthetic.main.fragment_dialer.view.*
-import nl.vialer.voip.android.R
+import nl.vialer.voip.android.example.R
 import kotlin.properties.Delegates
 
 class Dialer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : TableLayout(context, attrs) {

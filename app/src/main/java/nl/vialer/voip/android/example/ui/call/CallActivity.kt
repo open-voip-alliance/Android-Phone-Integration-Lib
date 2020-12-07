@@ -6,7 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_call.*
 import nl.vialer.voip.android.PIL
-import nl.vialer.voip.android.R
+import nl.vialer.voip.android.example.R
 import nl.vialer.voip.android.android.CallScreenLifecycleObserver
 import nl.vialer.voip.android.audio.AudioRoute
 import nl.vialer.voip.android.events.Event

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="nl.vialer.voip.android">
+    package="nl.vialer.voip.android.example">
 
     <application
-        android:name=".example.PILExampleApplication"
+        android:name=".PILExampleApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -11,15 +11,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VialerVoIPPlatformIntegrationLayer">
         <activity
-            android:name=".example.ui.call.CallActivity"
+            android:name=".ui.call.CallActivity"
             android:launchMode="singleTask"
             android:exported="true" />
         <activity
-            android:name=".example.ui.call.IncomingCallActivity"
+            android:name=".ui.call.IncomingCallActivity"
             android:launchMode="singleTask"
             android:exported="true" />
         <activity
-            android:name=".example.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

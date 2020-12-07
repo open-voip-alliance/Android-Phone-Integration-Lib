@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.fragment_dialer.*
-import nl.vialer.voip.android.R
+import nl.vialer.voip.android.example.R
 
 class TransferDialog(context: Context) : DialogFragment() {
 

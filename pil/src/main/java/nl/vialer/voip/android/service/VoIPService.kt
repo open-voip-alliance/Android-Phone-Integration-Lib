@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import java.util.*
 import nl.vialer.voip.android.PIL
 import nl.vialer.voip.android.R
+
 import nl.vialer.voip.android.call.CallDirection
 import nl.vialer.voip.android.call.CallState
 import nl.vialer.voip.android.events.Event

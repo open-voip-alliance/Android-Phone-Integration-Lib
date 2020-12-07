@@ -7,7 +7,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import nl.vialer.voip.android.R
+import nl.vialer.voip.android.example.R
 
 class MainActivity : AppCompatActivity() {
 
