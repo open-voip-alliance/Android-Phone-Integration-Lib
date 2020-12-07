@@ -39,17 +39,21 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
 }
 
+val libraryVersion = "0.0.2"
 
-
-val libraryVersion = "0.0.1"
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(android.sourceSets.getByName("main").java.srcDirs)
+}
 
 publishing {
     publications {
         create<MavenPublication>("Production") {
             artifact("$buildDir/outputs/aar/pil-release.aar")
-            groupId = "nl.vialer.voip"
-            artifactId = "AndroidVoIPPlatformIntegrationLayer"
+            groupId = "org.openvoipalliance"
+            artifactId = "AndroidPlatformIntegration"
             version = libraryVersion
+            artifact(sourcesJar.get())
 
             pom.withXml {
                 val dependenciesNode = asNode().appendNode("dependencies")
@@ -74,10 +78,11 @@ bintray {
     key = findProperty("bintray.token")
     setPublications("Production")
     pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
-        repo = "AndroidVoIPPlatformIntegrationLayer"
-        name = "AndroidVoIPPlatformIntegrationLayer"
-        websiteUrl = "https://gitlab.wearespindle.com/vialer/mobile/voip/android-platform-integration-layer"
-        vcsUrl = "https://gitlab.wearespindle.com/vialer/mobile/voip/android-platform-integration-layer"
+        repo = "AndroidPlatformIntegration"
+        name = "AndroidPlatformIntegration"
+        websiteUrl = "https://github.com/open-voip-alliance/AndroidPlatformIntegration"
+        vcsUrl = "https://github.com/open-voip-alliance/AndroidPlatformIntegration"
+        githubRepo = "open-voip-alliance/AndroidPlatformIntegration"
         description = "Integrating VoIP into the Android platform.."
         setLabels("kotlin")
         setLicenses("Apache-2.0")
