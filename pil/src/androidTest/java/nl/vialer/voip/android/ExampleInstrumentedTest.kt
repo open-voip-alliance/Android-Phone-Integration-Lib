@@ -1,4 +1,4 @@
-package nl.vialer.voip.android
+package org.openvoipalliance.androidplatformintegration
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry

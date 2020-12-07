@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <nl.vialer.voip.android.example.ui.Dialer
+    <org.openvoipalliance.androidplatformintegration.example.ui.Dialer
         android:id="@+id/dialer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -7,13 +7,13 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="nl.vialer.voip.android.example.ui.home.DialerFragment"
+        android:name="org.openvoipalliance.androidplatformintegration.example.ui.home.DialerFragment"
         android:label="@string/title_dialer"
         tools:layout="@layout/fragment_dialer" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="nl.vialer.voip.android.example.ui.settings.SettingsFragment"
+        android:name="org.openvoipalliance.androidplatformintegration.example.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_dashboard" />
 
