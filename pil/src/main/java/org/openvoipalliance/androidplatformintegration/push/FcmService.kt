@@ -11,6 +11,8 @@ internal class FcmService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
+        if (!PIL.isInitialized) return
+
         if (pil.androidTelecomManager.isInCall) {
             pil.app.middleware?.respond(remoteMessage, false)
             return
@@ -23,6 +25,9 @@ internal class FcmService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+
+        if (!PIL.isInitialized) return
+
         pil.app.middleware?.tokenReceived(token)
     }
 }

@@ -25,6 +25,7 @@ import org.openvoipalliance.androidplatformintegration.telecom.Connection
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.RegistrationState.FAILED
 import org.openvoipalliance.phonelib.model.RegistrationState.REGISTERED
+import kotlin.reflect.KProperty
 
 class PIL internal constructor(internal val app: ApplicationSetup) {
 
@@ -162,5 +163,13 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
 
     companion object {
         lateinit var instance: PIL
+
+        /**
+         * Check whether the PIL has been initialized, this should only be needed when calling the PIL
+         * from a service class that may run before your application onCreate method.
+         *
+         */
+        val isInitialized: Boolean
+            get() = ::instance.isInitialized
     }
 }
