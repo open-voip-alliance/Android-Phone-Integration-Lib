@@ -46,7 +46,7 @@ internal class VoIPService : Service(), PILEventListener {
     val callEventLoop = object : Runnable {
         override fun run() {
             if (pil.call != null)
-                pil.events.broadcast(Event.CALL_UPDATED)
+                pil.events.broadcast(Event.CallEvent.CallUpdated(pil.call))
             else
                 stopSelf()
 

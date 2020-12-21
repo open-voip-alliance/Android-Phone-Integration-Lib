@@ -77,6 +77,6 @@ class Connection internal constructor(private val pil: PIL) : AndroidConnection(
         }
 
         callback.invoke(call)
-        pil.events.broadcast(Event.CALL_UPDATED)
+        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.call))
     }
 }

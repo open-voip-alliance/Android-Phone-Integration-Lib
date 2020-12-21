@@ -5,13 +5,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_call.*
-import org.openvoipalliance.androidplatformintegration.PIL
-import org.openvoipalliance.androidplatformintegration.example.R
 import org.openvoipalliance.androidplatformintegration.CallScreenLifecycleObserver
+import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.audio.AudioRoute
+import org.openvoipalliance.androidplatformintegration.call.PILCall
 import org.openvoipalliance.androidplatformintegration.events.Event
-import org.openvoipalliance.androidplatformintegration.events.Event.*
+import org.openvoipalliance.androidplatformintegration.events.Event.CallEvent
 import org.openvoipalliance.androidplatformintegration.events.PILEventListener
+import org.openvoipalliance.androidplatformintegration.example.R
 import org.openvoipalliance.androidplatformintegration.example.ui.TransferDialog
 
 class CallActivity : AppCompatActivity(), PILEventListener {
@@ -72,8 +73,8 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         pil.events.stopListening(this)
     }
 
-    private fun render() {
-        val call = pil.call ?: run {
+    private fun render(call: PILCall? = pil.call) {
+        if (call == null) {
             finish()
             return
         }
@@ -110,14 +111,15 @@ class CallActivity : AppCompatActivity(), PILEventListener {
     }
 
     override fun onEvent(event: Event) = when (event) {
-        CALL_ENDED -> {
+        is CallEvent.CallEnded -> {
             if (pil.call == null) {
                 finish()
             } else {
-                render()
+
+                render(event.call)
             }
         }
-        CALL_UPDATED -> render()
+        is CallEvent.CallUpdated -> render(event.call)
         else -> {}
     }
 }

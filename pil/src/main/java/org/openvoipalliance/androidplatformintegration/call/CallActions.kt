@@ -76,7 +76,7 @@ class CallActions internal constructor(
 
         callback.invoke(connection)
 
-        pil.events.broadcast(Event.CALL_UPDATED)
+        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.call))
     }
 
     /**
@@ -91,6 +91,6 @@ class CallActions internal constructor(
         }
 
         callback.invoke(call)
-        pil.events.broadcast(Event.CALL_UPDATED)
+        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.call))
     }
 }

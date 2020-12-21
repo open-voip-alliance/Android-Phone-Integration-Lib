@@ -19,7 +19,7 @@ class EventsManager internal constructor(private val pil: PIL) {
 
     internal fun broadcast(event: Event) {
         GlobalScope.launch(Dispatchers.Main) {
-            pil.writeLog("Broadcasting ${event.name}")
+            pil.writeLog("Broadcasting ${event::javaClass.name}")
             eventListeners.forEach { it.onEvent(event) }
         }
     }

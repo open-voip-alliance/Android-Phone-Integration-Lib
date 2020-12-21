@@ -22,7 +22,7 @@ internal class CallManager(private val pil: PIL) : CallListener {
     override fun incomingCallReceived(call: Call) {
         if (!isInCall) {
             this.call = call
-            pil.events.broadcast(Event.INCOMING_CALL_RECEIVED)
+            pil.events.broadcast(Event.CallEvent.IncomingCallReceived(pil.call))
             pil.androidTelecomManager.addNewIncomingCall(call.phoneNumber)
         }
     }
@@ -30,14 +30,14 @@ internal class CallManager(private val pil: PIL) : CallListener {
     override fun callConnected(call: Call) {
         super.callConnected(call)
         pil.writeLog("EVENT RECEIVED: callConnected")
-        pil.events.broadcast(Event.CALL_CONNECTED)
+        pil.events.broadcast(Event.CallEvent.CallConnected(pil.call))
         pil.app.application.startCallActivity()
     }
 
     override fun outgoingCallCreated(call: Call) {
         if (!isInCall) {
             this.call = call
-            pil.events.broadcast(Event.OUTGOING_CALL_STARTED)
+            pil.events.broadcast(Event.CallEvent.OutgoingCallStarted(pil.call))
             pil.connection?.setActive()
             pil.connection?.setCallerDisplayName(
                 pil.call?.remotePartyHeading,
@@ -61,7 +61,7 @@ internal class CallManager(private val pil: PIL) : CallListener {
             pil.connection?.destroy()
         }
 
-        pil.events.broadcast(Event.CALL_ENDED)
+        pil.events.broadcast(Event.CallEvent.CallEnded(pil.call))
         transferSession = null
     }
 

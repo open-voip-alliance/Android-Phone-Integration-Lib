@@ -44,8 +44,8 @@ class IncomingCallActivity : AppCompatActivity(), PILEventListener {
 
     override fun onEvent(event: Event) {
         when (event) {
-            CALL_ENDED -> finish()
-            CALL_UPDATED -> displayCall()
+            is CallEvent.CallEnded -> finish()
+            is CallEvent.CallUpdated -> displayCall()
             else -> {}
         }
     }

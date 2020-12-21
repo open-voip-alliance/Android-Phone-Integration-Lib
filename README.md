@@ -130,14 +130,14 @@ An example implementation that will display the call or close the activity depen
 
 ```kotlin
 override fun onEvent(event: Event) = when(event) {
-	CALL_ENDED -> {
+	is CallEvent.CallEnded -> {
 		if (pil.call == null) {
 			finish()
 		} else {
 			displayCall()
 		}
 	}
-	CALL_UPDATED -> displayCall()
+	is CallEvent.CallUpdated -> displayCall()
 	else -> {}
 }
 ```
