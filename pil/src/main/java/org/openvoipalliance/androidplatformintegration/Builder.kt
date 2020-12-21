@@ -16,7 +16,6 @@ class Builder internal constructor() {
     internal fun start(applicationSetup: ApplicationSetup): PIL {
         val pil = PIL(applicationSetup)
 
-        Log.e("TEST123", "bbb");
         applicationSetup.middleware?.let { setupFcmWithMiddleware(it) }
         setupApplicationBackgroundListeners(pil)
         pil.preferences = this.preferences
