@@ -1,6 +1,5 @@
 package org.openvoipalliance.androidplatformintegration
 
-import android.util.Log
 import com.google.firebase.messaging.FirebaseMessaging
 import com.takwolf.android.foreback.Foreback
 import org.openvoipalliance.androidplatformintegration.configuration.ApplicationSetup

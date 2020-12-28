@@ -5,12 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_call.callSubtitle
 import kotlinx.android.synthetic.main.activity_call.callTitle
 import kotlinx.android.synthetic.main.activity_incoming_call.*
-import org.openvoipalliance.androidplatformintegration.PIL
-import org.openvoipalliance.androidplatformintegration.example.R
 import org.openvoipalliance.androidplatformintegration.CallScreenLifecycleObserver
+import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.events.Event
-import org.openvoipalliance.androidplatformintegration.events.Event.*
+import org.openvoipalliance.androidplatformintegration.events.Event.CallEvent
 import org.openvoipalliance.androidplatformintegration.events.PILEventListener
+import org.openvoipalliance.androidplatformintegration.example.R
 
 class IncomingCallActivity : AppCompatActivity(), PILEventListener {
 

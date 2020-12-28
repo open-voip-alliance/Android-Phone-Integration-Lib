@@ -5,6 +5,7 @@ import org.openvoipalliance.phonelib.config.Config
 import org.openvoipalliance.phonelib.model.RegistrationState
 import org.openvoipalliance.phonelib.repository.initialise.LogLevel
 import org.openvoipalliance.phonelib.repository.initialise.LogListener
+import org.openvoipalliance.androidplatformintegration.logging.LogLevel as PilLogLevel
 
 internal class PhoneLibHelper(private val pil: PIL) {
 
@@ -78,12 +79,12 @@ internal class PhoneLibHelper(private val pil: PIL) {
             pil.app.logger?.onLogReceived(
                 message,
                 when (lev) {
-                    LogLevel.DEBUG -> org.openvoipalliance.androidplatformintegration.logging.LogLevel.DEBUG
-                    LogLevel.TRACE -> org.openvoipalliance.androidplatformintegration.logging.LogLevel.DEBUG
-                    LogLevel.MESSAGE -> org.openvoipalliance.androidplatformintegration.logging.LogLevel.INFO
-                    LogLevel.WARNING -> org.openvoipalliance.androidplatformintegration.logging.LogLevel.WARNING
-                    LogLevel.ERROR -> org.openvoipalliance.androidplatformintegration.logging.LogLevel.ERROR
-                    LogLevel.FATAL -> org.openvoipalliance.androidplatformintegration.logging.LogLevel.ERROR
+                    LogLevel.DEBUG -> PilLogLevel.DEBUG
+                    LogLevel.TRACE -> PilLogLevel.DEBUG
+                    LogLevel.MESSAGE -> PilLogLevel.INFO
+                    LogLevel.WARNING -> PilLogLevel.WARNING
+                    LogLevel.ERROR -> PilLogLevel.ERROR
+                    LogLevel.FATAL -> PilLogLevel.ERROR
                 }
             )
         }

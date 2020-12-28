@@ -11,11 +11,11 @@ import com.android.volley.toolbox.Volley
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.openvoipalliance.androidplatformintegration.PIL
-import org.openvoipalliance.androidplatformintegration.example.R
-import org.openvoipalliance.androidplatformintegration.configuration.Auth
-import org.openvoipalliance.androidplatformintegration.example.VoIPGRIDMiddleware
 import org.json.JSONObject
+import org.openvoipalliance.androidplatformintegration.PIL
+import org.openvoipalliance.androidplatformintegration.configuration.Auth
+import org.openvoipalliance.androidplatformintegration.example.R
+import org.openvoipalliance.androidplatformintegration.example.VoIPGRIDMiddleware
 
 class SettingsFragment : PreferenceFragmentCompat() {
 

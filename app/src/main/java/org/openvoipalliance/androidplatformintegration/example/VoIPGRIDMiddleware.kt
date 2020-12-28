@@ -6,8 +6,8 @@ import androidx.preference.PreferenceManager
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.openvoipalliance.androidplatformintegration.push.Middleware
 import okhttp3.*
+import org.openvoipalliance.androidplatformintegration.push.Middleware
 import java.io.IOException
 
 class VoIPGRIDMiddleware(private val context: Context) : Middleware {

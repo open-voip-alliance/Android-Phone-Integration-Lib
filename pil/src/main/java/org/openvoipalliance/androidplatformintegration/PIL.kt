@@ -4,9 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.telecom.TelecomManager
 import androidx.core.content.ContextCompat
-import org.openvoipalliance.androidplatformintegration.CallManager
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import org.openvoipalliance.androidplatformintegration.audio.AudioManager
 import org.openvoipalliance.androidplatformintegration.call.CallActions
 import org.openvoipalliance.androidplatformintegration.call.PILCall
@@ -25,7 +22,8 @@ import org.openvoipalliance.androidplatformintegration.telecom.Connection
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.RegistrationState.FAILED
 import org.openvoipalliance.phonelib.model.RegistrationState.REGISTERED
-import kotlin.reflect.KProperty
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class PIL internal constructor(internal val app: ApplicationSetup) {
 
@@ -152,7 +150,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     }
 
     private fun performPermissionCheck() {
-        if (ContextCompat.checkSelfPermission(app.application, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_DENIED) {
+        if (ContextCompat.checkSelfPermission(app.application, Manifest.permission.CALL_PHONE)
+            == PackageManager.PERMISSION_DENIED) {
             throw PermissionException(Manifest.permission.CALL_PHONE)
         }
     }

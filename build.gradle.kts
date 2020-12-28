@@ -13,15 +13,8 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${project.extra["kotlinVersion"]}")
         classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
         classpath("com.google.gms:google-services:4.3.4")
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:9.4.1")
     }
 }
-
-//apply(plugin = "org.jlleitschuh.gradle.ktlint-idea")
-
-//subprojects {
-//    //apply(plugin = "org.jlleitschuh.gradle.ktlint-idea")
-//}
 
 allprojects {
     repositories {
