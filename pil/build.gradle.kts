@@ -17,7 +17,7 @@ android {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
+    api(platform("com.google.firebase:firebase-bom:26.1.0"))
 
     api("org.openvoipalliance:AndroidPhoneLib:0.6.25")
     api("com.google.firebase:firebase-messaging")
