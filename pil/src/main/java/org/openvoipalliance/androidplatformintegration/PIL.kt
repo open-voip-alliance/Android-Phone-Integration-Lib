@@ -2,7 +2,6 @@ package org.openvoipalliance.androidplatformintegration
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.telecom.TelecomManager
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidplatformintegration.audio.AudioManager
 import org.openvoipalliance.androidplatformintegration.call.CallActions
@@ -11,14 +10,13 @@ import org.openvoipalliance.androidplatformintegration.call.PILCallFactory
 import org.openvoipalliance.androidplatformintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidplatformintegration.configuration.Auth
 import org.openvoipalliance.androidplatformintegration.configuration.Preferences
-import org.openvoipalliance.androidplatformintegration.contacts.Contacts
+import org.openvoipalliance.androidplatformintegration.di.di
 import org.openvoipalliance.androidplatformintegration.events.EventsManager
 import org.openvoipalliance.androidplatformintegration.events.PILEventListener
 import org.openvoipalliance.androidplatformintegration.exception.NoAuthenticationCredentialsException
 import org.openvoipalliance.androidplatformintegration.exception.PermissionException
 import org.openvoipalliance.androidplatformintegration.logging.LogLevel
-import org.openvoipalliance.androidplatformintegration.telecom.AndroidTelecomManager
-import org.openvoipalliance.androidplatformintegration.telecom.Connection
+import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.RegistrationState.FAILED
 import org.openvoipalliance.phonelib.model.RegistrationState.REGISTERED
@@ -27,19 +25,16 @@ import kotlin.coroutines.suspendCoroutine
 
 class PIL internal constructor(internal val app: ApplicationSetup) {
 
-    private val callFactory = PILCallFactory(this, Contacts(app.application))
-    internal var connection: Connection? = null
-    internal val callManager = CallManager(this)
-    internal val androidTelecomManager: AndroidTelecomManager = AndroidTelecomManager(
-        app.application,
-        app.application.getSystemService(TelecomManager::class.java)
-    )
-    internal val phoneLib by lazy { PhoneLib.getInstance(app.application) }
-    private val phoneLibHelper = PhoneLibHelper(this)
+    private val callFactory: PILCallFactory by di.koin.inject()
+    private val callManager: CallManager by di.koin.inject()
+    private val androidCallFramework: AndroidCallFramework by di.koin.inject()
 
-    val actions = CallActions(this, phoneLib, callManager)
-    val audio = AudioManager(this, phoneLib, callManager)
-    val events = EventsManager(this)
+    private val phoneLib: PhoneLib by di.koin.inject()
+    private val phoneLibHelper: PhoneLibHelper by di.koin.inject()
+
+    val actions: CallActions by di.koin.inject()
+    val audio: AudioManager by di.koin.inject()
+    val events: EventsManager by di.koin.inject()
 
     var preferences: Preferences = Preferences.DEFAULT
         set(preferences) {
@@ -119,7 +114,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         performPermissionCheck()
 
         start {
-            androidTelecomManager.placeCall(number)
+            androidCallFramework.placeCall(number)
         }
     }
 

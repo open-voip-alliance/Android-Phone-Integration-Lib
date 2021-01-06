@@ -8,13 +8,17 @@ import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import android.widget.Toast
 import org.openvoipalliance.androidplatformintegration.PIL
+import org.openvoipalliance.androidplatformintegration.di.di
+import org.openvoipalliance.phonelib.PhoneLib
 
 internal class ConnectionService : AndroidConnectionService() {
 
-    private val pil by lazy { PIL.instance }
+    private val pil: PIL by di.koin.inject()
+    private val phoneLib: PhoneLib by di.koin.inject()
+    private val androidCallFramework: AndroidCallFramework by di.koin.inject()
 
     private val baseConnection: Connection
-        get() = Connection(pil).apply {
+        get() = di.koin.get(Connection::class).apply {
             connectionProperties = PROPERTY_SELF_MANAGED
             connectionCapabilities = CAPABILITY_HOLD or CAPABILITY_SUPPORT_HOLD or CAPABILITY_MUTE
             audioModeIsVoip = true
@@ -29,9 +33,9 @@ internal class ConnectionService : AndroidConnectionService() {
             videoState = request.videoState
         }
 
-        pil.phoneLib.callTo(request.address.schemeSpecificPart)
+        phoneLib.callTo(request.address.schemeSpecificPart)
 
-        return connection.also { pil.connection = it }
+        return connection.also { androidCallFramework.connection = it }
     }
 
     override fun onCreateOutgoingConnectionFailed(
@@ -49,7 +53,7 @@ internal class ConnectionService : AndroidConnectionService() {
             videoState = request.videoState
             setCallerDisplayName(pil.call?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
             setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
-        }.also { pil.connection = it }
+        }.also { androidCallFramework.connection = it }
     }
 
     override fun onCreateIncomingConnectionFailed(

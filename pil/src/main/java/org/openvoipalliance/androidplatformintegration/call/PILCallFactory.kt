@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.Tasks.call
 import java.util.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.openvoipalliance.androidplatformintegration.CallManager
 import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.contacts.Contact
 import org.openvoipalliance.androidplatformintegration.contacts.Contacts
@@ -14,7 +15,7 @@ import org.openvoipalliance.phonelib.model.CallState
 import org.openvoipalliance.phonelib.model.CallState.*
 import org.openvoipalliance.phonelib.model.Direction
 
-internal class PILCallFactory(private val pil: PIL, private val contacts: Contacts) :
+internal class PILCallFactory(private val pil: PIL, private val contacts: Contacts, private val callManager: CallManager) :
     PILEventListener {
 
     private val cachedContacts = mutableMapOf<Call, Contact>()
@@ -47,7 +48,7 @@ internal class PILCallFactory(private val pil: PIL, private val contacts: Contac
     }
 
     override fun onEvent(event: Event) {
-        val call = pil.callManager.call ?: return
+        val call = callManager.call ?: return
 
         GlobalScope.launch {
             if (!cachedContacts.containsKey(call)) {

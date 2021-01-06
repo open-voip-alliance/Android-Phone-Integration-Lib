@@ -7,11 +7,12 @@ import org.openvoipalliance.androidplatformintegration.service.VoIPService
 import org.openvoipalliance.androidplatformintegration.service.startCallActivity
 import org.openvoipalliance.androidplatformintegration.service.startVoipService
 import org.openvoipalliance.androidplatformintegration.service.stopVoipService
+import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.phonelib.model.AttendedTransferSession
 import org.openvoipalliance.phonelib.model.Call
 import org.openvoipalliance.phonelib.repository.initialise.CallListener
 
-internal class CallManager(private val pil: PIL) : CallListener {
+internal class CallManager(private val pil: PIL, private val androidCallFramework: AndroidCallFramework) : CallListener {
 
     internal var call: Call? = null
     internal var transferSession: AttendedTransferSession? = null
@@ -23,7 +24,7 @@ internal class CallManager(private val pil: PIL) : CallListener {
         if (!isInCall) {
             this.call = call
             pil.events.broadcast(Event.CallEvent.IncomingCallReceived(pil.call))
-            pil.androidTelecomManager.addNewIncomingCall(call.phoneNumber)
+            androidCallFramework.addNewIncomingCall(call.phoneNumber)
         }
     }
 
@@ -38,8 +39,8 @@ internal class CallManager(private val pil: PIL) : CallListener {
         if (!isInCall) {
             this.call = call
             pil.events.broadcast(Event.CallEvent.OutgoingCallStarted(pil.call))
-            pil.connection?.setActive()
-            pil.connection?.setCallerDisplayName(
+            androidCallFramework.connection?.setActive()
+            androidCallFramework.connection?.setCallerDisplayName(
                 pil.call?.remotePartyHeading,
                 TelecomManager.PRESENTATION_ALLOWED
             )
@@ -57,8 +58,8 @@ internal class CallManager(private val pil: PIL) : CallListener {
         if (!pil.isInTransfer) {
             this.call = null
             pil.app.application.stopVoipService()
-            pil.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
-            pil.connection?.destroy()
+            androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
+            androidCallFramework.connection?.destroy()
         }
 
         pil.events.broadcast(Event.CallEvent.CallEnded(pil.call))

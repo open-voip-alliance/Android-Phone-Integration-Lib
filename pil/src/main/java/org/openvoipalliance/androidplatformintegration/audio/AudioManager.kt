@@ -1,15 +1,13 @@
 package org.openvoipalliance.androidplatformintegration.audio
 
 import android.telecom.CallAudioState.*
-import org.openvoipalliance.androidplatformintegration.CallManager
-import org.openvoipalliance.androidplatformintegration.PIL
+import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.Codec
 
 class AudioManager internal constructor(
-    private val pil: PIL,
     private val phoneLib: PhoneLib,
-    private val callManager: CallManager
+    private val androidCallFramework: AndroidCallFramework
 ) {
 
     val availableCodecs = arrayOf(Codec.OPUS, Codec.ILBC, Codec.G729, Codec.SPEEX)
@@ -21,7 +19,7 @@ class AudioManager internal constructor(
         get() = createAudioStateObject()
 
     fun routeAudio(route: AudioRoute) {
-        pil.connection?.setAudioRoute(pilRouteToNativeRoute(route))
+        androidCallFramework.connection?.setAudioRoute(pilRouteToNativeRoute(route))
     }
 
     fun mute() {
@@ -40,7 +38,7 @@ class AudioManager internal constructor(
 
         val default = AudioState(AudioRoute.PHONE, arrayOf(), null)
 
-        val connection = pil.connection ?: return default
+        val connection = androidCallFramework.connection ?: return default
 
         if (connection?.callAudioState == null) {
             return default

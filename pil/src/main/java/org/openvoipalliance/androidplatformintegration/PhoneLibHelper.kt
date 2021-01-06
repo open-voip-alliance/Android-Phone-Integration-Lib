@@ -1,5 +1,6 @@
 package org.openvoipalliance.androidplatformintegration
 
+import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.config.Auth
 import org.openvoipalliance.phonelib.config.Config
 import org.openvoipalliance.phonelib.model.RegistrationState
@@ -7,15 +8,15 @@ import org.openvoipalliance.phonelib.repository.initialise.LogLevel
 import org.openvoipalliance.phonelib.repository.initialise.LogListener
 import org.openvoipalliance.androidplatformintegration.logging.LogLevel as PilLogLevel
 
-internal class PhoneLibHelper(private val pil: PIL) {
+internal class PhoneLibHelper(private val pil: PIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
 
     /**
      * Boots the VoIP library.
      *
      */
     fun initialise(forceInitialize: Boolean = false) {
-        if (pil.phoneLib.isInitialised && !forceInitialize) {
-            pil.phoneLib.wake()
+        if (phoneLib.isInitialised && !forceInitialize) {
+            phoneLib.wake()
             pil.writeLog("The VoIP library is already initialised, skipping init.")
             return
         }
@@ -25,10 +26,10 @@ internal class PhoneLibHelper(private val pil: PIL) {
             return
         }
 
-        pil.phoneLib.initialise(
+        phoneLib.initialise(
             Config(
                 auth = Auth("", "", "", 0),
-                callListener = pil.callManager,
+                callListener = callManager,
                 encryption = auth.secure,
                 logListener = voipLibraryLogListener,
                 codecs = pil.preferences.codecs,
@@ -47,8 +48,8 @@ internal class PhoneLibHelper(private val pil: PIL) {
         forceReRegistration: Boolean = false,
         callback: () -> Unit
     ) {
-        pil.phoneLib.swapConfig(
-            pil.phoneLib.currentConfig.copy(
+        phoneLib.swapConfig(
+            phoneLib.currentConfig.copy(
                 auth = Auth(
                     auth.username,
                     auth.password,
@@ -58,7 +59,7 @@ internal class PhoneLibHelper(private val pil: PIL) {
             )
         )
 
-        if (pil.phoneLib.isRegistered && !forceReRegistration) {
+        if (phoneLib.isRegistered && !forceReRegistration) {
             pil.writeLog("We are already registered!")
             callback.invoke()
             return
@@ -66,7 +67,7 @@ internal class PhoneLibHelper(private val pil: PIL) {
 
         pil.writeLog("Attempting registration...")
 
-        pil.phoneLib.register {
+        phoneLib.register {
             if (it == RegistrationState.REGISTERED) {
                 pil.writeLog("Registration was successful!")
                 callback.invoke()

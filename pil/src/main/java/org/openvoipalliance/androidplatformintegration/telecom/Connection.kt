@@ -4,14 +4,21 @@ import android.annotation.SuppressLint
 import android.telecom.Connection as AndroidConnection
 import android.telecom.DisconnectCause
 import android.telecom.DisconnectCause.LOCAL
+import org.openvoipalliance.androidplatformintegration.CallManager
 import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.events.Event
 import org.openvoipalliance.androidplatformintegration.service.VoIPService
 import org.openvoipalliance.androidplatformintegration.service.startVoipService
+import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.Call
 import org.openvoipalliance.phonelib.model.Reason
 
-class Connection internal constructor(private val pil: PIL) : AndroidConnection() {
+class Connection internal constructor(
+    private val pil: PIL,
+    private val phoneLib: PhoneLib,
+    private val callManager: CallManager,
+    private val androidCallFramework: AndroidCallFramework
+    ) : AndroidConnection() {
 
     override fun onShowIncomingCallUi() {
         if (!VoIPService.isRunning) {
@@ -21,20 +28,20 @@ class Connection internal constructor(private val pil: PIL) : AndroidConnection(
 
     override fun onHold() {
         callExists {
-            pil.phoneLib.actions(it).hold(true)
+            phoneLib.actions(it).hold(true)
             setOnHold()
         }
     }
 
     fun toggleHold() {
         callExists {
-            pil.phoneLib.actions(it).hold(!it.isOnHold)
+            phoneLib.actions(it).hold(!it.isOnHold)
         }
     }
 
     override fun onUnhold() {
         callExists {
-            pil.phoneLib.actions(it).hold(false)
+            phoneLib.actions(it).hold(false)
             setActive()
         }
     }
@@ -42,7 +49,7 @@ class Connection internal constructor(private val pil: PIL) : AndroidConnection(
     @SuppressLint("MissingPermission")
     override fun onAnswer() {
         callExists {
-            pil.phoneLib.actions(it).accept()
+            phoneLib.actions(it).accept()
             setActive()
         }
     }
@@ -50,17 +57,17 @@ class Connection internal constructor(private val pil: PIL) : AndroidConnection(
     @SuppressLint("MissingPermission")
     override fun onReject() {
         callExists {
-            pil.phoneLib.actions(it).decline(Reason.BUSY)
+            phoneLib.actions(it).decline(Reason.BUSY)
             destroy()
         }
     }
 
     override fun onDisconnect() {
         callExists {
-            pil.phoneLib.actions(it).end()
+            phoneLib.actions(it).end()
         }
 
-        pil.connection = null
+        androidCallFramework.connection = null
         setDisconnected(DisconnectCause(LOCAL))
         destroy()
     }
@@ -70,9 +77,9 @@ class Connection internal constructor(private val pil: PIL) : AndroidConnection(
      *
      */
     private fun callExists(callback: (call: Call) -> Unit) {
-        var call = pil.callManager.call ?: return
+        var call = callManager.call ?: return
 
-        pil.callManager.transferSession?.let {
+        callManager.transferSession?.let {
             call = it.to
         }
 

@@ -29,6 +29,7 @@ dependencies {
     implementation("com.takwolf.android:foreback:0.1.1")
     implementation("com.tomash:androidcontacts:1.14.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
+    implementation("org.koin:koin-android:2.2.0")
 
     testImplementation("junit:junit:4.+")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")

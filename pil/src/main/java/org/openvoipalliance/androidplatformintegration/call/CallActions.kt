@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import org.openvoipalliance.androidplatformintegration.CallManager
 import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.events.Event
+import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidplatformintegration.telecom.Connection
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.model.Call
@@ -11,7 +12,8 @@ import org.openvoipalliance.phonelib.model.Call
 class CallActions internal constructor(
     private val pil: PIL,
     private val phoneLib: PhoneLib,
-    private val callManager: CallManager
+    private val callManager: CallManager,
+    private val androidCallFramework: AndroidCallFramework
 ) {
 
     fun hold() {
@@ -72,7 +74,7 @@ class CallActions internal constructor(
     }
 
     private fun connection(callback: (connection: Connection) -> Unit) {
-        val connection = pil.connection ?: return
+        val connection = androidCallFramework.connection ?: return
 
         callback.invoke(connection)
 

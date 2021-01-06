@@ -5,6 +5,7 @@ import com.takwolf.android.foreback.Foreback
 import org.openvoipalliance.androidplatformintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidplatformintegration.configuration.Auth
 import org.openvoipalliance.androidplatformintegration.configuration.Preferences
+import org.openvoipalliance.androidplatformintegration.di.initPilKoin
 import org.openvoipalliance.androidplatformintegration.push.Middleware
 
 class Builder internal constructor() {
@@ -13,6 +14,8 @@ class Builder internal constructor() {
     var auth: Auth? = null
 
     internal fun start(applicationSetup: ApplicationSetup): PIL {
+        initPilKoin(applicationSetup.application)
+
         val pil = PIL(applicationSetup)
 
         applicationSetup.middleware?.let { setupFcmWithMiddleware(it) }

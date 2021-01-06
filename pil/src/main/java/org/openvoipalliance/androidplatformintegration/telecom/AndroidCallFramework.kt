@@ -16,10 +16,12 @@ import org.openvoipalliance.androidplatformintegration.BuildConfig
  * and less verbose.
  *
  */
-internal class AndroidTelecomManager(
+internal class AndroidCallFramework(
     private val context: Context,
     private val telecomManager: TelecomManager
 ) {
+
+    internal var connection: Connection? = null
 
     private val handle: PhoneAccountHandle by lazy {
         PhoneAccountHandle(
