@@ -34,7 +34,7 @@ internal class VoIPService : Service(), PILEventListener {
 
     private val isIncomingRinging
         get() = kotlin.run {
-            pil.call?.let {
+            pil.calls.active?.let {
                 return@run it.state == CallState.INITIALIZING && it.direction == CallDirection.INBOUND
             }
 
@@ -45,8 +45,8 @@ internal class VoIPService : Service(), PILEventListener {
 
     val callEventLoop = object : Runnable {
         override fun run() {
-            if (pil.call != null)
-                pil.events.broadcast(Event.CallEvent.CallUpdated(pil.call))
+            if (pil.calls.active != null)
+                pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
             else
                 stopSelf()
 
@@ -100,7 +100,7 @@ internal class VoIPService : Service(), PILEventListener {
         wakeLock?.acquire(30000)
 
         val incomingCallActivity = pil.app.activities.incomingCall ?: return
-        val call = pil.call ?: return
+        val call = pil.calls.active ?: return
 
         val intent = Intent(Intent.ACTION_MAIN, null)
         intent.flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -137,7 +137,7 @@ internal class VoIPService : Service(), PILEventListener {
 
         pil.writeLog("Updating call notification")
 
-        val call = pil.call ?: return
+        val call = pil.calls.active ?: return
 
         val notification = createNotification()
             .setContentTitle(call.remoteNumber)
@@ -253,7 +253,6 @@ internal class VoIPService : Service(), PILEventListener {
         const val INCOMING_CALLS_CHANNEL_ID = "VoIP Incoming Calls"
         const val INCOMING_CALLS_APP_RING_CHANNEL_ID = "VoIP Incoming Calls (App Ring)"
         const val REPEAT_MS = 500L
-        const val TIMER_NAME = "call-update"
 
         internal var isRunning = false
     }

@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidplatformintegration.audio.AudioManager
 import org.openvoipalliance.androidplatformintegration.call.CallActions
-import org.openvoipalliance.androidplatformintegration.call.PILCall
+import org.openvoipalliance.androidplatformintegration.call.Calls
 import org.openvoipalliance.androidplatformintegration.call.PILCallFactory
 import org.openvoipalliance.androidplatformintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidplatformintegration.configuration.Auth
@@ -15,6 +15,7 @@ import org.openvoipalliance.androidplatformintegration.events.EventsManager
 import org.openvoipalliance.androidplatformintegration.events.PILEventListener
 import org.openvoipalliance.androidplatformintegration.exception.NoAuthenticationCredentialsException
 import org.openvoipalliance.androidplatformintegration.exception.PermissionException
+import org.openvoipalliance.androidplatformintegration.helpers.PhoneLibHelper
 import org.openvoipalliance.androidplatformintegration.logging.LogLevel
 import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.phonelib.PhoneLib
@@ -26,49 +27,42 @@ import kotlin.coroutines.suspendCoroutine
 class PIL internal constructor(internal val app: ApplicationSetup) {
 
     private val callFactory: PILCallFactory by di.koin.inject()
-    private val callManager: CallManager by di.koin.inject()
     private val androidCallFramework: AndroidCallFramework by di.koin.inject()
-
     private val phoneLib: PhoneLib by di.koin.inject()
     private val phoneLibHelper: PhoneLibHelper by di.koin.inject()
 
     val actions: CallActions by di.koin.inject()
     val audio: AudioManager by di.koin.inject()
     val events: EventsManager by di.koin.inject()
+    val calls: Calls by di.koin.inject()
 
+    /**
+     * The user preferences for the PIL, when this value is updated it will trigger
+     * a full PIL restart and re-register.
+     *
+     */
     var preferences: Preferences = Preferences.DEFAULT
         set(preferences) {
             field = preferences
-            if (!phoneLib.isInitialised) return
 
-            start(forceInitialize = true, forceReregister = true)
+            if (isPreparedToStart) {
+                start(forceInitialize = true, forceReregister = true)
+            }
         }
 
+    /**
+     * The authentication details for the PIL, when this value is updated it will
+     * trigger a full re-register.
+     *
+     */
     var auth: Auth? = null
         set(auth) {
-            if (auth?.isValid != true) {
-                writeLog("Attempting to set an invalid auth object", LogLevel.ERROR)
-                return
+            field = if (auth?.isValid == true) auth else null
+
+            if (isPreparedToStart) {
+                start(forceInitialize = false, forceReregister = true)
             }
-
-            field = auth
-            start(forceInitialize = false, forceReregister = true)
         }
-
-    val call: PILCall?
-        get() = run {
-            if (isInTransfer) {
-                return@run callFactory.make(callManager.transferSession?.to)
-            }
-
-            callManager.call?.let { callFactory.make(it) }
-        }
-
-    val transferCall: PILCall?
-        get() = callManager.transferSession?.let { callFactory.make(it.from) }
-
-    val isInTransfer: Boolean
-        get() = callManager.transferSession != null
 
     init {
         instance = this
@@ -154,6 +148,9 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     internal fun writeLog(message: String, level: LogLevel = LogLevel.INFO) {
         app.logger?.onLogReceived(message, level)
     }
+
+    private val isPreparedToStart: Boolean
+        get() = phoneLib.isInitialised && auth != null
 
     companion object {
         lateinit var instance: PIL

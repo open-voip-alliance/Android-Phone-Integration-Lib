@@ -3,9 +3,10 @@ package org.openvoipalliance.androidplatformintegration.di
 import android.telecom.TelecomManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import org.openvoipalliance.androidplatformintegration.CallManager
+import org.openvoipalliance.androidplatformintegration.call.CallManager
+import org.openvoipalliance.androidplatformintegration.call.Calls
 import org.openvoipalliance.androidplatformintegration.PIL
-import org.openvoipalliance.androidplatformintegration.PhoneLibHelper
+import org.openvoipalliance.androidplatformintegration.helpers.PhoneLibHelper
 import org.openvoipalliance.androidplatformintegration.audio.AudioManager
 import org.openvoipalliance.androidplatformintegration.call.CallActions
 import org.openvoipalliance.androidplatformintegration.call.PILCallFactory
@@ -45,4 +46,6 @@ val pilModule = module {
     single { PhoneLibHelper(get(), get(), get()) }
 
     factory { Connection(get(), get(), get(), get()) }
+
+    factory { Calls(get(), get()) }
 }

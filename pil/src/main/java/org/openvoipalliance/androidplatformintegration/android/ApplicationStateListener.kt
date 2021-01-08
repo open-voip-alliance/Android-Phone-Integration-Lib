@@ -12,7 +12,7 @@ internal class ApplicationStateListener(private val pil: PIL) : Foreback.Listene
         pil.writeLog("Application has entered the foreground")
 
         if (VoIPService.isRunning && pil.app.automaticallyStartCallActivity) {
-            if (pil.call?.state == CallState.CONNECTED) {
+            if (pil.calls.active?.state == CallState.CONNECTED) {
                 pil.app.application.startCallActivity()
             }
         }

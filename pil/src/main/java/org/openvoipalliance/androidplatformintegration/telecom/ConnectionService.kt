@@ -51,7 +51,7 @@ internal class ConnectionService : AndroidConnectionService() {
     ): Connection {
         return baseConnection.apply {
             videoState = request.videoState
-            setCallerDisplayName(pil.call?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
+            setCallerDisplayName(pil.calls.active?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
             setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
         }.also { androidCallFramework.connection = it }
     }

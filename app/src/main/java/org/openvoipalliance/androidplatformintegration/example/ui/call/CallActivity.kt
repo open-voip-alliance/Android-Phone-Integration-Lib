@@ -73,16 +73,16 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         pil.events.stopListening(this)
     }
 
-    private fun render(call: PILCall? = pil.call) {
+    private fun render(call: PILCall? = pil.calls.active) {
         if (call == null) {
             finish()
             return
         }
 
-        if (pil.isInTransfer) {
-            transferCallInformation.text = pil.transferCall?.remotePartyHeading
-            if (pil.transferCall?.remotePartySubheading?.isNotBlank() == true) {
-                transferCallInformation.text = "${transferCallInformation.text} (${pil.transferCall?.remotePartySubheading})"
+        if (pil.calls.isInTransfer) {
+            transferCallInformation.text = pil.calls.inactive?.remotePartyHeading
+            if (pil.calls.inactive?.remotePartySubheading?.isNotBlank() == true) {
+                transferCallInformation.text = "${transferCallInformation.text} (${pil.calls.inactive?.remotePartySubheading})"
             }
             transferContainer.visibility = View.VISIBLE
         } else {
@@ -112,7 +112,7 @@ class CallActivity : AppCompatActivity(), PILEventListener {
 
     override fun onEvent(event: Event) = when (event) {
         is CallEvent.CallEnded -> {
-            if (pil.call == null) {
+            if (pil.calls.active == null) {
                 finish()
             } else {
 

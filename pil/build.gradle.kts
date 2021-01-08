@@ -17,10 +17,8 @@ android {
 }
 
 dependencies {
-    api(platform("com.google.firebase:firebase-bom:26.1.0"))
-
     api("org.openvoipalliance:AndroidPhoneLib:0.6.25")
-    api("com.google.firebase:firebase-messaging")
+    api("com.google.firebase:firebase-messaging-ktx:21.0.1")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
     implementation("androidx.core:core-ktx:1.3.2")

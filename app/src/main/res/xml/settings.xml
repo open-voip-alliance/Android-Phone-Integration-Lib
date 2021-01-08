@@ -69,6 +69,12 @@
             app:title="Unregister with Middleware"
             app:enabled="false">
         </Preference>
+
+        <Preference
+            app:key="voipgrid_sync"
+            app:title="Sync VoIP Authentication"
+            app:enabled="false">
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory

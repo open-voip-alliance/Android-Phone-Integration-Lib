@@ -1,7 +1,8 @@
-package org.openvoipalliance.androidplatformintegration
+package org.openvoipalliance.androidplatformintegration.call
 
 import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
+import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.events.Event
 import org.openvoipalliance.androidplatformintegration.service.VoIPService
 import org.openvoipalliance.androidplatformintegration.service.startCallActivity
@@ -23,7 +24,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
     override fun incomingCallReceived(call: Call) {
         if (!isInCall) {
             this.call = call
-            pil.events.broadcast(Event.CallEvent.IncomingCallReceived(pil.call))
+            pil.events.broadcast(Event.CallEvent.IncomingCallReceived(pil.calls.active))
             androidCallFramework.addNewIncomingCall(call.phoneNumber)
         }
     }
@@ -31,17 +32,17 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
     override fun callConnected(call: Call) {
         super.callConnected(call)
         pil.writeLog("EVENT RECEIVED: callConnected")
-        pil.events.broadcast(Event.CallEvent.CallConnected(pil.call))
+        pil.events.broadcast(Event.CallEvent.CallConnected(pil.calls.active))
         pil.app.application.startCallActivity()
     }
 
     override fun outgoingCallCreated(call: Call) {
         if (!isInCall) {
             this.call = call
-            pil.events.broadcast(Event.CallEvent.OutgoingCallStarted(pil.call))
+            pil.events.broadcast(Event.CallEvent.OutgoingCallStarted(pil.calls.active))
             androidCallFramework.connection?.setActive()
             androidCallFramework.connection?.setCallerDisplayName(
-                pil.call?.remotePartyHeading,
+                pil.calls.active?.remotePartyHeading,
                 TelecomManager.PRESENTATION_ALLOWED
             )
             pil.app.application.startCallActivity()
@@ -55,14 +56,14 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
     override fun callEnded(call: Call) {
         pil.writeLog("EVENT RECEIVED: callEnded")
 
-        if (!pil.isInTransfer) {
+        if (!pil.calls.isInTransfer) {
             this.call = null
             pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
         }
 
-        pil.events.broadcast(Event.CallEvent.CallEnded(pil.call))
+        pil.events.broadcast(Event.CallEvent.CallEnded(pil.calls.active))
         transferSession = null
     }
 

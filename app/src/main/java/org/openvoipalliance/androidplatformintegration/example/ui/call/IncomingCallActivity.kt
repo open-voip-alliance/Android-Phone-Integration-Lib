@@ -36,7 +36,7 @@ class IncomingCallActivity : AppCompatActivity(), PILEventListener {
     }
 
     private fun displayCall() {
-        val call = pil.call ?: return
+        val call = pil.calls.active ?: return
 
         callTitle.text = call.remotePartyHeading
         callSubtitle.text = call.remotePartySubheading

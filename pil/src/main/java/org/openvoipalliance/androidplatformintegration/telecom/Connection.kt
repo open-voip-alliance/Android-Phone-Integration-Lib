@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.telecom.Connection as AndroidConnection
 import android.telecom.DisconnectCause
 import android.telecom.DisconnectCause.LOCAL
-import org.openvoipalliance.androidplatformintegration.CallManager
+import org.openvoipalliance.androidplatformintegration.call.CallManager
 import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.events.Event
 import org.openvoipalliance.androidplatformintegration.service.VoIPService
@@ -84,6 +84,6 @@ class Connection internal constructor(
         }
 
         callback.invoke(call)
-        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.call))
+        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
     }
 }

@@ -1,7 +1,6 @@
 package org.openvoipalliance.androidplatformintegration.call
 
 import android.annotation.SuppressLint
-import org.openvoipalliance.androidplatformintegration.CallManager
 import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.events.Event
 import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
@@ -78,7 +77,7 @@ class CallActions internal constructor(
 
         callback.invoke(connection)
 
-        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.call))
+        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
     }
 
     /**
@@ -93,6 +92,6 @@ class CallActions internal constructor(
         }
 
         callback.invoke(call)
-        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.call))
+        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
     }
 }

@@ -1,5 +1,7 @@
-package org.openvoipalliance.androidplatformintegration
+package org.openvoipalliance.androidplatformintegration.helpers
 
+import org.openvoipalliance.androidplatformintegration.PIL
+import org.openvoipalliance.androidplatformintegration.call.CallManager
 import org.openvoipalliance.phonelib.PhoneLib
 import org.openvoipalliance.phonelib.config.Auth
 import org.openvoipalliance.phonelib.config.Config
