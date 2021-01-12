@@ -9,6 +9,7 @@ import android.telecom.TelecomManager
 import android.widget.Toast
 import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.di.di
+import org.openvoipalliance.androidplatformintegration.events.Event
 import org.openvoipalliance.phonelib.PhoneLib
 
 internal class ConnectionService : AndroidConnectionService() {
@@ -42,7 +43,7 @@ internal class ConnectionService : AndroidConnectionService() {
         connectionManagerPhoneAccount: PhoneAccountHandle?,
         request: ConnectionRequest?
     ) {
-        Toast.makeText(this, "Outgoing call failed", Toast.LENGTH_LONG).show()
+        pil.events.broadcast(Event.CallSetupFailedEvent.OutgoingCallSetupFailed(Event.CallSetupFailedEvent.REASON.REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
     }
 
     override fun onCreateIncomingConnection(
@@ -60,6 +61,6 @@ internal class ConnectionService : AndroidConnectionService() {
         connectionManagerPhoneAccount: PhoneAccountHandle,
         request: ConnectionRequest
     ) {
-        Toast.makeText(this, "Incoming call failed", Toast.LENGTH_LONG).show()
+        pil.events.broadcast(Event.CallSetupFailedEvent.IncomingCallSetupFailed(Event.CallSetupFailedEvent.REASON.REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
     }
 }
