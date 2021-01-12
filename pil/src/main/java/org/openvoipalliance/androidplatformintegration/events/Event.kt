@@ -16,11 +16,11 @@ sealed class Event {
         class CallConnected(call: PILCall?) : CallEvent(call)
     }
 
-    sealed class CallSetupFailedEvent(val reason: REASON): Event() {
-        class OutgoingCallSetupFailed(reason: REASON): CallSetupFailedEvent(reason)
-        class IncomingCallSetupFailed(reason: REASON): CallSetupFailedEvent(reason)
+    sealed class CallSetupFailedEvent(val reason: Reason): Event() {
+        class OutgoingCallSetupFailed(reason: Reason): CallSetupFailedEvent(reason)
+        class IncomingCallSetupFailed(reason: Reason): CallSetupFailedEvent(reason)
 
-        enum class REASON {
+        enum class Reason {
             REJECTED_BY_ANDROID_TELECOM_FRAMEWORK
         }
     }

@@ -6,7 +6,6 @@ import android.telecom.ConnectionRequest
 import android.telecom.ConnectionService as AndroidConnectionService
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
-import android.widget.Toast
 import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.di.di
 import org.openvoipalliance.androidplatformintegration.events.Event
@@ -43,7 +42,7 @@ internal class ConnectionService : AndroidConnectionService() {
         connectionManagerPhoneAccount: PhoneAccountHandle?,
         request: ConnectionRequest?
     ) {
-        pil.events.broadcast(Event.CallSetupFailedEvent.OutgoingCallSetupFailed(Event.CallSetupFailedEvent.REASON.REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
+        pil.events.broadcast(Event.CallSetupFailedEvent.OutgoingCallSetupFailed(Event.CallSetupFailedEvent.Reason.REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
     }
 
     override fun onCreateIncomingConnection(
@@ -61,6 +60,6 @@ internal class ConnectionService : AndroidConnectionService() {
         connectionManagerPhoneAccount: PhoneAccountHandle,
         request: ConnectionRequest
     ) {
-        pil.events.broadcast(Event.CallSetupFailedEvent.IncomingCallSetupFailed(Event.CallSetupFailedEvent.REASON.REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
+        pil.events.broadcast(Event.CallSetupFailedEvent.IncomingCallSetupFailed(Event.CallSetupFailedEvent.Reason.REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
     }
 }
