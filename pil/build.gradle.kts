@@ -31,33 +31,22 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
 
-val libraryVersion = "0.0.6"
+val libraryVersion = "0.0.8"
 
 val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
     from(android.sourceSets.getByName("main").java.srcDirs)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("Production") {
-            artifact("$buildDir/outputs/aar/pil-release.aar")
-            groupId = "org.openvoipalliance"
-            artifactId = "AndroidPlatformIntegration"
-            version = libraryVersion
-            artifact(sourcesJar.get())
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                groupId = "org.openvoipalliance"
+                artifactId = "AndroidPlatformIntegration"
+                version = libraryVersion
 
-            pom.withXml {
-                val dependenciesNode = asNode().appendNode("dependencies")
-
-                configurations.implementation.allDependencies.forEach {
-                    if (it.name != "unspecified") {
-                        val dependencyNode = dependenciesNode.appendNode("dependency")
-                        dependencyNode.appendNode("groupId", it.group)
-                        dependencyNode.appendNode("artifactId", it.name)
-                        dependencyNode.appendNode("version", it.version)
-                    }
-                }
+                from(components["release"])
             }
         }
     }
