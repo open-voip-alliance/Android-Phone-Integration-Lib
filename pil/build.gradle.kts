@@ -1,10 +1,7 @@
-import java.util.*
-
 plugins {
     id("com.android.library")
     kotlin("android")
     id("maven-publish")
-    id("com.jfrog.bintray")
 }
 
 android {
@@ -64,28 +61,4 @@ publishing {
             }
         }
     }
-}
-
-fun findProperty(s: String) = project.findProperty(s) as String?
-
-bintray {
-    user = findProperty("bintray.user")
-    key = findProperty("bintray.token")
-    setPublications("Production")
-    pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
-        repo = "AndroidPlatformIntegration"
-        name = "AndroidPlatformIntegration"
-        websiteUrl = "https://github.com/open-voip-alliance/AndroidPlatformIntegration"
-        vcsUrl = "https://github.com/open-voip-alliance/AndroidPlatformIntegration"
-        githubRepo = "open-voip-alliance/AndroidPlatformIntegration"
-        description = "Integrating VoIP into the Android platform.."
-        setLabels("kotlin")
-        setLicenses("Apache-2.0")
-        publish = true
-        desc = description
-        version(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.VersionConfig> {
-            name = libraryVersion
-            released = Date().toString()
-        })
-    })
 }
