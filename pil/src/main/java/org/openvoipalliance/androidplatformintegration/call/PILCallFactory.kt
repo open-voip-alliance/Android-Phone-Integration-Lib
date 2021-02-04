@@ -13,7 +13,7 @@ import org.openvoipalliance.phonelib.model.CallState
 import org.openvoipalliance.phonelib.model.CallState.*
 import org.openvoipalliance.phonelib.model.Direction
 
-internal class PILCallFactory(private val pil: PIL, private val contacts: Contacts, private val callManager: CallManager) :
+internal class PILCallFactory(private val contacts: Contacts, private val callManager: CallManager) :
     PILEventListener {
 
     private val cachedContacts = mutableMapOf<Call, Contact>()

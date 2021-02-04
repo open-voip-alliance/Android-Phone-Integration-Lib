@@ -27,7 +27,7 @@ val pilModule = module {
         )
     }
 
-    single { PILCallFactory(get(), get(), get()) }
+    single { PILCallFactory(get(), get()) }
 
     single { Contacts(androidContext()) }
 
