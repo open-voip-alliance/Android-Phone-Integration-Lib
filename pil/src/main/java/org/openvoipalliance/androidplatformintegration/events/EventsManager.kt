@@ -10,6 +10,8 @@ class EventsManager internal constructor(private val pil: PIL) {
     private var eventListeners = mutableListOf<PILEventListener>()
 
     fun listen(listener: PILEventListener) {
+        if (eventListeners.contains(listener)) return
+
         eventListeners.add(listener)
     }
 

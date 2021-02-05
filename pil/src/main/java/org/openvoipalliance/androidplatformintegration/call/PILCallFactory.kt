@@ -3,7 +3,6 @@ package org.openvoipalliance.androidplatformintegration.call
 import java.util.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.contacts.Contact
 import org.openvoipalliance.androidplatformintegration.contacts.Contacts
 import org.openvoipalliance.androidplatformintegration.events.Event

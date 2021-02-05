@@ -66,10 +66,6 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
 
     init {
         instance = this
-
-        arrayOf<PILEventListener>(callFactory).forEach {
-            events.listen(it)
-        }
     }
 
     /**
@@ -124,6 +120,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         val auth = auth ?: throw NoAuthenticationCredentialsException()
 
         if (!auth.isValid) throw NoAuthenticationCredentialsException()
+
+        events.listen(callFactory)
 
         if (forceInitialize) {
             phoneLib.destroy()
