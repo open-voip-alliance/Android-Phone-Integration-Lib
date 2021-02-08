@@ -6,6 +6,7 @@ import org.openvoipalliance.androidplatformintegration.configuration.Application
 import org.openvoipalliance.androidplatformintegration.configuration.Auth
 import org.openvoipalliance.androidplatformintegration.configuration.Preferences
 import org.openvoipalliance.androidplatformintegration.di.initPilKoin
+import org.openvoipalliance.androidplatformintegration.exception.PILAlreadyInitializedException
 import org.openvoipalliance.androidplatformintegration.push.Middleware
 
 class Builder internal constructor() {
@@ -14,6 +15,10 @@ class Builder internal constructor() {
     var auth: Auth? = null
 
     internal fun start(applicationSetup: ApplicationSetup): PIL {
+        if (PIL.isInitialized) {
+            throw PILAlreadyInitializedException()
+        }
+
         initPilKoin(applicationSetup.application)
 
         val pil = PIL(applicationSetup)

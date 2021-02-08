@@ -130,7 +130,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         phoneLibHelper.apply {
             initialise(forceInitialize)
             register(auth, forceReregister) {
-                writeLog("The VoIP library has been initialised and the user has been registered!")
+                writeLog("The VoIP library has been initialized and the user has been registered!")
                 callback?.invoke()
             }
         }

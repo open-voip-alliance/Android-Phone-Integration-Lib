@@ -19,7 +19,7 @@ internal class PhoneLibHelper(private val pil: PIL, private val phoneLib: PhoneL
     fun initialise(forceInitialize: Boolean = false) {
         if (phoneLib.isInitialised && !forceInitialize) {
             phoneLib.wake()
-            pil.writeLog("The VoIP library is already initialised, skipping init.")
+            pil.writeLog("The VoIP library is already initialized, skipping init.")
             return
         }
 
