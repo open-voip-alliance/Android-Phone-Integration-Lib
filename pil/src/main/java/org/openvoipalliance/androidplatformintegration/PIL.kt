@@ -148,7 +148,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     }
 
     private val isPreparedToStart: Boolean
-        get() = phoneLib.isInitialised && auth != null
+        get() = auth != null && phoneLib.isInitialised
 
     companion object {
         lateinit var instance: PIL
