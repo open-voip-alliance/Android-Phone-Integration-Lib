@@ -8,8 +8,8 @@ import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramew
 
 internal class FcmService : FirebaseMessagingService() {
 
-    private val pil: PIL by di.koin.inject()
-    private val androidCallFramework: AndroidCallFramework by di.koin.inject()
+    private val pil: PIL by lazy { di.koin.get() }
+    private val androidCallFramework: AndroidCallFramework by lazy { di.koin.get() }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
