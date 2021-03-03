@@ -8,18 +8,21 @@ import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramew
 
 internal class FcmService : FirebaseMessagingService() {
 
+    private val pil: PIL by lazy { di.koin.get() }
+    private val androidCallFramework: AndroidCallFramework by lazy { di.koin.get() }
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
         if (!PIL.isInitialized) return
 
-        if (androidCallFramework().isInCall) {
-            pil().app.middleware?.respond(remoteMessage, false)
+        if (androidCallFramework.isInCall) {
+            pil.app.middleware?.respond(remoteMessage, false)
             return
         }
 
-        pil().start {
-            pil().app.middleware?.respond(remoteMessage, true)
+        pil.start {
+            pil.app.middleware?.respond(remoteMessage, true)
         }
     }
 
@@ -28,10 +31,6 @@ internal class FcmService : FirebaseMessagingService() {
 
         if (!PIL.isInitialized) return
 
-        pil().app.middleware?.tokenReceived(token)
+        pil.app.middleware?.tokenReceived(token)
     }
-
-    private fun pil() = di.koin.get<PIL>()
-
-    private fun androidCallFramework() = di.koin.get<AndroidCallFramework>()
 }
