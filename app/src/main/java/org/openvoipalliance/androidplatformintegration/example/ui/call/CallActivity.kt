@@ -2,7 +2,10 @@ package org.openvoipalliance.androidplatformintegration.example.ui.call
 
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_call.*
 import org.openvoipalliance.androidplatformintegration.CallScreenLifecycleObserver
@@ -60,6 +63,23 @@ class CallActivity : AppCompatActivity(), PILEventListener {
 
         transferMergeButton.setOnClickListener {
             pil.actions.completeAttendedTransfer()
+        }
+
+        dtmfButton.setOnClickListener {
+
+            val editText = EditText(this).apply {
+                inputType = InputType.TYPE_CLASS_NUMBER
+            }
+
+            AlertDialog.Builder(this).apply {
+                setView(editText)
+                setTitle("Send DTMF to Remote Party")
+                setPositiveButton("Send DTMF") { _, _ ->
+                    pil.actions.sendDtmf(editText.text.toString())
+                }
+                setNegativeButton("Cancel") { _, _ ->
+                }
+            }.show()
         }
     }
 

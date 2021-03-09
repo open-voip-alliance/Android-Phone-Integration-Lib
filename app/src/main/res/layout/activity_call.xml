@@ -136,6 +136,15 @@
 
         </TableRow>
 
+        <TableRow>
+
+            <Button
+                android:id="@+id/dtmfButton"
+                android:layout_marginHorizontal="10dp"
+                android:text="DTMF"
+                android:enabled="true"/>
+        </TableRow>
+
         <TableRow android:layout_marginTop="20dp">
 
             <Space />
