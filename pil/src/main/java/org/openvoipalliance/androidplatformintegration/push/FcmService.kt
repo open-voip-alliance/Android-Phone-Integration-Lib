@@ -16,6 +16,8 @@ internal class FcmService : FirebaseMessagingService() {
 
         if (!PIL.isInitialized) return
 
+        pil.writeLog("Received FCM push message")
+
         if (androidCallFramework.isInCall) {
             pil.app.middleware?.respond(remoteMessage, false)
             return
@@ -30,6 +32,8 @@ internal class FcmService : FirebaseMessagingService() {
         super.onNewToken(token)
 
         if (!PIL.isInitialized) return
+
+        pil.writeLog("Received new FCM token")
 
         pil.app.middleware?.tokenReceived(token)
     }

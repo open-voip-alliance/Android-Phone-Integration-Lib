@@ -2,6 +2,7 @@ package org.openvoipalliance.androidplatformintegration.service
 
 import android.annotation.SuppressLint
 import android.app.*
+import android.app.Notification.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -107,13 +108,14 @@ internal class VoIPService : Service(), PILEventListener {
         intent.setClass(this, incomingCallActivity)
         val pendingIntent = PendingIntent.getActivity(this, 1, intent, 0)
 
-        val notification = Notification.Builder(this, incomingCallsChannelId).apply {
+        val notification = Builder(this, incomingCallsChannelId).apply {
             setOngoing(true)
-            setPriority(Notification.PRIORITY_HIGH)
             setContentIntent(pendingIntent)
             setFullScreenIntent(pendingIntent, true)
             setSmallIcon(R.drawable.ic_service)
             setContentTitle(call.remoteNumber)
+            setCategory(CATEGORY_CALL)
+            setVisibility(VISIBILITY_PUBLIC)
             setContentText(getString(R.string.notification_incoming_context_text))
             setColor(getColor(R.color.notification_background))
             setColorized(true)
