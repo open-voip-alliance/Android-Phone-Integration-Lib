@@ -4,7 +4,7 @@ This is a library that handles the challenges involved in integrating VoIP funct
 
 ### Does this library implement VoIP functionality?
 
-No, it relies on [AndroidPhoneLib](https://github.com/open-voip-alliance/AndroidPhoneLib). A library that we also maintain which currently uses Linphone as the underlying SIP technology.
+No, it relies on [AndroidVoIPLib](https://github.com/open-voip-alliance/AndroidVoIPLib). A library that we also maintain which currently uses Linphone as the underlying SIP technology.
 
 ### Tasks handled by the PIL
 

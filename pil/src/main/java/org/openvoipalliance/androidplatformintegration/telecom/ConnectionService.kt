@@ -9,12 +9,12 @@ import android.telecom.TelecomManager
 import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.di.di
 import org.openvoipalliance.androidplatformintegration.events.Event
-import org.openvoipalliance.phonelib.PhoneLib
+import org.openvoipalliance.voiplib.VoIPLib
 
 internal class ConnectionService : AndroidConnectionService() {
 
     private val pil: PIL by di.koin.inject()
-    private val phoneLib: PhoneLib by di.koin.inject()
+    private val phoneLib: VoIPLib by di.koin.inject()
     private val androidCallFramework: AndroidCallFramework by di.koin.inject()
 
     private val baseConnection: Connection

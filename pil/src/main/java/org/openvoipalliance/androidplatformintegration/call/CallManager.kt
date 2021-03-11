@@ -9,9 +9,9 @@ import org.openvoipalliance.androidplatformintegration.service.startCallActivity
 import org.openvoipalliance.androidplatformintegration.service.startVoipService
 import org.openvoipalliance.androidplatformintegration.service.stopVoipService
 import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
-import org.openvoipalliance.phonelib.model.AttendedTransferSession
-import org.openvoipalliance.phonelib.model.Call
-import org.openvoipalliance.phonelib.repository.initialise.CallListener
+import org.openvoipalliance.voiplib.model.AttendedTransferSession
+import org.openvoipalliance.voiplib.model.Call
+import org.openvoipalliance.voiplib.repository.initialise.CallListener
 
 internal class CallManager(private val pil: PIL, private val androidCallFramework: AndroidCallFramework) : CallListener {
 

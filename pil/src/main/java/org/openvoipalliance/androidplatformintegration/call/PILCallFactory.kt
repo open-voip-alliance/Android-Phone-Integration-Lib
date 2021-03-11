@@ -7,10 +7,10 @@ import org.openvoipalliance.androidplatformintegration.contacts.Contact
 import org.openvoipalliance.androidplatformintegration.contacts.Contacts
 import org.openvoipalliance.androidplatformintegration.events.Event
 import org.openvoipalliance.androidplatformintegration.events.PILEventListener
-import org.openvoipalliance.phonelib.model.Call
-import org.openvoipalliance.phonelib.model.CallState
-import org.openvoipalliance.phonelib.model.CallState.*
-import org.openvoipalliance.phonelib.model.Direction
+import org.openvoipalliance.voiplib.model.Call
+import org.openvoipalliance.voiplib.model.CallState
+import org.openvoipalliance.voiplib.model.CallState.*
+import org.openvoipalliance.voiplib.model.Direction
 
 internal class PILCallFactory(private val contacts: Contacts, private val callManager: CallManager) :
     PILEventListener {

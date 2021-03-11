@@ -6,7 +6,7 @@ import org.koin.dsl.module
 import org.openvoipalliance.androidplatformintegration.call.CallManager
 import org.openvoipalliance.androidplatformintegration.call.Calls
 import org.openvoipalliance.androidplatformintegration.PIL
-import org.openvoipalliance.androidplatformintegration.helpers.PhoneLibHelper
+import org.openvoipalliance.androidplatformintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidplatformintegration.audio.AudioManager
 import org.openvoipalliance.androidplatformintegration.call.CallActions
 import org.openvoipalliance.androidplatformintegration.call.PILCallFactory
@@ -14,7 +14,7 @@ import org.openvoipalliance.androidplatformintegration.contacts.Contacts
 import org.openvoipalliance.androidplatformintegration.events.EventsManager
 import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidplatformintegration.telecom.Connection
-import org.openvoipalliance.phonelib.PhoneLib
+import org.openvoipalliance.voiplib.VoIPLib
 
 fun getModules() = listOf(pilModule)
 
@@ -35,7 +35,7 @@ val pilModule = module {
 
     single { PIL.instance }
 
-    single { PhoneLib.getInstance(androidContext()) }
+    single { VoIPLib.getInstance(androidContext()) }
 
     single { CallActions(get(), get(), get(), get()) }
 
@@ -43,7 +43,7 @@ val pilModule = module {
 
     single { EventsManager(get()) }
 
-    single { PhoneLibHelper(get(), get(), get()) }
+    single { VoIPLibHelper(get(), get(), get()) }
 
     factory { Connection(get(), get(), get(), get()) }
 

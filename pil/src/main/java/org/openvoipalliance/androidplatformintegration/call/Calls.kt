@@ -1,6 +1,6 @@
 package org.openvoipalliance.androidplatformintegration.call
 
-import org.openvoipalliance.phonelib.model.Call
+import org.openvoipalliance.voiplib.model.Call
 
 class Calls internal constructor(private val callManager: CallManager, private val factory: PILCallFactory) {
 

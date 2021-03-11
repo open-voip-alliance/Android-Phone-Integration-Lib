@@ -2,15 +2,15 @@ package org.openvoipalliance.androidplatformintegration.helpers
 
 import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.call.CallManager
-import org.openvoipalliance.phonelib.PhoneLib
-import org.openvoipalliance.phonelib.config.Auth
-import org.openvoipalliance.phonelib.config.Config
-import org.openvoipalliance.phonelib.model.RegistrationState
-import org.openvoipalliance.phonelib.repository.initialise.LogLevel
-import org.openvoipalliance.phonelib.repository.initialise.LogListener
+import org.openvoipalliance.voiplib.VoIPLib
+import org.openvoipalliance.voiplib.config.Auth
+import org.openvoipalliance.voiplib.config.Config
+import org.openvoipalliance.voiplib.model.RegistrationState
+import org.openvoipalliance.voiplib.repository.initialise.LogLevel
+import org.openvoipalliance.voiplib.repository.initialise.LogListener
 import org.openvoipalliance.androidplatformintegration.logging.LogLevel as PilLogLevel
 
-internal class PhoneLibHelper(private val pil: PIL, private val phoneLib: PhoneLib, private val callManager: CallManager) {
+internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib, private val callManager: CallManager) {
 
     /**
      * Boots the VoIP library.

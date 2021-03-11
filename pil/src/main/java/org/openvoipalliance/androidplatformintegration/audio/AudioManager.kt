@@ -2,11 +2,11 @@ package org.openvoipalliance.androidplatformintegration.audio
 
 import android.telecom.CallAudioState.*
 import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
-import org.openvoipalliance.phonelib.PhoneLib
-import org.openvoipalliance.phonelib.model.Codec
+import org.openvoipalliance.voiplib.VoIPLib
+import org.openvoipalliance.voiplib.model.Codec
 
 class AudioManager internal constructor(
-    private val phoneLib: PhoneLib,
+    private val phoneLib: VoIPLib,
     private val androidCallFramework: AndroidCallFramework
 ) {
 

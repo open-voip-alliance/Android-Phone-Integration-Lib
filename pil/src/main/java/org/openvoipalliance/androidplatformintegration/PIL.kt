@@ -15,12 +15,12 @@ import org.openvoipalliance.androidplatformintegration.events.EventsManager
 import org.openvoipalliance.androidplatformintegration.events.PILEventListener
 import org.openvoipalliance.androidplatformintegration.exception.NoAuthenticationCredentialsException
 import org.openvoipalliance.androidplatformintegration.exception.PermissionException
-import org.openvoipalliance.androidplatformintegration.helpers.PhoneLibHelper
+import org.openvoipalliance.androidplatformintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidplatformintegration.logging.LogLevel
 import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
-import org.openvoipalliance.phonelib.PhoneLib
-import org.openvoipalliance.phonelib.model.RegistrationState.FAILED
-import org.openvoipalliance.phonelib.model.RegistrationState.REGISTERED
+import org.openvoipalliance.voiplib.VoIPLib
+import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
+import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -28,8 +28,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
 
     private val callFactory: PILCallFactory by di.koin.inject()
     private val androidCallFramework: AndroidCallFramework by di.koin.inject()
-    private val phoneLib: PhoneLib by di.koin.inject()
-    private val phoneLibHelper: PhoneLibHelper by di.koin.inject()
+    private val phoneLib: VoIPLib by di.koin.inject()
+    private val phoneLibHelper: VoIPLibHelper by di.koin.inject()
 
     val actions: CallActions by di.koin.inject()
     val audio: AudioManager by di.koin.inject()

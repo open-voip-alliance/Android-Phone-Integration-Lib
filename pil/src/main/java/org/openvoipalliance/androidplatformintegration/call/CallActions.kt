@@ -5,12 +5,12 @@ import org.openvoipalliance.androidplatformintegration.PIL
 import org.openvoipalliance.androidplatformintegration.events.Event
 import org.openvoipalliance.androidplatformintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidplatformintegration.telecom.Connection
-import org.openvoipalliance.phonelib.PhoneLib
-import org.openvoipalliance.phonelib.model.Call
+import org.openvoipalliance.voiplib.VoIPLib
+import org.openvoipalliance.voiplib.model.Call
 
 class CallActions internal constructor(
     private val pil: PIL,
-    private val phoneLib: PhoneLib,
+    private val phoneLib: VoIPLib,
     private val callManager: CallManager,
     private val androidCallFramework: AndroidCallFramework
 ) {
