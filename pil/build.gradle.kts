@@ -34,7 +34,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
 
-val libraryVersion = "0.0.19"
+val libraryVersion = "0.0.20"
 
 val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")

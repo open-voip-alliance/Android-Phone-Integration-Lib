@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".example.ui.home.DialerFragment">
 
-    <org.openvoipalliance.androidplatformintegration.example.ui.Dialer
+    <org.openvoipalliance.androidphoneintegration.example.ui.Dialer
         android:id="@+id/dialer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
