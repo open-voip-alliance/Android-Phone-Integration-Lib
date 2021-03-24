@@ -41,51 +41,30 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(android.sourceSets.getByName("main").java.srcDirs)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("Production") {
-            artifact("$buildDir/outputs/aar/pil-release.aar")
-            groupId = "org.openvoipalliance"
-            artifactId = "AndroidPlatformIntegration"
-            version = libraryVersion
-            artifact(sourcesJar.get())
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                artifact("$buildDir/outputs/aar/pil-release.aar")
+                groupId = "org.openvoipalliance"
+                artifactId = "AndroidPlatformIntegration"
+                version = libraryVersion
 
-            pom.withXml {
-                val dependenciesNode = asNode().appendNode("dependencies")
+                artifact(sourcesJar.get())
 
-                configurations.implementation.allDependencies.forEach {
-                    if (it.name != "unspecified") {
-                        val dependencyNode = dependenciesNode.appendNode("dependency")
-                        dependencyNode.appendNode("groupId", it.group)
-                        dependencyNode.appendNode("artifactId", it.name)
-                        dependencyNode.appendNode("version", it.version)
+                pom.withXml {
+                    val dependenciesNode = asNode().appendNode("dependencies")
+
+                    configurations.implementation.allDependencies.forEach {
+                        if (it.name != "unspecified") {
+                            val dependencyNode = dependenciesNode.appendNode("dependency")
+                            dependencyNode.appendNode("groupId", it.group)
+                            dependencyNode.appendNode("artifactId", it.name)
+                            dependencyNode.appendNode("version", it.version)
+                        }
                     }
                 }
             }
         }
     }
-}
-
-fun findProperty(s: String) = project.findProperty(s) as String?
-
-bintray {
-    user = findProperty("bintray.user")
-    key = findProperty("bintray.token")
-    setPublications("Production")
-    pkg(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
-        repo = "AndroidPlatformIntegration"
-        name = "AndroidPlatformIntegration"
-        websiteUrl = "https://github.com/open-voip-alliance/AndroidPlatformIntegration"
-        vcsUrl = "https://github.com/open-voip-alliance/AndroidPlatformIntegration"
-        githubRepo = "open-voip-alliance/AndroidPlatformIntegration"
-        description = "Integrating VoIP into the Android platform.."
-        setLabels("kotlin")
-        setLicenses("Apache-2.0")
-        publish = true
-        desc = description
-        version(delegateClosureOf<com.jfrog.bintray.gradle.BintrayExtension.VersionConfig> {
-            name = libraryVersion
-            released = Date().toString()
-        })
-    })
 }
