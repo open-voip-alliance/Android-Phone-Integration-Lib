@@ -45,25 +45,27 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("release") {
-                artifact("$buildDir/outputs/aar/pil-release.aar")
+                from(components.findByName("release"))
+
+                //artifact("$buildDir/outputs/aar/pil-release.aar")
                 groupId = "org.openvoipalliance"
                 artifactId = "AndroidPlatformIntegration"
                 version = libraryVersion
 
-                artifact(sourcesJar.get())
+                //artifact(sourcesJar.get())
 
-                pom.withXml {
-                    val dependenciesNode = asNode().appendNode("dependencies")
-
-                    configurations.implementation.allDependencies.forEach {
-                        if (it.name != "unspecified") {
-                            val dependencyNode = dependenciesNode.appendNode("dependency")
-                            dependencyNode.appendNode("groupId", it.group)
-                            dependencyNode.appendNode("artifactId", it.name)
-                            dependencyNode.appendNode("version", it.version)
-                        }
-                    }
-                }
+//                pom.withXml {
+//                    val dependenciesNode = asNode().appendNode("dependencies")
+//
+//                    configurations.implementation.allDependencies.forEach {
+//                        if (it.name != "unspecified") {
+//                            val dependencyNode = dependenciesNode.appendNode("dependency")
+//                            dependencyNode.appendNode("groupId", it.group)
+//                            dependencyNode.appendNode("artifactId", it.name)
+//                            dependencyNode.appendNode("version", it.version)
+//                        }
+//                    }
+//                }
             }
         }
     }
