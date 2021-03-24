@@ -48,7 +48,7 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
     fun register(
         auth: org.openvoipalliance.androidphoneintegration.configuration.Auth,
         forceReRegistration: Boolean = false,
-        callback: () -> Unit
+        callback: (Boolean) -> Unit
     ) {
         phoneLib.swapConfig(
             phoneLib.currentConfig.copy(
@@ -63,7 +63,7 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
 
         if (phoneLib.isRegistered && !forceReRegistration) {
             pil.writeLog("We are already registered!")
-            callback.invoke()
+            callback.invoke(true)
             return
         }
 
@@ -72,7 +72,12 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
         phoneLib.register {
             if (it == RegistrationState.REGISTERED) {
                 pil.writeLog("Registration was successful!")
-                callback.invoke()
+                callback.invoke(true)
+            }
+
+            if (it == RegistrationState.FAILED) {
+                pil.writeLog("Unable to register...")
+                callback.invoke(false)
             }
         }
     }

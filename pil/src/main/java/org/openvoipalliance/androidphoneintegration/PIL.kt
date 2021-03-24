@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
 import org.openvoipalliance.androidphoneintegration.call.CallActions
@@ -11,6 +12,7 @@ import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSet
 import org.openvoipalliance.androidphoneintegration.configuration.Auth
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
 import org.openvoipalliance.androidphoneintegration.di.di
+import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.exception.NoAuthenticationCredentialsException
 import org.openvoipalliance.androidphoneintegration.exception.PermissionException
@@ -18,6 +20,7 @@ import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
+import org.openvoipalliance.voiplib.model.Reason
 import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
 import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
 import kotlin.coroutines.resume
@@ -102,8 +105,13 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     fun call(number: String) {
         performPermissionCheck()
 
-        start {
-            androidCallFramework.placeCall(number)
+        start { success ->
+            if (success) {
+                androidCallFramework.placeCall(number)
+            } else {
+                writeLog("Unable to register so not continuing with placing a call", LogLevel.ERROR)
+                events.broadcast(Event.CallSetupFailedEvent.OutgoingCallSetupFailed(Event.CallSetupFailedEvent.Reason.UNABLE_TO_REGISTER))
+            }
         }
     }
 
@@ -114,7 +122,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     fun start(
         forceInitialize: Boolean = false,
         forceReregister: Boolean = false,
-        callback: (() -> Unit)? = null
+        callback: ((Boolean) -> Unit)? = null
     ) {
         val auth = auth ?: throw NoAuthenticationCredentialsException()
 
@@ -128,9 +136,9 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
 
         phoneLibHelper.apply {
             initialise(forceInitialize)
-            register(auth, forceReregister) {
+            register(auth, forceReregister) { success ->
                 writeLog("The VoIP library has been initialized and the user has been registered!")
-                callback?.invoke()
+                callback?.invoke(success)
             }
         }
     }
