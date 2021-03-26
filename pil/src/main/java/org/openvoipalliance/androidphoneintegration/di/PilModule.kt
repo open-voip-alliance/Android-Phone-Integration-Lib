@@ -1,6 +1,8 @@
 package org.openvoipalliance.androidphoneintegration.di
 
+import android.app.NotificationManager
 import android.telecom.TelecomManager
+import androidx.core.content.ContextCompat.getSystemService
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import org.openvoipalliance.androidphoneintegration.call.CallManager
@@ -12,6 +14,8 @@ import org.openvoipalliance.androidphoneintegration.call.CallActions
 import org.openvoipalliance.androidphoneintegration.call.PILCallFactory
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
+import org.openvoipalliance.androidphoneintegration.notifications.CallNotification
+import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidphoneintegration.telecom.Connection
 import org.openvoipalliance.voiplib.VoIPLib
@@ -45,7 +49,13 @@ val pilModule = module {
 
     single { VoIPLibHelper(get(), get(), get()) }
 
-    factory { Connection(get(), get(), get(), get()) }
+    factory { Connection(get(), get(), get(), get(), get()) }
 
     factory { Calls(get(), get()) }
+
+    single { androidContext().getSystemService(NotificationManager::class.java) }
+
+    single { IncomingCallNotification() }
+
+    single { CallNotification() }
 }

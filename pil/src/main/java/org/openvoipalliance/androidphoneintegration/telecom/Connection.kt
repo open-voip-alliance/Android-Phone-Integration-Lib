@@ -1,29 +1,34 @@
 package org.openvoipalliance.androidphoneintegration.telecom
 
 import android.annotation.SuppressLint
-import android.telecom.Connection as AndroidConnection
 import android.telecom.DisconnectCause
 import android.telecom.DisconnectCause.LOCAL
-import org.openvoipalliance.androidphoneintegration.call.CallManager
 import org.openvoipalliance.androidphoneintegration.PIL
+import org.openvoipalliance.androidphoneintegration.call.CallManager
 import org.openvoipalliance.androidphoneintegration.events.Event
-import org.openvoipalliance.androidphoneintegration.service.VoIPService
-import org.openvoipalliance.androidphoneintegration.service.startVoipService
+import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.model.Reason
+import android.telecom.Connection as AndroidConnection
 
 class Connection internal constructor(
     private val pil: PIL,
     private val phoneLib: VoIPLib,
     private val callManager: CallManager,
-    private val androidCallFramework: AndroidCallFramework
+    private val androidCallFramework: AndroidCallFramework,
+    private val incomingCallNotification: IncomingCallNotification
     ) : AndroidConnection() {
 
     override fun onShowIncomingCallUi() {
-        if (!VoIPService.isRunning) {
-            pil.app.application.startVoipService()
-        }
+        pil.writeLog("Starting to alert user to an incoming call")
+        incomingCallNotification.notify(call = pil.calls.active ?: return)
+    }
+
+    override fun onSilence() {
+        super.onSilence()
+        pil.writeLog("Received request to silence the ringer")
+        incomingCallNotification.silence(call = pil.calls.active ?: return)
     }
 
     override fun onHold() {
@@ -70,6 +75,14 @@ class Connection internal constructor(
         androidCallFramework.connection = null
         setDisconnected(DisconnectCause(LOCAL))
         destroy()
+    }
+
+    override fun onStateChanged(state: Int) {
+        super.onStateChanged(state)
+
+        if (state != STATE_RINGING) {
+            incomingCallNotification.cancel()
+        }
     }
 
     /**

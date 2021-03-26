@@ -17,7 +17,6 @@ class VoIPGRIDMiddleware(private val context: Context) : Middleware {
     }
 
     private val client = OkHttpClient()
-
     suspend fun register(): Boolean = withContext(Dispatchers.IO) {
         val data = FormBody.Builder().apply {
             add("name", prefs.getString("voipgrid_username", "")!!)
