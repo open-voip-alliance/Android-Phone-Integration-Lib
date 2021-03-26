@@ -34,6 +34,11 @@ This repo contains an example application with implementations of the basic func
 
 ## Getting Started
 
+[![Release](https://jitpack.io/v/open-voip-alliance/Android-Phone-Integration-Lib.svg)]
+(https://jitpack.io/#open-voip-alliance/Android-Phone-Integration-Lib)
+
+This libray is installed via jitpack.io, follow the instructions here[](https://jitpack.io/#open-voip-alliance/Android-Phone-Integration-Lib)ere to install.
+
 In your [Application Class](https://developer.android.com/reference/android/app/Application) under the onCreate method, you must start the PIL:
 
 ```kotlin
@@ -235,9 +240,3 @@ val pil = startAndroidPIL {
 The library contains colors.xml and strings.xml, your Application should override these if you wish to change the text and color of notifications.
 
 The app ringtone can be changed by adding a sound file resource in the raw directory with the filename of "ringtone" (e.g. raw/ringtone.ogg).
-
-## TODO
-
-These are the long-term goals for the library:
-
-- [ ] Support an option that will use an always-on foreground service to allow for background calls without middleware
