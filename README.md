@@ -37,7 +37,7 @@ This repo contains an example application with implementations of the basic func
 [![Release](https://jitpack.io/v/open-voip-alliance/Android-Phone-Integration-Lib.svg)]
 (https://jitpack.io/#open-voip-alliance/Android-Phone-Integration-Lib)
 
-This libray is installed via jitpack.io, follow the instructions here[](https://jitpack.io/#open-voip-alliance/Android-Phone-Integration-Lib)ere to install.
+This libray is installed via jitpack.io, follow the instructions here[](https://jitpack.io/#open-voip-alliance/Android-Phone-Integration-Lib) to install.
 
 In your [Application Class](https://developer.android.com/reference/android/app/Application) under the onCreate method, you must start the PIL:
 
@@ -116,10 +116,6 @@ val call: Call? = pil.call
 ```
 
 This call object is immutable and is a snap-shot of the call at the time it was requested.
-
-### Render loop
-
-When implementing a Call Activity it is recommended to implement a render loop, so every <1000ms to request the call from the PIL and update your UI appropriately. Obviously it is unlikely you will actually want to use a loop to implement this, a technology such as the Android Handler class is more appropriate.
 
 ### Event Handling
 
