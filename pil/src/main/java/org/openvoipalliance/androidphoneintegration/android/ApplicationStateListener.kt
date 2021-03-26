@@ -3,8 +3,8 @@ package org.openvoipalliance.androidphoneintegration
 import android.app.Activity
 import com.takwolf.android.foreback.Foreback
 import org.openvoipalliance.androidphoneintegration.call.CallState
+import org.openvoipalliance.androidphoneintegration.helpers.startCallActivity
 import org.openvoipalliance.androidphoneintegration.service.VoIPService
-import org.openvoipalliance.androidphoneintegration.service.startCallActivity
 
 internal class ApplicationStateListener(private val pil: PIL) : Foreback.Listener {
 
