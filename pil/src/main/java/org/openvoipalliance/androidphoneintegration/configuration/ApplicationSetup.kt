@@ -33,7 +33,7 @@ data class ApplicationSetup(
      * opened when the user interacts with the call notification.
      *
      */
-    val automaticallyStartCallActivity: Boolean = true,
+    val automaticallyLaunchCallActivity: AutomaticallyLaunchCallActivity = AutomaticallyLaunchCallActivity.ALWAYS,
 
     /**
      * The user-agent that will be used when making SIP calls.
@@ -41,5 +41,16 @@ data class ApplicationSetup(
      */
     val userAgent: String = "AndroidPIL",
 ) {
+    enum class AutomaticallyLaunchCallActivity {
+        // Activities will never be automatically launched (they will still be launched via direct user input)
+        NEVER,
+
+        // Activities will be launched if the app is in the background, such as on call connect
+        ONLY_FROM_BACKGROUND,
+
+        // We will always launch activities, this means the consuming app does not need to manually transition between activities
+        ALWAYS
+    }
+
     data class Activities(val call: Class<out Activity>?, val incomingCall: Class<out Activity>?)
 }

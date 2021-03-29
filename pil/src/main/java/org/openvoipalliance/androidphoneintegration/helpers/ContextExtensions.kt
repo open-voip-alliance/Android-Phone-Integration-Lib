@@ -2,7 +2,10 @@ package org.openvoipalliance.androidphoneintegration.helpers
 
 import android.content.Context
 import android.content.Intent
+import com.takwolf.android.foreback.Foreback
 import org.openvoipalliance.androidphoneintegration.PIL
+import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup.AutomaticallyLaunchCallActivity.NEVER
+import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup.AutomaticallyLaunchCallActivity.ONLY_FROM_BACKGROUND
 import org.openvoipalliance.androidphoneintegration.service.VoIPService
 
 fun Context.startVoipService() {
@@ -14,7 +17,10 @@ fun Context.stopVoipService() {
 }
 
 fun Context.startCallActivity() {
-    if (!PIL.instance.app.automaticallyStartCallActivity) return
+    val automaticallyLaunchCallActivity = PIL.instance.app.automaticallyLaunchCallActivity
+
+    if (automaticallyLaunchCallActivity == NEVER
+        || (automaticallyLaunchCallActivity == ONLY_FROM_BACKGROUND && Foreback.isApplicationInTheForeground())) return
 
     PIL.instance.app.application.startActivity(
         Intent(PIL.instance.app.application, PIL.instance.app.activities.call).apply {
