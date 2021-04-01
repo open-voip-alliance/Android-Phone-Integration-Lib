@@ -46,7 +46,6 @@ internal class CallNotification: Notification() {
             .setContentTitle(context.getString(R.string.notification_default_title))
             .setContentText(context.getString(R.string.notification_default_subtitle))
             .setSmallIcon(R.drawable.ic_service)
-
             .setShowWhen(false)
             .setColorized(true)
             .setOngoing(true)

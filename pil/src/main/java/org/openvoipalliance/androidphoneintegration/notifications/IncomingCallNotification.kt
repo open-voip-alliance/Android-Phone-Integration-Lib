@@ -76,7 +76,7 @@ internal class IncomingCallNotification: Notification() {
             setOngoing(true)
             setOnlyAlertOnce(setOnlyAlertOnce)
             setSmallIcon(R.drawable.ic_service)
-            setContentTitle(call.remoteNumber)
+            setContentTitle(call.remotePartyHeading)
             setCategory(android.app.Notification.CATEGORY_CALL)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setContentText(pil.app.application.getString(R.string.notification_incoming_context_text))

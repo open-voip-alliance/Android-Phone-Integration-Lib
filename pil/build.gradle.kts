@@ -18,7 +18,7 @@ dependencies {
     api("com.github.open-voip-alliance:Android-VoIP-Lib:0.1.0")
     api("com.google.firebase:firebase-messaging-ktx:21.0.1")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.32")
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("com.takwolf.android:foreback:0.1.1")
