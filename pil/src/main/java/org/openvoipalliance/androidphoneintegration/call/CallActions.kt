@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration.call
 
 import android.annotation.SuppressLint
 import org.openvoipalliance.androidphoneintegration.PIL
+import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidphoneintegration.telecom.Connection
@@ -12,7 +13,8 @@ class CallActions internal constructor(
     private val pil: PIL,
     private val phoneLib: VoIPLib,
     private val callManager: CallManager,
-    private val androidCallFramework: AndroidCallFramework
+    private val androidCallFramework: AndroidCallFramework,
+    private val localDtmfToneGenerator: LocalDtmfToneGenerator
 ) {
 
     fun hold() {
@@ -33,10 +35,27 @@ class CallActions internal constructor(
         }
     }
 
+    /**
+     * Send a string of DTMF, no local tone will be played.
+     *
+     */
     fun sendDtmf(dtmf: String) {
         callExists {
             phoneLib.actions(it).sendDtmf(dtmf)
         }
+    }
+
+    /**
+     * Send a single DTMF character.
+     *
+     * @param playToneLocally If true, will play the requested DTMF tone to the local user.
+     */
+    fun sendDtmf(dtmf: Char, playToneLocally: Boolean = true) {
+        if (playToneLocally) {
+            localDtmfToneGenerator.play(dtmf)
+        }
+
+        sendDtmf(dtmf.toString())
     }
 
     @SuppressLint("MissingPermission")

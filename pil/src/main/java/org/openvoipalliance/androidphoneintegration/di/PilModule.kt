@@ -10,6 +10,7 @@ import org.openvoipalliance.androidphoneintegration.call.Calls
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
+import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
 import org.openvoipalliance.androidphoneintegration.call.CallActions
 import org.openvoipalliance.androidphoneintegration.call.PILCallFactory
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
@@ -41,7 +42,7 @@ val pilModule = module {
 
     single { VoIPLib.getInstance(androidContext()) }
 
-    single { CallActions(get(), get(), get(), get()) }
+    single { CallActions(get(), get(), get(), get(), get()) }
 
     single { AudioManager(get(), get()) }
 
@@ -55,7 +56,11 @@ val pilModule = module {
 
     single { androidContext().getSystemService(NotificationManager::class.java) }
 
+    single { androidContext().getSystemService(android.media.AudioManager::class.java) }
+
     single { IncomingCallNotification() }
 
     single { CallNotification() }
+
+    single { LocalDtmfToneGenerator(get()) }
 }

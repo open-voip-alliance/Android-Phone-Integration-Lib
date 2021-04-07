@@ -75,7 +75,13 @@ class CallActivity : AppCompatActivity(), PILEventListener {
                 setView(editText)
                 setTitle("Send DTMF to Remote Party")
                 setPositiveButton("Send DTMF") { _, _ ->
-                    pil.actions.sendDtmf(editText.text.toString())
+                    val dtmf: String = editText.text.toString()
+
+                    if (dtmf.length > 1) {
+                        pil.actions.sendDtmf(dtmf)
+                    } else {
+                        pil.actions.sendDtmf(dtmf[0])
+                    }
                 }
                 setNegativeButton("Cancel") { _, _ ->
                 }
