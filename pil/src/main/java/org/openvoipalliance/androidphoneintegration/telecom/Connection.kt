@@ -1,6 +1,7 @@
 package org.openvoipalliance.androidphoneintegration.telecom
 
 import android.annotation.SuppressLint
+import android.os.Bundle
 import android.telecom.DisconnectCause
 import android.telecom.DisconnectCause.LOCAL
 import org.openvoipalliance.androidphoneintegration.PIL
@@ -79,6 +80,20 @@ class Connection internal constructor(
 
     override fun onStateChanged(state: Int) {
         super.onStateChanged(state)
+
+        val stateStr = when(state) {
+            4 -> "ACTIVE"
+            3 -> "DIALING"
+            6 -> "DISCONNECTED"
+            5 -> "HOLDING"
+            0 -> "INITIALIZING"
+            1 -> "NEW"
+            7 -> "PULLING_CALL"
+            2 -> "RINGING"
+            else -> "UNKNOWN"
+        }
+
+        pil.writeLog("AndroidTelecomFramework State: $stateStr")
 
         if (state != STATE_RINGING) {
             incomingCallNotification.cancel()

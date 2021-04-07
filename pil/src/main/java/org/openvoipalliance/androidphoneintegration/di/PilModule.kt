@@ -35,7 +35,7 @@ val pilModule = module {
 
     single { Contacts(androidContext()) }
 
-    single { CallManager(get(), get()) }
+    single { CallManager(get(), get(), get()) }
 
     single { PIL.instance }
 

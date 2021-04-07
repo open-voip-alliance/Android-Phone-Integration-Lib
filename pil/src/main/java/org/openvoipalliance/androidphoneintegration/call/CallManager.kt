@@ -7,13 +7,15 @@ import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.helpers.startCallActivity
 import org.openvoipalliance.androidphoneintegration.helpers.startVoipService
 import org.openvoipalliance.androidphoneintegration.helpers.stopVoipService
+import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.androidphoneintegration.service.VoIPService
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
+import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.AttendedTransferSession
 import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.repository.initialise.CallListener
 
-internal class CallManager(private val pil: PIL, private val androidCallFramework: AndroidCallFramework) : CallListener {
+internal class CallManager(private val pil: PIL, private val androidCallFramework: AndroidCallFramework, val voIPLib: VoIPLib) : CallListener {
 
     internal var call: Call? = null
     internal var transferSession: AttendedTransferSession? = null
@@ -35,6 +37,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
     override fun callConnected(call: Call) {
         super.callConnected(call)
         pil.writeLog("A call has connected!")
+        pil.writeLog(voIPLib.actions(call).callInfo())
         pil.events.broadcast(Event.CallEvent.CallConnected(pil.calls.active))
         pil.app.application.startCallActivity()
 
@@ -51,6 +54,11 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
             pil.writeLog("There is no active call yet so we will setup our outgoing call")
             this.call = call
             pil.events.broadcast(Event.CallEvent.OutgoingCallStarted(pil.calls.active))
+
+            if (androidCallFramework.connection == null) {
+                pil.writeLog("There is no connection object!", LogLevel.ERROR)
+            }
+
             androidCallFramework.connection?.setActive()
             androidCallFramework.connection?.setCallerDisplayName(
                 pil.calls.active?.remotePartyHeading,
@@ -62,6 +70,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
 
     override fun callEnded(call: Call) {
         pil.writeLog("Call has ended")
+        pil.writeLog(voIPLib.actions(call).callInfo())
 
         if (!pil.calls.isInTransfer) {
             pil.writeLog("We are not in a call so tearing down VoIP")

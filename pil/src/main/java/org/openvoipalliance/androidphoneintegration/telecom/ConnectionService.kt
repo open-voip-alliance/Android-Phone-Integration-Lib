@@ -31,11 +31,13 @@ internal class ConnectionService : AndroidConnectionService() {
     ): Connection {
         val connection = baseConnection.apply {
             videoState = request.videoState
+        }.also {
+            androidCallFramework.connection = it
         }
 
         phoneLib.callTo(request.address.schemeSpecificPart)
 
-        return connection.also { androidCallFramework.connection = it }
+        return connection
     }
 
     override fun onCreateOutgoingConnectionFailed(

@@ -15,7 +15,7 @@ android {
 }
 
 dependencies {
-    api("com.github.open-voip-alliance:Android-VoIP-Lib:0.1.0")
+    api("com.github.open-voip-alliance:Android-VoIP-Lib:0.1.4")
     api("com.google.firebase:firebase-messaging-ktx:21.0.1")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.32")
