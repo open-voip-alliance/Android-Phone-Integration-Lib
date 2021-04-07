@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "32423423423",
+    "project_id": "androidplatformintegrationex",
+    "storage_bucket": "androidplatformintegrationex.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35412312321384:android:c86444dsfsdfsdgdfga97b8e5",
+        "android_client_info": {
+          "package_name": "org.openvoipalliance.androidplatformintegration"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "35dfgdfgasdasdasdasdjqf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaasdasdasdasdP-yGmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354sdfsdfsdfdsfsttjqf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

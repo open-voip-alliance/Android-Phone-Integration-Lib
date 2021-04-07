@@ -49,3 +49,22 @@ afterEvaluate {
         }
     }
 }
+
+task("generateDummyGoogleServicesJsonFile") {
+        val file = File("app/google-services.json")
+
+        if (file.exists()) return@task
+
+        val exampleFile = File("app/google-services.example")
+
+        if (!exampleFile.exists()) {
+            print("Example file does not exist, unable to make google-services.json file. Please add a ${exampleFile.path}.")
+            return@task
+        }
+
+        val newFile = exampleFile.copyTo(file, overwrite = true)
+
+        if (newFile.exists()) {
+            print("Created dummy google-services.json file.")
+        }
+}
