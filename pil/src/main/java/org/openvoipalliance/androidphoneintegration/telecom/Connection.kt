@@ -56,7 +56,6 @@ class Connection internal constructor(
     override fun onAnswer() {
         callExists {
             phoneLib.actions(it).accept()
-            setActive()
         }
     }
 

@@ -37,6 +37,11 @@ internal class ConnectionService : AndroidConnectionService() {
 
         phoneLib.callTo(request.address.schemeSpecificPart)
 
+        connection?.apply {
+            setCallerDisplayName(pil.calls.active?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
+            setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
+        }
+
         return connection
     }
 

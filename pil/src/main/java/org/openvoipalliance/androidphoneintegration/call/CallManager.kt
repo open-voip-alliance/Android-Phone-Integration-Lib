@@ -45,6 +45,10 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
             pil.writeLog("The VoIP service is not running, starting it.")
             pil.app.application.startVoipService()
         }
+
+        if (transferSession == null) {
+            androidCallFramework.connection?.setActive()
+        }
     }
 
     override fun outgoingCallCreated(call: Call) {
@@ -59,7 +63,6 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
                 pil.writeLog("There is no connection object!", LogLevel.ERROR)
             }
 
-            androidCallFramework.connection?.setActive()
             androidCallFramework.connection?.setCallerDisplayName(
                 pil.calls.active?.remotePartyHeading,
                 TelecomManager.PRESENTATION_ALLOWED

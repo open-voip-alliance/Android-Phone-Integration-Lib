@@ -1,3 +1,0 @@
-include ':pil'
-include ':app'
-rootProject.name = "Vialer VoIP Platform Integration Layer"
