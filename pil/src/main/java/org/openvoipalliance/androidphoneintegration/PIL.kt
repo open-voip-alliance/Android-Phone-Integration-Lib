@@ -11,6 +11,7 @@ import org.openvoipalliance.androidphoneintegration.call.PILCallFactory
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidphoneintegration.configuration.Auth
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
+import org.openvoipalliance.androidphoneintegration.debug.VersionInfo
 import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
@@ -18,6 +19,7 @@ import org.openvoipalliance.androidphoneintegration.exception.NoAuthenticationCr
 import org.openvoipalliance.androidphoneintegration.exception.PermissionException
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel
+import org.openvoipalliance.androidphoneintegration.logging.LogManager
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.Reason
@@ -33,10 +35,18 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     private val phoneLib: VoIPLib by di.koin.inject()
     private val phoneLibHelper: VoIPLibHelper by di.koin.inject()
 
+    internal val logManager: LogManager by di.koin.inject()
+
     val actions: CallActions by di.koin.inject()
     val audio: AudioManager by di.koin.inject()
     val events: EventsManager by di.koin.inject()
     val calls: Calls by di.koin.inject()
+
+    var versionInfo: VersionInfo = VersionInfo.build(app.application, phoneLib)
+        set(value) {
+            field = value
+            logManager.logVersion()
+        }
 
     /**
      * The user preferences for the PIL, when this value is updated it will trigger
@@ -141,6 +151,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
                 callback?.invoke(success)
             }
         }
+
+        versionInfo = VersionInfo.build(app.application, phoneLib)
     }
 
     private fun performPermissionCheck() {
@@ -151,7 +163,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     }
 
     internal fun writeLog(message: String, level: LogLevel = LogLevel.INFO) {
-        app.logger?.onLogReceived(message, level)
+        logManager.writeLog(message, level)
     }
 
     private val isPreparedToStart: Boolean

@@ -3,7 +3,10 @@ plugins {
     kotlin("android")
     id("maven-publish")
     id("com.jfrog.bintray")
+    id("com.palantir.git-version") version "0.12.3"
 }
+
+extra["voipLibVersion"] = "0.1.4"
 
 android {
     compileSdkVersion(30)
@@ -11,11 +14,14 @@ android {
         minSdkVersion(26)
         targetSdkVersion(30)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        createVersionInformation(this)
     }
 }
 
 dependencies {
-    api("com.github.open-voip-alliance:Android-VoIP-Lib:0.1.4")
+    val voipLibVersion = project.extra["voipLibVersion"]
+
+    api("com.github.open-voip-alliance:Android-VoIP-Lib:$voipLibVersion")
     api("com.google.firebase:firebase-messaging-ktx:21.0.1")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.32")
@@ -67,4 +73,18 @@ task("generateDummyGoogleServicesJsonFile") {
         if (newFile.exists()) {
             print("Created dummy google-services.json file.")
         }
+}
+
+
+fun createVersionInformation(defaultConfig: com.android.build.api.dsl.DefaultConfig) {
+    val voipLibVersion = project.extra["voipLibVersion"] as String
+    val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
+    version = versionDetails().version
+    val lastTag = versionDetails().lastTag
+    val gitHash = versionDetails().gitHash
+
+    defaultConfig.resValue("string", "pil_build_info_version", version.toString())
+    defaultConfig.resValue("string", "pil_build_info_tag", lastTag)
+    defaultConfig.resValue("string", "pil_build_info_hash", gitHash)
+    defaultConfig.resValue("string", "pil_build_info_voip_lib_version", voipLibVersion)
 }

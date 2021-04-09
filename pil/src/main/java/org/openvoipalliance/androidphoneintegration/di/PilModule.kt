@@ -14,7 +14,9 @@ import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
 import org.openvoipalliance.androidphoneintegration.call.CallActions
 import org.openvoipalliance.androidphoneintegration.call.PILCallFactory
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
+import org.openvoipalliance.androidphoneintegration.debug.VersionInfo
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
+import org.openvoipalliance.androidphoneintegration.logging.LogManager
 import org.openvoipalliance.androidphoneintegration.notifications.CallNotification
 import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
@@ -63,4 +65,6 @@ val pilModule = module {
     single { CallNotification() }
 
     single { LocalDtmfToneGenerator(get()) }
+
+    single { LogManager(get()) }
 }
