@@ -14,6 +14,11 @@ internal class FcmService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
+        if (pil.app.middleware?.inspect(remoteMessage) == false) {
+            pil.writeLog("Client has inspected push message and determined this is not a call")
+            return
+        }
+
         if (!PIL.isInitialized) return
 
         pil.writeLog("Received FCM push message")
