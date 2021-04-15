@@ -16,8 +16,14 @@ class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObs
 
     private var wakeLock: WakeLock? = null
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun begin() {
+        if (!PIL.isInitialized) return
+
+        if (wakeLock?.isHeld == true) {
+            wakeLock?.release()
+        }
+
         wakeLock = powerManager.newWakeLock(
             PROXIMITY_SCREEN_OFF_WAKE_LOCK or ACQUIRE_CAUSES_WAKEUP,
             "${activity.packageName}:call"
@@ -38,12 +44,12 @@ class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObs
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun end() {
         wakeLock?.release()
         wakeLock = null
 
-        if (activity is PILEventListener) {
+        if (PIL.isInitialized && activity is PILEventListener) {
             PIL.instance.events.stopListening(activity)
         }
     }
