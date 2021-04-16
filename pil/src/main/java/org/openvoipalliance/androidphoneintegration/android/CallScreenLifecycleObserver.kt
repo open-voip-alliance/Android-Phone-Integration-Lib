@@ -17,14 +17,8 @@ class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObs
 
     private var wakeLock: WakeLock? = null
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun begin() {
-        if (!PIL.isInitialized) return
-
-        if (wakeLock?.isHeld == true) {
-            wakeLock?.release()
-        }
-
         wakeLock = powerManager.newWakeLock(
             PROXIMITY_SCREEN_OFF_WAKE_LOCK or ACQUIRE_CAUSES_WAKEUP,
             "${activity.packageName}:call"
@@ -34,7 +28,6 @@ class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObs
             }
 
         activity.apply {
-            volumeControlStream = AudioManager.STREAM_VOICE_CALL
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
                 setTurnScreenOn(true)
@@ -45,6 +38,7 @@ class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObs
                         or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                         or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON)
             }
+            volumeControlStream = AudioManager.STREAM_VOICE_CALL
         }
 
         if (activity is PILEventListener) {
@@ -52,12 +46,12 @@ class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObs
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun end() {
         wakeLock?.release()
         wakeLock = null
 
-        if (PIL.isInitialized && activity is PILEventListener) {
+        if (activity is PILEventListener) {
             PIL.instance.events.stopListening(activity)
         }
     }
