@@ -6,7 +6,7 @@ plugins {
     id("com.palantir.git-version") version "0.12.3"
 }
 
-extra["voipLibVersion"] = "0.1.5"
+extra["voipLibVersion"] = "0.1.6"
 
 android {
     compileSdkVersion(30)
