@@ -1,7 +1,7 @@
 package org.openvoipalliance.androidphoneintegration.telecom
 
 import android.annotation.SuppressLint
-import android.os.Bundle
+import android.telecom.CallAudioState
 import android.telecom.DisconnectCause
 import android.telecom.DisconnectCause.LOCAL
 import org.openvoipalliance.androidphoneintegration.PIL
@@ -111,6 +111,10 @@ class Connection internal constructor(
         }
 
         callback.invoke(call)
+        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
+    }
+
+    override fun onCallAudioStateChanged(state: CallAudioState?) {
         pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
     }
 }
