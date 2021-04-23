@@ -1,5 +1,6 @@
 package org.openvoipalliance.androidphoneintegration.example.ui.settings
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.text.InputType
@@ -28,6 +29,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private val voIPGRIDMiddleware by lazy { VoIPGRIDMiddleware(requireActivity()) }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        loadFromFile()
         setPreferencesFromResource(R.xml.settings, rootKey)
         findPreference<EditTextPreference>("username")?.summaryProvider = Preference.SummaryProvider<EditTextPreference> {
             prefs.getString("username", "")
@@ -217,6 +219,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 findPreference<Preference>("status")?.summaryProvider = Preference.SummaryProvider<Preference> {
                     summary
                 }
+            }
+        }
+    }
+
+    @SuppressLint("ApplySharedPref")
+    private fun loadFromFile() {
+        val keyToDefault = mapOf(
+            "username" to getString(R.string.default_sip_user),
+            "password" to getString(R.string.default_sip_password),
+            "domain" to getString(R.string.default_sip_domain),
+            "port" to getString(R.string.default_sip_port),
+            "voipgrid_username" to getString(R.string.default_voipgrid_username),
+            "voipgrid_password" to getString(R.string.default_voipgrid_password)
+        )
+
+        keyToDefault.forEach {
+            if (prefs.getString(it.key, "")!!.isEmpty()) {
+                prefs.edit().putString(it.key, it.value).commit()
             }
         }
     }
