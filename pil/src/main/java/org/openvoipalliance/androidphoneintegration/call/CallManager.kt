@@ -71,6 +71,8 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
                 setActive()
             }
             pil.app.application.startCallActivity()
+
+            pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
         }
     }
 
