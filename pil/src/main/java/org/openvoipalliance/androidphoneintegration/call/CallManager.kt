@@ -63,10 +63,13 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
                 pil.writeLog("There is no connection object!", LogLevel.ERROR)
             }
 
-            androidCallFramework.connection?.setCallerDisplayName(
-                pil.calls.active?.remotePartyHeading,
-                TelecomManager.PRESENTATION_ALLOWED
-            )
+            androidCallFramework.connection?.apply {
+                setCallerDisplayName(
+                    pil.calls.active?.remotePartyHeading,
+                    TelecomManager.PRESENTATION_ALLOWED
+                )
+                setActive()
+            }
             pil.app.application.startCallActivity()
         }
     }
