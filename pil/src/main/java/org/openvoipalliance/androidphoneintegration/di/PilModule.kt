@@ -2,20 +2,18 @@ package org.openvoipalliance.androidphoneintegration.di
 
 import android.app.NotificationManager
 import android.telecom.TelecomManager
-import androidx.core.content.ContextCompat.getSystemService
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import org.openvoipalliance.androidphoneintegration.call.CallManager
-import org.openvoipalliance.androidphoneintegration.call.Calls
 import org.openvoipalliance.androidphoneintegration.PIL
-import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
 import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
 import org.openvoipalliance.androidphoneintegration.call.CallActions
-import org.openvoipalliance.androidphoneintegration.call.PILCallFactory
+import org.openvoipalliance.androidphoneintegration.call.CallFactory
+import org.openvoipalliance.androidphoneintegration.call.CallManager
+import org.openvoipalliance.androidphoneintegration.call.Calls
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
-import org.openvoipalliance.androidphoneintegration.debug.VersionInfo
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
+import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidphoneintegration.logging.LogManager
 import org.openvoipalliance.androidphoneintegration.notifications.CallNotification
 import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
@@ -34,7 +32,7 @@ val pilModule = module {
         )
     }
 
-    single { PILCallFactory(get(), get()) }
+    single { CallFactory(get(), get()) }
 
     single { Contacts(androidContext()) }
 
@@ -44,9 +42,9 @@ val pilModule = module {
 
     single { VoIPLib.getInstance(androidContext()) }
 
-    single { CallActions(get(), get(), get(), get(), get()) }
+    single { CallActions(get(), get(), get(), get()) }
 
-    single { AudioManager(get(), get()) }
+    single { AudioManager(get(), get(), get()) }
 
     single { EventsManager(get()) }
 

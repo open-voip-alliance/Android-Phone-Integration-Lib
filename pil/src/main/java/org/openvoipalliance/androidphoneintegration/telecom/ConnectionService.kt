@@ -3,13 +3,13 @@ package org.openvoipalliance.androidphoneintegration.telecom
 import android.annotation.SuppressLint
 import android.telecom.Connection.*
 import android.telecom.ConnectionRequest
-import android.telecom.ConnectionService as AndroidConnectionService
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.voiplib.VoIPLib
+import android.telecom.ConnectionService as AndroidConnectionService
 
 internal class ConnectionService : AndroidConnectionService() {
 
@@ -37,7 +37,7 @@ internal class ConnectionService : AndroidConnectionService() {
 
         phoneLib.callTo(request.address.schemeSpecificPart)
 
-        connection?.apply {
+        connection.apply {
             setCallerDisplayName(pil.calls.active?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
             setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
         }

@@ -2,12 +2,11 @@ package org.openvoipalliance.androidphoneintegration
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
 import org.openvoipalliance.androidphoneintegration.call.CallActions
+import org.openvoipalliance.androidphoneintegration.call.CallFactory
 import org.openvoipalliance.androidphoneintegration.call.Calls
-import org.openvoipalliance.androidphoneintegration.call.PILCallFactory
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidphoneintegration.configuration.Auth
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
@@ -22,7 +21,6 @@ import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.androidphoneintegration.logging.LogManager
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
-import org.openvoipalliance.voiplib.model.Reason
 import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
 import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
 import kotlin.coroutines.resume
@@ -30,7 +28,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class PIL internal constructor(internal val app: ApplicationSetup) {
 
-    private val callFactory: PILCallFactory by di.koin.inject()
+    private val callFactory: CallFactory by di.koin.inject()
     private val androidCallFramework: AndroidCallFramework by di.koin.inject()
     private val phoneLib: VoIPLib by di.koin.inject()
     private val phoneLibHelper: VoIPLibHelper by di.koin.inject()

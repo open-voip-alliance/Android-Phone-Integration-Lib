@@ -1,16 +1,13 @@
 package org.openvoipalliance.androidphoneintegration.call
 
 import android.annotation.SuppressLint
-import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
-import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidphoneintegration.telecom.Connection
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.Call
 
 class CallActions internal constructor(
-    private val pil: PIL,
     private val phoneLib: VoIPLib,
     private val callManager: CallManager,
     private val androidCallFramework: AndroidCallFramework,
@@ -67,6 +64,7 @@ class CallActions internal constructor(
 
     fun completeAttendedTransfer() {
         callManager.transferSession?.let {
+            callManager.mergeRequested = true
             phoneLib.actions(it.from).finishAttendedTransfer(it)
         }
     }
@@ -95,8 +93,6 @@ class CallActions internal constructor(
         val connection = androidCallFramework.connection ?: return
 
         callback.invoke(connection)
-
-        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
     }
 
     /**
@@ -104,13 +100,12 @@ class CallActions internal constructor(
      *
      */
     private fun callExists(callback: (call: Call) -> Unit) {
-        var call = callManager.call ?: return
+        var call = callManager.voipLibCall ?: return
 
         callManager.transferSession?.let {
             call = it.to
         }
 
         callback.invoke(call)
-        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
     }
 }
