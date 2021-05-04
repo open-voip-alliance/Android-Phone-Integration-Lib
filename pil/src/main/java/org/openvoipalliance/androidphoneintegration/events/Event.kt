@@ -1,6 +1,6 @@
 package org.openvoipalliance.androidphoneintegration.events
 
-import org.openvoipalliance.androidphoneintegration.call.PILCall
+import org.openvoipalliance.androidphoneintegration.CallSessionState
 
 interface PILEventListener {
     fun onEvent(event: Event)
@@ -8,12 +8,21 @@ interface PILEventListener {
 
 sealed class Event {
 
-    sealed class CallEvent(val call: PILCall?): Event() {
-        class OutgoingCallStarted(call: PILCall?) : CallEvent(call)
-        class IncomingCallReceived(call: PILCall?) : CallEvent(call)
-        class CallEnded(call: PILCall?) : CallEvent(call)
-        class CallUpdated(call: PILCall?) : CallEvent(call)
-        class CallConnected(call: PILCall?) : CallEvent(call)
+    sealed class CallSessionEvent(val state: CallSessionState): Event() {
+        class OutgoingCallStarted(state: CallSessionState) : CallSessionEvent(state)
+        class IncomingCallReceived(state: CallSessionState) : CallSessionEvent(state)
+        class CallEnded(state: CallSessionState) : CallSessionEvent(state)
+        class CallConnected(state: CallSessionState) : CallSessionEvent(state)
+        class CallDurationUpdated(state: CallSessionState) : CallSessionEvent(state)
+        class AudioStateUpdated(state: CallSessionState) : CallSessionEvent(state)
+        class CallStateUpdated(state: CallSessionState) : CallSessionEvent(state)
+
+        sealed class AttendedTransferEvent(state: CallSessionState): CallSessionEvent(state) {
+            class AttendedTransferStarted(state: CallSessionState) : CallSessionEvent(state)
+            class AttendedTransferConnected(state: CallSessionState) : CallSessionEvent(state)
+            class AttendedTransferAborted(state: CallSessionState) : CallSessionEvent(state)
+            class AttendedTransferEnded(state: CallSessionState) : CallSessionEvent(state)
+        }
     }
 
     sealed class CallSetupFailedEvent(val reason: Reason): Event() {

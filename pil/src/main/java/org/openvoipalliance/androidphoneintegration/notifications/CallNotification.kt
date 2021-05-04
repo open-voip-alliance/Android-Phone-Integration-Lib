@@ -6,9 +6,8 @@ import android.app.PendingIntent
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import org.openvoipalliance.androidphoneintegration.R
-import org.openvoipalliance.androidphoneintegration.call.PILCall
+import org.openvoipalliance.androidphoneintegration.call.Call
 import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver
-import org.openvoipalliance.androidphoneintegration.service.VoIPService
 
 internal class CallNotification: Notification() {
 
@@ -28,7 +27,7 @@ internal class CallNotification: Notification() {
         )
     }
 
-    internal fun update(call: PILCall) {
+    internal fun update(call: Call) {
         notificationManger.notify(
             notificationId,
             build()

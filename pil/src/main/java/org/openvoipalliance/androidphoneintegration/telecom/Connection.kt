@@ -111,10 +111,9 @@ class Connection internal constructor(
         }
 
         callback.invoke(call)
-        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
     }
 
     override fun onCallAudioStateChanged(state: CallAudioState?) {
-        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
+        pil.events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
     }
 }

@@ -4,6 +4,8 @@ import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferEnded
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.CallEnded
 import org.openvoipalliance.androidphoneintegration.helpers.startCallActivity
 import org.openvoipalliance.androidphoneintegration.helpers.startVoipService
 import org.openvoipalliance.androidphoneintegration.helpers.stopVoipService
@@ -17,11 +19,15 @@ import org.openvoipalliance.voiplib.repository.initialise.CallListener
 
 internal class CallManager(private val pil: PIL, private val androidCallFramework: AndroidCallFramework, val voIPLib: VoIPLib) : CallListener {
 
+    internal var mergeRequested = false
     internal var call: Call? = null
     internal var transferSession: AttendedTransferSession? = null
 
-    val isInCall
+    private val isInCall
         get() = this.call != null
+
+    private val isInTransfer
+        get() = this.transferSession != null
 
     override fun incomingCallReceived(call: Call) {
         pil.writeLog("Incoming call has been received")
@@ -29,7 +35,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         if (!isInCall) {
             pil.writeLog("There is no active call so setting up our new incoming call")
             this.call = call
-            pil.events.broadcast(Event.CallEvent.IncomingCallReceived(pil.calls.active))
+            pil.events.broadcast(Event.CallSessionEvent.IncomingCallReceived::class)
             androidCallFramework.addNewIncomingCall(call.phoneNumber)
         }
     }
@@ -38,15 +44,17 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         super.callConnected(call)
         pil.writeLog("A call has connected!")
         pil.writeLog(voIPLib.actions(call).callInfo())
-        pil.events.broadcast(Event.CallEvent.CallConnected(pil.calls.active))
-        pil.app.application.startCallActivity()
 
         if (!VoIPService.isRunning) {
             pil.writeLog("The VoIP service is not running, starting it.")
             pil.app.application.startVoipService()
         }
 
-        if (transferSession == null) {
+        if (isInTransfer) {
+            pil.events.broadcast(Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferConnected::class)
+        } else {
+            pil.events.broadcast(Event.CallSessionEvent.CallConnected::class)
+            pil.app.application.startCallActivity()
             androidCallFramework.connection?.setActive()
         }
     }
@@ -57,7 +65,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         if (!isInCall) {
             pil.writeLog("There is no active call yet so we will setup our outgoing call")
             this.call = call
-            pil.events.broadcast(Event.CallEvent.OutgoingCallStarted(pil.calls.active))
+            pil.events.broadcast(Event.CallSessionEvent.OutgoingCallStarted::class)
 
             if (androidCallFramework.connection == null) {
                 pil.writeLog("There is no connection object!", LogLevel.ERROR)
@@ -69,8 +77,8 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
             )
 
             pil.app.application.startCallActivity()
-
-            pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
+        } else {
+            pil.events.broadcast(Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferStarted::class)
         }
     }
 
@@ -84,10 +92,17 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
             pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
+            pil.events.broadcast(if (mergeRequested) AttendedTransferEnded::class else CallEnded::class)
+            mergeRequested = false
+        } else {
+            transferSession = null
+            pil.events.broadcast(Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferAborted::class)
         }
+    }
 
-        pil.events.broadcast(Event.CallEvent.CallEnded(pil.calls.active))
-        transferSession = null
+    override fun callUpdated(call: Call) {
+        super.callUpdated(call)
+        pil.events.broadcast(Event.CallSessionEvent.CallStateUpdated::class)
     }
 
     override fun error(call: Call) {

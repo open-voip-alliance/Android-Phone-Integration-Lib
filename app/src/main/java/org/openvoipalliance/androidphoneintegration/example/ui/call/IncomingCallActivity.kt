@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.activity_incoming_call.*
 import org.openvoipalliance.androidphoneintegration.CallScreenLifecycleObserver
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event
-import org.openvoipalliance.androidphoneintegration.events.Event.CallEvent
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
 import org.openvoipalliance.androidphoneintegration.example.R
 
@@ -44,8 +44,8 @@ class IncomingCallActivity : AppCompatActivity(), PILEventListener {
 
     override fun onEvent(event: Event) {
         when (event) {
-            is CallEvent.CallEnded -> finish()
-            is CallEvent.CallUpdated -> displayCall()
+            is CallSessionEvent.CallEnded -> finish()
+            is CallSessionEvent -> displayCall()
             else -> {}
         }
     }

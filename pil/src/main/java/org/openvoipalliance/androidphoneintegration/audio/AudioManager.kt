@@ -1,46 +1,52 @@
 package org.openvoipalliance.androidphoneintegration.audio
 
 import android.telecom.CallAudioState.*
+import org.openvoipalliance.androidphoneintegration.events.Event
+import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.Codec
 
 class AudioManager internal constructor(
     private val phoneLib: VoIPLib,
-    private val androidCallFramework: AndroidCallFramework
+    private val androidCallFramework: AndroidCallFramework,
+    private val events: EventsManager
 ) {
 
     val availableCodecs = arrayOf(Codec.OPUS, Codec.ILBC, Codec.G729, Codec.SPEEX)
 
-    val isMicrophoneMuted: Boolean
+    var isMicrophoneMuted: Boolean
         get() = phoneLib.microphoneMuted
+        private set(value) {
+            phoneLib.microphoneMuted = value
+            events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
+        }
 
     val state: AudioState
         get() = createAudioStateObject()
 
-    fun routeAudio(route: AudioRoute) {
+    fun routeAudio(route: AudioRoute) =
         androidCallFramework.connection?.setAudioRoute(pilRouteToNativeRoute(route))
-    }
 
     fun mute() {
-        phoneLib.microphoneMuted = true
+        isMicrophoneMuted = true
     }
 
     fun unmute() {
-        phoneLib.microphoneMuted = false
+        isMicrophoneMuted = false
     }
 
     fun toggleMute() {
-        phoneLib.microphoneMuted = !phoneLib.microphoneMuted
+        isMicrophoneMuted = !isMicrophoneMuted
     }
 
     private fun createAudioStateObject(): AudioState {
 
-        val default = AudioState(AudioRoute.PHONE, arrayOf(), null)
+        val default = AudioState(AudioRoute.PHONE, arrayOf(), null, false)
 
         val connection = androidCallFramework.connection ?: return default
 
-        if (connection?.callAudioState == null) {
+        if (connection.callAudioState == null) {
             return default
         }
 
@@ -68,7 +74,7 @@ class AudioManager internal constructor(
             null
         }
 
-        return AudioState(currentRoute, supportedRoutes.toTypedArray(), bluetoothName)
+        return AudioState(currentRoute, supportedRoutes.toTypedArray(), bluetoothName, phoneLib.microphoneMuted)
     }
 
     private fun nativeRouteToPilRoute(nativeRoute: Int) = when (nativeRoute) {

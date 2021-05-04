@@ -1,29 +1,16 @@
 package org.openvoipalliance.androidphoneintegration.service
 
 import android.annotation.SuppressLint
-import android.app.*
-import android.app.Notification.*
-import android.content.Context
+import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.media.AudioAttributes
-import android.media.RingtoneManager
-import android.net.Uri
-import android.os.Build
-import android.os.Handler
-import android.os.IBinder
-import android.os.PowerManager
-import androidx.core.app.NotificationCompat
-import java.util.*
+import android.os.*
 import org.openvoipalliance.androidphoneintegration.PIL
-import org.openvoipalliance.androidphoneintegration.R
-
-import org.openvoipalliance.androidphoneintegration.call.CallDirection
-import org.openvoipalliance.androidphoneintegration.call.CallState
 import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
 import org.openvoipalliance.androidphoneintegration.notifications.CallNotification
+import java.util.*
 
 internal class VoIPService : Service(), PILEventListener {
 
@@ -35,12 +22,12 @@ internal class VoIPService : Service(), PILEventListener {
     private var timer: Timer? = null
     private var wakeLock: PowerManager.WakeLock? = null
 
-    private val handler = Handler()
+    private val handler by lazy { Handler(Looper.getMainLooper()) }
 
     val callEventLoop = object : Runnable {
         override fun run() {
             if (pil.calls.active != null)
-                pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
+                pil.events.broadcast(Event.CallSessionEvent.CallDurationUpdated::class)
             else
                 stopSelf()
 

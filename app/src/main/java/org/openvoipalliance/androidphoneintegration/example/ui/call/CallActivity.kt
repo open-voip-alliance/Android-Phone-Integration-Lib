@@ -5,15 +5,15 @@ import android.os.Bundle
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_call.*
 import org.openvoipalliance.androidphoneintegration.CallScreenLifecycleObserver
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.audio.AudioRoute
-import org.openvoipalliance.androidphoneintegration.call.PILCall
 import org.openvoipalliance.androidphoneintegration.events.Event
-import org.openvoipalliance.androidphoneintegration.events.Event.CallEvent
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
 import org.openvoipalliance.androidphoneintegration.example.R
 import org.openvoipalliance.androidphoneintegration.example.ui.TransferDialog
@@ -21,6 +21,8 @@ import org.openvoipalliance.androidphoneintegration.example.ui.TransferDialog
 class CallActivity : AppCompatActivity(), PILEventListener {
 
     private val pil by lazy { PIL.instance }
+
+    private var lastEvent: CallSessionEvent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,7 +93,7 @@ class CallActivity : AppCompatActivity(), PILEventListener {
 
     override fun onResume() {
         super.onResume()
-        render()
+        lastEvent?.let { render(it) }
     }
 
     override fun onDestroy() {
@@ -99,25 +101,28 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         pil.events.stopListening(this)
     }
 
-    private fun render(call: PILCall? = pil.calls.active) {
-        if (call == null) {
-            finish()
+    private fun render(event: CallSessionEvent) {
+        if (event is CallSessionEvent.CallDurationUpdated) {
+            callDuration.text = event.state.activeCall?.prettyDuration
             return
         }
 
-        if (pil.calls.isInTransfer) {
-            transferCallInformation.text = pil.calls.inactive?.remotePartyHeading
-            if (pil.calls.inactive?.remotePartySubheading?.isNotBlank() == true) {
-                transferCallInformation.text = "${transferCallInformation.text} (${pil.calls.inactive?.remotePartySubheading})"
-            }
+        if (event is CallSessionEvent.AttendedTransferEvent.AttendedTransferStarted) {
             transferContainer.visibility = View.VISIBLE
-        } else {
+        } else if (event is CallSessionEvent.AttendedTransferEvent.AttendedTransferAborted) {
             transferContainer.visibility = View.GONE
+        }
+
+        val call = event.state.activeCall ?: return
+
+        transferCallInformation.text = pil.calls.inactive?.remotePartyHeading
+        if (pil.calls.inactive?.remotePartySubheading?.isNotBlank() == true) {
+            transferCallInformation.text = "${transferCallInformation.text} (${pil.calls.inactive?.remotePartySubheading})"
         }
 
         callTitle.text = call.remotePartyHeading
         callSubtitle.text = call.remotePartySubheading
-        callDuration.text = call.prettyDuration
+        callDuration.text = event.state.activeCall?.prettyDuration
 
         holdButton.text = if (call.isOnHold) "unhold" else "hold"
         muteButton.text = if (pil.audio.isMicrophoneMuted) "unmute" else "mute"
@@ -137,15 +142,12 @@ class CallActivity : AppCompatActivity(), PILEventListener {
     }
 
     override fun onEvent(event: Event) = when (event) {
-        is CallEvent.CallEnded -> {
-            if (pil.calls.active == null) {
-                finish()
-            } else {
-
-                render(event.call)
-            }
+        is CallSessionEvent.CallEnded -> finish()
+        is CallSessionEvent.AttendedTransferEvent.AttendedTransferEnded -> {
+            Toast.makeText(this, "Call transfer complete!", Toast.LENGTH_LONG).show()
+            finish()
         }
-        is CallEvent.CallUpdated -> render(event.call)
+        is CallSessionEvent -> render(event)
         else -> {}
     }
 }

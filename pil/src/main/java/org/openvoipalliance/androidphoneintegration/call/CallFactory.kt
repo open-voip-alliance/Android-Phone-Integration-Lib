@@ -6,7 +6,6 @@ import org.openvoipalliance.androidphoneintegration.contacts.Contact
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
-import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.model.CallState
 import org.openvoipalliance.voiplib.model.CallState.*
 import org.openvoipalliance.voiplib.model.Direction
@@ -14,20 +13,22 @@ import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-internal class PILCallFactory(private val contacts: Contacts, private val callManager: CallManager) :
+typealias VoipLibCall = org.openvoipalliance.voiplib.model.Call
+
+internal class CallFactory(private val contacts: Contacts, private val callManager: CallManager) :
     PILEventListener {
 
-    private val cachedContacts = mutableMapOf<Call, Contact>()
+    private val cachedContacts = mutableMapOf<VoipLibCall, Contact>()
 
-    fun make(libraryCall: Call?): PILCall? {
-        val call = libraryCall ?: return null
+    fun make(voipLibCall: VoipLibCall?): Call? {
+        val call = voipLibCall ?: return null
         val remoteParty = findAppropriateRemotePartyInformation(call)
 
-        return PILCall(
+        return Call(
             remoteParty.number,
             remoteParty.name,
-            convertCallState(call.state),
-            if (call.direction == Direction.INCOMING) CallDirection.INBOUND else CallDirection.OUTBOUND,
+            convertCallState(voipLibCall.state),
+            if (voipLibCall.direction == Direction.INCOMING) CallDirection.INBOUND else CallDirection.OUTBOUND,
             call.duration,
             call.isOnHold,
             UUID.randomUUID().toString(),
@@ -36,7 +37,7 @@ internal class PILCallFactory(private val contacts: Contacts, private val callMa
         )
     }
 
-    private fun findAppropriateRemotePartyInformation(call: Call): RemotePartyInformation {
+    private fun findAppropriateRemotePartyInformation(call: VoipLibCall): RemotePartyInformation {
         if (call.pAssertedIdentity.isNotBlank()) {
             extractCallerInformationFromAlternativeHeaders(call.pAssertedIdentity)?.let {
                 return it
