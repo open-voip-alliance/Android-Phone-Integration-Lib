@@ -100,7 +100,7 @@ class CallActions internal constructor(
      *
      */
     private fun callExists(callback: (call: Call) -> Unit) {
-        var call = callManager.call ?: return
+        var call = callManager.voipLibCall ?: return
 
         callManager.transferSession?.let {
             call = it.to

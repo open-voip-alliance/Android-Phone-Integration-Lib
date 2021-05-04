@@ -66,7 +66,7 @@ internal class CallFactory(private val contacts: Contacts, private val callManag
     }
 
     override fun onEvent(event: Event) {
-        val call = callManager.call ?: return
+        val call = callManager.voipLibCall ?: return
 
         GlobalScope.launch {
             if (!cachedContacts.containsKey(call)) {

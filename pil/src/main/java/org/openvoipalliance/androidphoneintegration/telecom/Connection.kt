@@ -103,14 +103,14 @@ class Connection internal constructor(
      * An easy way to perform a null safety check and log whether there was no call found.
      *
      */
-    private fun callExists(callback: (call: VoipLibCall) -> Unit) {
-        var call = callManager.call ?: return
+    private fun callExists(callback: (voipLibCall: VoipLibCall) -> Unit) {
+        var voipLibCall = callManager.voipLibCall ?: return
 
         callManager.transferSession?.let {
-            call = it.to
+            voipLibCall = it.to
         }
 
-        callback.invoke(call)
+        callback.invoke(voipLibCall)
     }
 
     override fun onCallAudioStateChanged(state: CallAudioState?) {

@@ -27,7 +27,7 @@ class Calls internal constructor(private val callManager: CallManager, private v
             return it.to
         }
 
-        return callManager.call
+        return callManager.voipLibCall
     }
 
     private fun findInactiveCall(): VoipLibCall? {
