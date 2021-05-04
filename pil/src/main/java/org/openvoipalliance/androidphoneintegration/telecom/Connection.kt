@@ -6,10 +6,10 @@ import android.telecom.DisconnectCause
 import android.telecom.DisconnectCause.LOCAL
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.call.CallManager
+import org.openvoipalliance.androidphoneintegration.call.VoipLibCall
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
 import org.openvoipalliance.voiplib.VoIPLib
-import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.model.Reason
 import android.telecom.Connection as AndroidConnection
 
@@ -103,18 +103,17 @@ class Connection internal constructor(
      * An easy way to perform a null safety check and log whether there was no call found.
      *
      */
-    private fun callExists(callback: (call: Call) -> Unit) {
-        var call = callManager.call ?: return
+    private fun callExists(callback: (voipLibCall: VoipLibCall) -> Unit) {
+        var voipLibCall = callManager.voipLibCall ?: return
 
         callManager.transferSession?.let {
-            call = it.to
+            voipLibCall = it.to
         }
 
-        callback.invoke(call)
-        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
+        callback.invoke(voipLibCall)
     }
 
     override fun onCallAudioStateChanged(state: CallAudioState?) {
-        pil.events.broadcast(Event.CallEvent.CallUpdated(pil.calls.active))
+        pil.events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
     }
 }

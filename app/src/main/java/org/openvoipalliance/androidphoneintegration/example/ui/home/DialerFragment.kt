@@ -10,9 +10,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_dialer.*
 import org.openvoipalliance.androidphoneintegration.PIL
-import org.openvoipalliance.androidphoneintegration.example.R
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
+import org.openvoipalliance.androidphoneintegration.example.R
 import org.openvoipalliance.androidphoneintegration.example.ui.Dialer
 
 class DialerFragment : Fragment(), PILEventListener {

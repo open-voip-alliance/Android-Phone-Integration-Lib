@@ -1,14 +1,13 @@
 package org.openvoipalliance.androidphoneintegration.call
 
-import org.openvoipalliance.voiplib.model.Call
 
-class Calls internal constructor(private val callManager: CallManager, private val factory: PILCallFactory) {
+class Calls internal constructor(private val callManager: CallManager, private val factory: CallFactory) {
 
     /**
      * The currently active call that is setup to send/receive audio.
      *
      */
-    val active: PILCall?
+    val active: Call?
         get() = factory.make(findActiveCall())
 
     /**
@@ -17,21 +16,21 @@ class Calls internal constructor(private val callManager: CallManager, private v
      * new call.
      *
      */
-    val inactive: PILCall?
+    val inactive: Call?
         get() = factory.make(findInactiveCall())
 
     val isInTransfer: Boolean
         get() = callManager.transferSession != null
 
-    private fun findActiveCall(): Call? {
+    private fun findActiveCall(): VoipLibCall? {
         callManager.transferSession?.let {
             return it.to
         }
 
-        return callManager.call
+        return callManager.voipLibCall
     }
 
-    private fun findInactiveCall(): Call? {
+    private fun findInactiveCall(): VoipLibCall? {
         callManager.transferSession?.let { return it.from }
 
         return null

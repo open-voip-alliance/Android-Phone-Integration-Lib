@@ -3,17 +3,15 @@ package org.openvoipalliance.androidphoneintegration.notifications
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import org.openvoipalliance.androidphoneintegration.R
-import org.openvoipalliance.androidphoneintegration.call.PILCall
+import org.openvoipalliance.androidphoneintegration.call.Call
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
 import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver
-import org.openvoipalliance.androidphoneintegration.service.VoIPService
 
 internal class IncomingCallNotification: Notification() {
 
@@ -55,13 +53,13 @@ internal class IncomingCallNotification: Notification() {
      * Silence the incoming notification, stop the ringing.
      *
      */
-    fun silence(call: PILCall) = notify(call, setOnlyAlertOnce = true)
+    fun silence(call: Call) = notify(call, setOnlyAlertOnce = true)
 
     /**
      * Begin ringing the user's phone.
      *
      */
-    fun notify(call: PILCall, setOnlyAlertOnce: Boolean = false) {
+    fun notify(call: Call, setOnlyAlertOnce: Boolean = false) {
         createNotificationChannel()
 
         val notification = NotificationCompat.Builder(pil.app.application, channelId).apply {

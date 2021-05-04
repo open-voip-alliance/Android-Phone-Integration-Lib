@@ -3,7 +3,7 @@ package org.openvoipalliance.androidphoneintegration.call
 import android.text.format.DateUtils
 import org.openvoipalliance.androidphoneintegration.contacts.Contact
 
-data class PILCall(
+data class Call(
     val remoteNumber: String,
     val displayName: String,
     val state: CallState,
