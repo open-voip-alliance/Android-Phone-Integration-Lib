@@ -14,13 +14,12 @@ import org.openvoipalliance.androidphoneintegration.service.VoIPService
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.AttendedTransferSession
-import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.repository.initialise.CallListener
 
 internal class CallManager(private val pil: PIL, private val androidCallFramework: AndroidCallFramework, val voIPLib: VoIPLib) : CallListener {
 
     internal var mergeRequested = false
-    internal var call: Call? = null
+    internal var call: VoipLibCall? = null
     internal var transferSession: AttendedTransferSession? = null
 
     private val isInCall
@@ -29,7 +28,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
     private val isInTransfer
         get() = this.transferSession != null
 
-    override fun incomingCallReceived(call: Call) {
+    override fun incomingCallReceived(call: VoipLibCall) {
         pil.writeLog("Incoming call has been received")
 
         if (!isInCall) {
@@ -40,7 +39,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         }
     }
 
-    override fun callConnected(call: Call) {
+    override fun callConnected(call: VoipLibCall) {
         super.callConnected(call)
         pil.writeLog("A call has connected!")
         pil.writeLog(voIPLib.actions(call).callInfo())
@@ -59,7 +58,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         }
     }
 
-    override fun outgoingCallCreated(call: Call) {
+    override fun outgoingCallCreated(call: VoipLibCall) {
         pil.writeLog("An outgoing call has been created")
 
         if (!isInCall) {
@@ -82,7 +81,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         }
     }
 
-    override fun callEnded(call: Call) {
+    override fun callEnded(call: VoipLibCall) {
         pil.writeLog("Call has ended")
         pil.writeLog(voIPLib.actions(call).callInfo())
 
@@ -100,12 +99,12 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         }
     }
 
-    override fun callUpdated(call: Call) {
+    override fun callUpdated(call: VoipLibCall) {
         super.callUpdated(call)
         pil.events.broadcast(Event.CallSessionEvent.CallStateUpdated::class)
     }
 
-    override fun error(call: Call) {
+    override fun error(call: VoipLibCall) {
         pil.writeLog("There was an error, sending a call ended event.")
         callEnded(call)
     }

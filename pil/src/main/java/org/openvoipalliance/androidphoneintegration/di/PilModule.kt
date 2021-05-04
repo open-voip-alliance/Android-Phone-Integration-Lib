@@ -42,7 +42,7 @@ val pilModule = module {
 
     single { VoIPLib.getInstance(androidContext()) }
 
-    single { CallActions(get(), get(), get(), get(), get()) }
+    single { CallActions(get(), get(), get(), get()) }
 
     single { AudioManager(get(), get(), get()) }
 
