@@ -40,6 +40,9 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     val events: EventsManager by di.koin.inject()
     val calls: Calls by di.koin.inject()
 
+    val sessionState: CallSessionState
+        get() = CallSessionState(calls.active, calls.inactive, audio.state)
+
     var versionInfo: VersionInfo = VersionInfo.build(app.application, phoneLib)
         set(value) {
             field = value
