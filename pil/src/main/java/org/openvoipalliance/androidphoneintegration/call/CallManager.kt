@@ -87,11 +87,11 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
 
         if (!pil.calls.isInTransfer) {
             pil.writeLog("We are not in a call so tearing down VoIP")
+            pil.events.broadcast(if (mergeRequested) AttendedTransferEnded::class else CallEnded::class)
             this.voipLibCall = null
             pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
-            pil.events.broadcast(if (mergeRequested) AttendedTransferEnded::class else CallEnded::class)
             mergeRequested = false
         } else {
             transferSession = null
