@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration.call
 
 import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
+import android.util.Log
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferAborted
@@ -15,14 +16,40 @@ import org.openvoipalliance.androidphoneintegration.service.VoIPService
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.AttendedTransferSession
+import org.openvoipalliance.voiplib.model.CallState
 import org.openvoipalliance.voiplib.repository.initialise.CallListener
 
 internal class CallManager(private val pil: PIL, private val androidCallFramework: AndroidCallFramework, val voIPLib: VoIPLib) : CallListener {
 
+    internal val voipLibCall: VoipLibCall?
+        get() = activeVoipLibCall
+
+    internal val transferSession: AttendedTransferSession?
+        get() {
+            val activeCall = activeVoipLibCall ?: return null
+            val inactiveCall = inactiveVoipLibCall ?: return null
+
+            return AttendedTransferSession(activeCall, inactiveCall)
+        }
+
+    private var activeVoipLibCall: VoipLibCall? = null
+        set(value) {
+            pil.writeLog("Assigning ${value?.hashCode()} as active call")
+            mergeInitiated = false
+            field = value
+        }
+
+    private var inactiveVoipLibCall: VoipLibCall? = null
+        set(value) {
+            pil.writeLog("Assigning ${value?.hashCode()} as inactive call")
+            field = value
+        }
+
     internal var mergeInitiated = false
-    internal var voipLibCall: VoipLibCall? = null
-    internal var transferSession: AttendedTransferSession? = null
-        private set
+        set(value) {
+            pil.writeLog("Initiated a call transfer merge")
+            field = value
+        }
 
     private val isInCall
         get() = this.voipLibCall != null
@@ -36,7 +63,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         if (!isInCall) {
             pil.writeLog("There is no active call so setting up our new incoming call")
             mergeInitiated = false
-            this.voipLibCall = call
+            this.activeVoipLibCall = call
             pil.events.broadcast(Event.CallSessionEvent.IncomingCallReceived::class)
             androidCallFramework.addNewIncomingCall(call.phoneNumber)
         }
@@ -67,7 +94,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         if (!isInCall) {
             pil.writeLog("There is no active call yet so we will setup our outgoing call")
             mergeInitiated = false
-            this.voipLibCall = call
+            this.activeVoipLibCall = call
             pil.events.broadcast(Event.CallSessionEvent.OutgoingCallStarted::class)
 
             if (androidCallFramework.connection == null) {
@@ -81,10 +108,8 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
 
             pil.app.application.startCallActivity()
         } else {
-            this.voipLibCall?.let {
-                transferSession = AttendedTransferSession(it, call)
-                pil.events.broadcast(Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferStarted::class)
-            }
+            inactiveVoipLibCall = call
+            pil.events.broadcast(Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferStarted::class)
         }
     }
 
@@ -98,7 +123,6 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
 
         if (!pil.calls.isInTransfer) {
             pil.writeLog("We are not in a call so tearing down VoIP")
-            this.voipLibCall = null
             pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
@@ -107,13 +131,33 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
             }
             mergeInitiated = false
         } else {
-            transferSession = null
             pil.events.broadcast(
                 if (mergeInitiated)
                     AttendedTransferEnded(sessionState)
                 else
                     AttendedTransferAborted(sessionState)
             )
+        }
+
+        resyncActiveCall()
+    }
+
+    private fun resyncActiveCall() {
+        val endedStates = arrayOf(CallState.CallEnd, CallState.Error, CallState.Unknown, CallState.Error)
+
+        activeVoipLibCall?.let {
+            if (endedStates.contains(it.state)) {
+                activeVoipLibCall = null
+            }
+        }
+
+        inactiveVoipLibCall?.let {
+            if (endedStates.contains(it.state)) {
+                inactiveVoipLibCall = null
+            } else if (activeVoipLibCall == null) {
+                activeVoipLibCall = inactiveVoipLibCall
+                inactiveVoipLibCall = null
+            }
         }
     }
 
