@@ -98,15 +98,18 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
             pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
-            pil.events.broadcast(
-                if (mergeInitiated) AttendedTransferEnded(sessionState) else CallEnded(sessionState)
-            )
+            if (!mergeInitiated) {
+                pil.events.broadcast(CallEnded(sessionState))
+            }
             mergeInitiated = false
         } else {
             transferSession = null
-            if (!mergeInitiated) {
-                pil.events.broadcast(AttendedTransferAborted(sessionState))
-            }
+            pil.events.broadcast(
+                if (mergeInitiated)
+                    AttendedTransferEnded(sessionState)
+                else
+                    AttendedTransferAborted(sessionState)
+            )
         }
     }
 
