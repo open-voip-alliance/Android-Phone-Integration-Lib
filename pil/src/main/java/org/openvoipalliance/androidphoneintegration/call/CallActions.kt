@@ -58,7 +58,7 @@ class CallActions internal constructor(
     @SuppressLint("MissingPermission")
     fun beginAttendedTransfer(number: String) {
         callExists {
-            callManager.transferSession = phoneLib.actions(it).beginAttendedTransfer(number)
+            phoneLib.actions(it).beginAttendedTransfer(number)
         }
     }
 

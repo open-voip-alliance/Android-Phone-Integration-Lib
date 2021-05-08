@@ -22,6 +22,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
     internal var mergeInitiated = false
     internal var voipLibCall: VoipLibCall? = null
     internal var transferSession: AttendedTransferSession? = null
+        private set
 
     private val isInCall
         get() = this.voipLibCall != null
@@ -80,7 +81,10 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
 
             pil.app.application.startCallActivity()
         } else {
-            pil.events.broadcast(Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferStarted::class)
+            this.voipLibCall?.let {
+                transferSession = AttendedTransferSession(it, call)
+                pil.events.broadcast(Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferStarted::class)
+            }
         }
     }
 
