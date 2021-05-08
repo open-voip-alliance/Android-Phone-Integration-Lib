@@ -2,8 +2,10 @@ package org.openvoipalliance.androidphoneintegration.call
 
 import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
+import org.openvoipalliance.androidphoneintegration.CallSessionState
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferAborted
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferEnded
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.CallEnded
 import org.openvoipalliance.androidphoneintegration.helpers.startCallActivity
@@ -85,17 +87,23 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
         pil.writeLog("Call has ended")
         pil.writeLog(voIPLib.actions(call).callInfo())
 
+        // Copying the session state before we start assigning calls so these
+        // events can contain the call objects.
+        val sessionState = pil.sessionState
+
         if (!pil.calls.isInTransfer) {
             pil.writeLog("We are not in a call so tearing down VoIP")
-            pil.events.broadcast(if (mergeRequested) AttendedTransferEnded::class else CallEnded::class)
             this.voipLibCall = null
             pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
             mergeRequested = false
+            pil.events.broadcast(
+                if (mergeRequested) AttendedTransferEnded(sessionState) else CallEnded(sessionState)
+            )
         } else {
             transferSession = null
-            pil.events.broadcast(Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferAborted::class)
+            pil.events.broadcast(AttendedTransferAborted(sessionState))
         }
     }
 
