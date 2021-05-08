@@ -2,7 +2,6 @@ package org.openvoipalliance.androidphoneintegration.call
 
 import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
-import org.openvoipalliance.androidphoneintegration.CallSessionState
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferAborted
@@ -20,7 +19,7 @@ import org.openvoipalliance.voiplib.repository.initialise.CallListener
 
 internal class CallManager(private val pil: PIL, private val androidCallFramework: AndroidCallFramework, val voIPLib: VoIPLib) : CallListener {
 
-    internal var mergeRequested = false
+    internal var mergeInitiated = false
     internal var voipLibCall: VoipLibCall? = null
     internal var transferSession: AttendedTransferSession? = null
 
@@ -35,6 +34,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
 
         if (!isInCall) {
             pil.writeLog("There is no active call so setting up our new incoming call")
+            mergeInitiated = false
             this.voipLibCall = call
             pil.events.broadcast(Event.CallSessionEvent.IncomingCallReceived::class)
             androidCallFramework.addNewIncomingCall(call.phoneNumber)
@@ -65,6 +65,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
 
         if (!isInCall) {
             pil.writeLog("There is no active call yet so we will setup our outgoing call")
+            mergeInitiated = false
             this.voipLibCall = call
             pil.events.broadcast(Event.CallSessionEvent.OutgoingCallStarted::class)
 
@@ -97,13 +98,15 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
             pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
-            mergeRequested = false
             pil.events.broadcast(
-                if (mergeRequested) AttendedTransferEnded(sessionState) else CallEnded(sessionState)
+                if (mergeInitiated) AttendedTransferEnded(sessionState) else CallEnded(sessionState)
             )
+            mergeInitiated = false
         } else {
             transferSession = null
-            pil.events.broadcast(AttendedTransferAborted(sessionState))
+            if (!mergeInitiated) {
+                pil.events.broadcast(AttendedTransferAborted(sessionState))
+            }
         }
     }
 

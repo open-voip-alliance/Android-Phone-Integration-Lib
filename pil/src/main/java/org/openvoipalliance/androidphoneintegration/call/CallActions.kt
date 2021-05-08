@@ -64,7 +64,7 @@ class CallActions internal constructor(
 
     fun completeAttendedTransfer() {
         callManager.transferSession?.let {
-            callManager.mergeRequested = true
+            callManager.mergeInitiated = true
             phoneLib.actions(it.from).finishAttendedTransfer(it)
         }
     }
