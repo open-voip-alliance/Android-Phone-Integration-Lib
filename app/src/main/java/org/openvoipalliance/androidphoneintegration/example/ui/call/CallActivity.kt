@@ -50,6 +50,18 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         }
 
         bluetoothButton.setOnClickListener {
+            val bluetoothRoutes = pil.audio.state.bluetoothRoutes
+
+            if (bluetoothRoutes.size > 1) {
+                AlertDialog.Builder(this)
+                    .setItems(bluetoothRoutes.map { it.displayName }.toTypedArray()) { dialog, which ->
+                        pil.audio.routeAudio(bluetoothRoutes[which])
+                    }
+                    .show()
+
+                return@setOnClickListener
+            }
+
             pil.audio.routeAudio(AudioRoute.BLUETOOTH)
         }
 

@@ -5,4 +5,5 @@ data class AudioState(
     val availableRoutes: Array<AudioRoute>,
     val bluetoothDeviceName: String?,
     val isMicrophoneMuted: Boolean,
+    val bluetoothRoutes: Array<BluetoothAudioRoute>,
 )

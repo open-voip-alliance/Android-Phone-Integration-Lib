@@ -182,3 +182,13 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
             get() = ::instance.isInitialized
     }
 }
+
+/**
+ * Helper function to write a log from anywhere.
+ *
+ */
+internal fun log(message: String, level: LogLevel = LogLevel.INFO) {
+    if (!PIL.isInitialized) return
+
+    PIL.instance.writeLog(message, level)
+}

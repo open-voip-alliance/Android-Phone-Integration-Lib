@@ -1,8 +1,10 @@
 package org.openvoipalliance.androidphoneintegration.audio
 
+import android.os.Build
 import android.telecom.CallAudioState.*
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
+import org.openvoipalliance.androidphoneintegration.log
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.Codec
@@ -25,8 +27,34 @@ class AudioManager internal constructor(
     val state: AudioState
         get() = createAudioStateObject()
 
+    /**
+     * Route audio to a general type of audio device.
+     *
+     */
     fun routeAudio(route: AudioRoute) =
         androidCallFramework.connection?.setAudioRoute(pilRouteToNativeRoute(route))
+
+    /**
+     *  Route audio to a specific bluetooth device.
+     *
+     */
+    fun routeAudio(route: BluetoothAudioRoute) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+
+            val connection = androidCallFramework.connection ?: return
+            val callAudioState = connection.callAudioState ?: return
+
+            callAudioState.supportedBluetoothDevices?.firstOrNull {
+                it.name == route.identifier
+            }?.let {
+                log("Requesting bluetooth audio be routed to ${it.name}")
+                connection.requestBluetoothAudio(it)
+            }
+
+        } else {
+            log("Android version too low to route audio to specific bluetooth device")
+        }
+    }
 
     fun mute() {
         isMicrophoneMuted = true
@@ -42,7 +70,13 @@ class AudioManager internal constructor(
 
     private fun createAudioStateObject(): AudioState {
 
-        val default = AudioState(AudioRoute.PHONE, arrayOf(), null, false)
+        val default = AudioState(
+            AudioRoute.PHONE,
+            arrayOf(),
+            null,
+            false,
+            arrayOf()
+        )
 
         val connection = androidCallFramework.connection ?: return default
 
@@ -74,7 +108,30 @@ class AudioManager internal constructor(
             null
         }
 
-        return AudioState(currentRoute, supportedRoutes.toTypedArray(), bluetoothName, phoneLib.microphoneMuted)
+        val bluetoothRoutes = mutableListOf<BluetoothAudioRoute>()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            connection.callAudioState.supportedBluetoothDevices.forEach {
+                val name = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) it.alias else ""
+
+                bluetoothRoutes.add(BluetoothAudioRoute(
+                    if (name != null && name.isNotBlank()) {
+                        name
+                    } else {
+                        it.name
+                    },
+                    it.name
+                ))
+            }
+        }
+
+        return AudioState(
+            currentRoute,
+            supportedRoutes.toTypedArray(),
+            bluetoothName,
+            phoneLib.microphoneMuted,
+            bluetoothRoutes.toTypedArray()
+        )
     }
 
     private fun nativeRouteToPilRoute(nativeRoute: Int) = when (nativeRoute) {
