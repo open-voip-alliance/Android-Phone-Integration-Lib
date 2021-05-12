@@ -39,20 +39,23 @@ class AudioManager internal constructor(
      *
      */
     fun routeAudio(route: BluetoothAudioRoute) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-
-            val connection = androidCallFramework.connection ?: return
-            val callAudioState = connection.callAudioState ?: return
-
-            callAudioState.supportedBluetoothDevices?.firstOrNull {
-                it.name == route.identifier
-            }?.let {
-                log("Requesting bluetooth audio be routed to ${it.name}")
-                connection.requestBluetoothAudio(it)
-            }
-
-        } else {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             log("Android version too low to route audio to specific bluetooth device")
+            return
+        }
+
+        val connection = androidCallFramework.connection ?: return
+        val callAudioState = connection.callAudioState ?: return
+
+        callAudioState.supportedBluetoothDevices?.firstOrNull {
+            it.name == route.identifier
+        }?.let {
+            log("Requesting bluetooth audio be routed to ${it.name}")
+            connection.requestBluetoothAudio(it)
+        }
+
+        if (state.currentRoute != AudioRoute.BLUETOOTH) {
+            routeAudio(AudioRoute.BLUETOOTH)
         }
     }
 
