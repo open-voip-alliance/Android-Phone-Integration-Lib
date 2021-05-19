@@ -7,6 +7,7 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.call.Call
@@ -65,9 +66,10 @@ internal class IncomingCallNotification: Notification() {
         val notification = NotificationCompat.Builder(pil.app.application, channelId).apply {
             pil.app.activities.incomingCall?.let {
                 val pendingIntent = PendingIntent.getActivity(pil.app.application, 1, Intent(Intent.ACTION_MAIN, null).apply {
+                    putExtra("is_incoming", true)
                     flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION or Intent.FLAG_ACTIVITY_NEW_TASK
                     setClass(pil.app.application, it)
-                }, 0)
+                }, PendingIntent.FLAG_UPDATE_CURRENT)
                 setContentIntent(pendingIntent)
                 setFullScreenIntent(pendingIntent, true)
             }

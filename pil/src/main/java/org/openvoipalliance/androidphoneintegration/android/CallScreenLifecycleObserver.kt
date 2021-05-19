@@ -1,36 +1,31 @@
 package org.openvoipalliance.androidphoneintegration
 
 import android.app.Activity
+import android.app.KeyguardManager
+import android.content.Context
 import android.media.AudioManager
 import android.os.Build
 import android.os.PowerManager
 import android.os.PowerManager.*
+import android.util.Log
 import android.view.WindowManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
 
 class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObserver {
 
-    private val powerManager by lazy { activity.getSystemService(PowerManager::class.java) }
+    private val keyguardManager by lazy { activity.getSystemService(KeyguardManager::class.java) }
 
-    private var wakeLock: WakeLock? = null
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun begin() {
-        wakeLock = powerManager.newWakeLock(
-            PROXIMITY_SCREEN_OFF_WAKE_LOCK or ACQUIRE_CAUSES_WAKEUP,
-            "${activity.packageName}:call"
-        )
-            .apply {
-                acquire(10 * 60 * 1000L)
-            }
-
         activity.apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
                 setTurnScreenOn(true)
+                keyguardManager.requestDismissKeyguard(this, null)
             } else {
                 window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         or WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
@@ -48,9 +43,6 @@ class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObs
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun end() {
-        wakeLock?.release()
-        wakeLock = null
-
         if (activity is PILEventListener) {
             PIL.instance.events.stopListening(activity)
         }

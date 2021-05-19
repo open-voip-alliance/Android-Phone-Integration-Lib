@@ -45,9 +45,10 @@ internal class VoIPService : Service(), PILEventListener {
         startForeground()
 
         wakeLock = powerManager.newWakeLock(
-            PowerManager.PARTIAL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-            "Vialer::IncomingCallWakelock"
-        ).apply { acquire(30000) }
+            PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK
+                    or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "Vialer::ProximitySensor"
+        ).apply { acquire(2 * 60 * 60 * 1000) }
 
         handler.post(callEventLoop)
 
