@@ -2,8 +2,6 @@ package org.openvoipalliance.androidphoneintegration.telecom
 
 import android.annotation.SuppressLint
 import android.telecom.CallAudioState
-import android.telecom.DisconnectCause
-import android.telecom.DisconnectCause.LOCAL
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.call.CallManager
 import org.openvoipalliance.androidphoneintegration.call.VoipLibCall
@@ -71,10 +69,6 @@ class Connection internal constructor(
         callExists {
             phoneLib.actions(it).end()
         }
-
-        androidCallFramework.connection = null
-        setDisconnected(DisconnectCause(LOCAL))
-        destroy()
     }
 
     override fun onStateChanged(state: Int) {

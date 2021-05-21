@@ -2,7 +2,6 @@ package org.openvoipalliance.androidphoneintegration.call
 
 import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
-import android.util.Log
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.AttendedTransferAborted
@@ -126,6 +125,7 @@ internal class CallManager(private val pil: PIL, private val androidCallFramewor
             pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
+            androidCallFramework.connection = null
             if (!mergeInitiated) {
                 pil.events.broadcast(CallEnded(sessionState))
             }
