@@ -1,7 +1,7 @@
 package org.openvoipalliance.androidphoneintegration.helpers
 
 import org.openvoipalliance.androidphoneintegration.PIL
-import org.openvoipalliance.androidphoneintegration.call.CallManager
+import org.openvoipalliance.androidphoneintegration.call.VoipLibEventTranslator
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.config.Auth
 import org.openvoipalliance.voiplib.config.Config
@@ -10,7 +10,7 @@ import org.openvoipalliance.voiplib.repository.initialise.LogLevel
 import org.openvoipalliance.voiplib.repository.initialise.LogListener
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel as PilLogLevel
 
-internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib, private val callManager: CallManager) {
+internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib, private val voipLibEventTranslator: VoipLibEventTranslator) {
 
     /**
      * Boots the VoIP library.
@@ -31,7 +31,7 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
         phoneLib.initialise(
             Config(
                 auth = Auth("", "", "", 0),
-                callListener = callManager,
+                callListener = voipLibEventTranslator,
                 encryption = auth.secure,
                 logListener = voipLibraryLogListener,
                 codecs = pil.preferences.codecs,

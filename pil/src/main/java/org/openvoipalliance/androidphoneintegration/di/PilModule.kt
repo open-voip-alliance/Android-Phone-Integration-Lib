@@ -7,10 +7,11 @@ import org.koin.dsl.module
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
 import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
-import org.openvoipalliance.androidphoneintegration.call.CallActions
+import org.openvoipalliance.androidphoneintegration.call.*
 import org.openvoipalliance.androidphoneintegration.call.CallFactory
-import org.openvoipalliance.androidphoneintegration.call.CallManager
-import org.openvoipalliance.androidphoneintegration.call.Calls
+import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
+import org.openvoipalliance.androidphoneintegration.call.Calls.Companion.MAX_CALLS
+import org.openvoipalliance.androidphoneintegration.call.VoipLibEventTranslator
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
@@ -32,11 +33,11 @@ val pilModule = module {
         )
     }
 
-    single { CallFactory(get(), get()) }
+    single { CallFactory(get()) }
 
     single { Contacts(androidContext()) }
 
-    single { CallManager(get(), get(), get()) }
+    single { PlatformIntegrator(get(), get()) }
 
     single { PIL.instance }
 
@@ -50,9 +51,9 @@ val pilModule = module {
 
     single { VoIPLibHelper(get(), get(), get()) }
 
-    factory { Connection(get(), get(), get(), get(), get()) }
+    factory { Connection(get(), get(), get(), get()) }
 
-    factory { Calls(get(), get()) }
+    single { Calls(get(), CallArrayList(MAX_CALLS)) }
 
     single { androidContext().getSystemService(NotificationManager::class.java) }
 
@@ -65,4 +66,6 @@ val pilModule = module {
     single { LocalDtmfToneGenerator(get()) }
 
     single { LogManager(get()) }
+
+    single { VoipLibEventTranslator(get(), get(), get()) }
 }

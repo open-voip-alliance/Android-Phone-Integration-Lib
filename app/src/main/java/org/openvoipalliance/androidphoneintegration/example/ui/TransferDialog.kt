@@ -1,6 +1,5 @@
 package org.openvoipalliance.androidphoneintegration.example.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,7 @@ import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.fragment_dialer.*
 import org.openvoipalliance.androidphoneintegration.example.R
 
-class TransferDialog(context: Context) : DialogFragment() {
+class TransferDialog : DialogFragment() {
 
     var onTransferListener: OnTransferListener? = null
 

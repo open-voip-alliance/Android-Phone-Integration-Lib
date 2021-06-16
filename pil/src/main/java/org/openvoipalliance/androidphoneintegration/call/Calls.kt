@@ -1,14 +1,37 @@
 package org.openvoipalliance.androidphoneintegration.call
 
+import org.openvoipalliance.voiplib.model.AttendedTransferSession
+import org.openvoipalliance.voiplib.model.Call as VoipLibCall
 
-class Calls internal constructor(private val callManager: CallManager, private val factory: CallFactory) {
+
+class Calls internal constructor(private val factory: CallFactory, private val list: CallList)
+    : CallList by list {
+
+    internal val isInCall
+        get() = list.isNotEmpty()
+
+    val isInTransfer: Boolean
+        get() = list.size >= 2
+
+    internal val activeVoipLibCall: VoipLibCall?
+        get() = list.lastOrNull()
+
+    internal val inactiveVoipLibCall
+        get() = if (isInTransfer) list.firstOrNull() else null
+
+    internal val transferSession: AttendedTransferSession?
+        get() = activeVoipLibCall?.let { active ->
+            inactiveVoipLibCall?.let { inactive ->
+                AttendedTransferSession(active, inactive)
+            }
+        }
 
     /**
      * The currently active call that is setup to send/receive audio.
      *
      */
     val active: Call?
-        get() = factory.make(findActiveCall())
+        get() = factory.make(activeVoipLibCall)
 
     /**
      * The background call, this will only exist when there is a transfer
@@ -17,22 +40,13 @@ class Calls internal constructor(private val callManager: CallManager, private v
      *
      */
     val inactive: Call?
-        get() = factory.make(findInactiveCall())
+        get() = factory.make(inactiveVoipLibCall)
 
-    val isInTransfer: Boolean
-        get() = callManager.transferSession != null
+    companion object {
 
-    private fun findActiveCall(): VoipLibCall? {
-        callManager.transferSession?.let {
-            return it.to
-        }
-
-        return callManager.voipLibCall
-    }
-
-    private fun findInactiveCall(): VoipLibCall? {
-        callManager.transferSession?.let { return it.from }
-
-        return null
+        /**
+         * The maximum number of calls that will be held in the call list.
+         */
+        const val MAX_CALLS = 2
     }
 }

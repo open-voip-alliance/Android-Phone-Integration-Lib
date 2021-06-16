@@ -38,7 +38,7 @@ class VoIPGRIDMiddleware(private val context: Context) : Middleware {
         val data = FormBody.Builder().apply {
             add("token", token!!)
             add("sip_user_id", prefs.getString("username", "")!!)
-            add("app", context?.packageName!!)
+            add("app", context.packageName!!)
         }.build()
 
         val request = createMiddlewareRequest()

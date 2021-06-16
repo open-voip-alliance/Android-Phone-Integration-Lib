@@ -3,7 +3,6 @@ buildscript {
     project.extra.set("kotlinVersion",  "1.4.10")
 
     repositories {
-        jcenter()
         google()
         maven("https://plugins.gradle.org/m2/")
     }

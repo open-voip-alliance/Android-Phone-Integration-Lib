@@ -12,17 +12,21 @@ import kotlinx.coroutines.withContext
 
 internal class Contacts(private val context: Context) {
 
-    suspend fun find(number: String): Contact? = withContext(Dispatchers.IO) {
-        if (!hasPermission) return@withContext null
+    fun find(number: String): Contact? {
+        if (!hasPermission) return null
 
         val contact = ContactsGetterBuilder(context)
             .onlyWithPhones()
             .addField(FieldType.NAME_DATA)
             .withPhone(number)
             .firstOrNull()
-            ?: return@withContext null
+            ?: return null
 
-        return@withContext Contact(contact.nameData.fullName, contact.photoUri)
+        return Contact(contact.nameData.fullName, contact.photoUri)
+    }
+
+    suspend fun findAsync(number: String): Contact? = withContext(Dispatchers.IO) {
+        find(number)
     }
 
     private val hasPermission: Boolean

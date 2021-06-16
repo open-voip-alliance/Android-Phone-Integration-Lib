@@ -54,7 +54,7 @@ class CallActivity : AppCompatActivity(), PILEventListener {
 
             if (bluetoothRoutes.size > 1) {
                 AlertDialog.Builder(this)
-                    .setItems(bluetoothRoutes.map { it.displayName }.toTypedArray()) { dialog, which ->
+                    .setItems(bluetoothRoutes.map { it.displayName }.toTypedArray()) { _, which ->
                         pil.audio.routeAudio(bluetoothRoutes[which])
                     }
                     .show()
@@ -66,7 +66,7 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         }
 
         transferButton.setOnClickListener {
-            TransferDialog(this).apply {
+            TransferDialog().apply {
                 onTransferListener = TransferDialog.OnTransferListener { number ->
                     pil.actions.beginAttendedTransfer(number)
                     dismiss()

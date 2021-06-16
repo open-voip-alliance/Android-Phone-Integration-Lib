@@ -2,11 +2,13 @@ package org.openvoipalliance.androidphoneintegration
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
-import org.openvoipalliance.androidphoneintegration.call.CallActions
+import org.openvoipalliance.androidphoneintegration.call.*
 import org.openvoipalliance.androidphoneintegration.call.CallFactory
-import org.openvoipalliance.androidphoneintegration.call.Calls
+import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
+import org.openvoipalliance.androidphoneintegration.call.VoipLibEventTranslator
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidphoneintegration.configuration.Auth
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
@@ -28,10 +30,10 @@ import kotlin.coroutines.suspendCoroutine
 
 class PIL internal constructor(internal val app: ApplicationSetup) {
 
-    private val callFactory: CallFactory by di.koin.inject()
     private val androidCallFramework: AndroidCallFramework by di.koin.inject()
     private val phoneLib: VoIPLib by di.koin.inject()
     private val phoneLibHelper: VoIPLibHelper by di.koin.inject()
+    private val platformIntegrator: PlatformIntegrator by di.koin.inject()
 
     internal val logManager: LogManager by di.koin.inject()
 
@@ -79,6 +81,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
 
     init {
         instance = this
+        events.listen(platformIntegrator)
     }
 
     /**
@@ -138,8 +141,6 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         val auth = auth ?: throw NoAuthenticationCredentialsException()
 
         if (!auth.isValid) throw NoAuthenticationCredentialsException()
-
-        events.listen(callFactory)
 
         if (forceInitialize) {
             phoneLib.destroy()

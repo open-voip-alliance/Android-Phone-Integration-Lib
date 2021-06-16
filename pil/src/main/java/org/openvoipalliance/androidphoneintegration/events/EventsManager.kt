@@ -3,7 +3,6 @@ package org.openvoipalliance.androidphoneintegration.events
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.openvoipalliance.androidphoneintegration.CallSessionState
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.*
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.*
@@ -24,12 +23,13 @@ class EventsManager internal constructor(private val pil: PIL) {
     }
 
     internal fun broadcast(event: Event) = GlobalScope.launch(Dispatchers.Main) {
-        pil.writeLog("Broadcasting ${event::class.simpleName}")
-        eventListeners.forEach { it.onEvent(event) }
+        eventListeners.forEach {
+            it.onEvent(event)
+        }
     }
 
     internal fun broadcast(eventClass: KClass<out Event.CallSessionEvent>) {
-        val state = CallSessionState(pil.calls.active, pil.calls.inactive, pil.audio.state)
+        val state = pil.sessionState
 
         broadcast(
             when(eventClass) {

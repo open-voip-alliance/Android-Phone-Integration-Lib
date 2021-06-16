@@ -5,11 +5,12 @@ import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidphoneintegration.telecom.Connection
 import org.openvoipalliance.voiplib.VoIPLib
+import org.openvoipalliance.voiplib.model.AttendedTransferSession
 import org.openvoipalliance.voiplib.model.Call
 
 class CallActions internal constructor(
     private val phoneLib: VoIPLib,
-    private val callManager: CallManager,
+    private val calls: Calls,
     private val androidCallFramework: AndroidCallFramework,
     private val localDtmfToneGenerator: LocalDtmfToneGenerator
 ) {
@@ -63,9 +64,8 @@ class CallActions internal constructor(
     }
 
     fun completeAttendedTransfer() {
-        callManager.transferSession?.let {
-            callManager.mergeInitiated = true
-            phoneLib.actions(it.from).finishAttendedTransfer(it)
+        calls.transferSession?.let {
+            phoneLib.actions(it.to).finishAttendedTransfer(it)
         }
     }
 
@@ -100,12 +100,6 @@ class CallActions internal constructor(
      *
      */
     private fun callExists(callback: (call: Call) -> Unit) {
-        var call = callManager.voipLibCall ?: return
-
-        callManager.transferSession?.let {
-            call = it.to
-        }
-
-        callback.invoke(call)
+        callback.invoke(calls.activeVoipLibCall ?: return)
     }
 }

@@ -3,7 +3,7 @@ package org.openvoipalliance.androidphoneintegration.telecom
 import android.annotation.SuppressLint
 import android.telecom.CallAudioState
 import org.openvoipalliance.androidphoneintegration.PIL
-import org.openvoipalliance.androidphoneintegration.call.CallManager
+import org.openvoipalliance.androidphoneintegration.call.Calls
 import org.openvoipalliance.androidphoneintegration.call.VoipLibCall
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
@@ -14,9 +14,8 @@ import android.telecom.Connection as AndroidConnection
 class Connection internal constructor(
     private val pil: PIL,
     private val phoneLib: VoIPLib,
-    private val callManager: CallManager,
-    private val androidCallFramework: AndroidCallFramework,
-    private val incomingCallNotification: IncomingCallNotification
+    private val incomingCallNotification: IncomingCallNotification,
+    private val calls: Calls,
     ) : AndroidConnection() {
 
     override fun onShowIncomingCallUi() {
@@ -97,13 +96,7 @@ class Connection internal constructor(
      *
      */
     private fun callExists(callback: (voipLibCall: VoipLibCall) -> Unit) {
-        var voipLibCall = callManager.voipLibCall ?: return
-
-        callManager.transferSession?.let {
-            voipLibCall = it.to
-        }
-
-        callback.invoke(voipLibCall)
+        callback.invoke(calls.activeVoipLibCall ?: return)
     }
 
     override fun onCallAudioStateChanged(state: CallAudioState?) {

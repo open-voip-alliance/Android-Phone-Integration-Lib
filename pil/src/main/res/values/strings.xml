@@ -7,6 +7,8 @@
 <!--  The name of the notification channel, this cannot be changed once the app has been installed. -->
     <string name="notification_channel_name">VoIP Service</string>
     <string name="notification_incoming_calls_channel_name">Incoming Calls Notification</string>
+    <string name="notification_missed_calls_channel_name">Missed Calls Notification</string>
+    <string name="notification_missed_calls_title">Missed call</string>
 
     <string name="notification_answer_action">Answer</string>
     <string name="notification_hang_up_action">Hang Up</string>

@@ -1,11 +1,8 @@
 package org.openvoipalliance.androidphoneintegration.call
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.openvoipalliance.androidphoneintegration.contacts.Contact
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
-import org.openvoipalliance.androidphoneintegration.events.Event
-import org.openvoipalliance.androidphoneintegration.events.PILEventListener
+import org.openvoipalliance.androidphoneintegration.helpers.identifier
 import org.openvoipalliance.voiplib.model.CallState
 import org.openvoipalliance.voiplib.model.CallState.*
 import org.openvoipalliance.voiplib.model.Direction
@@ -15,10 +12,9 @@ import java.util.regex.Pattern
 
 typealias VoipLibCall = org.openvoipalliance.voiplib.model.Call
 
-internal class CallFactory(private val contacts: Contacts, private val callManager: CallManager) :
-    PILEventListener {
+internal class CallFactory(private val contacts: Contacts) {
 
-    private val cachedContacts = mutableMapOf<VoipLibCall, Contact>()
+    private val cachedContacts = mutableMapOf<String, Contact?>()
 
     fun make(voipLibCall: VoipLibCall?): Call? {
         val call = voipLibCall ?: return null
@@ -33,8 +29,18 @@ internal class CallFactory(private val contacts: Contacts, private val callManag
             call.isOnHold,
             UUID.randomUUID().toString(),
             call.quality.average,
-            cachedContacts[call]
+            findContact(voipLibCall)
         )
+    }
+
+    private fun findContact(voipLibCall: VoipLibCall): Contact? {
+        if (cachedContacts.contains(voipLibCall.identifier)) {
+            return cachedContacts[voipLibCall.identifier]
+        }
+
+        return contacts.find(voipLibCall.phoneNumber).also {
+            cachedContacts[voipLibCall.identifier] = it
+        }
     }
 
     private fun findAppropriateRemotePartyInformation(call: VoipLibCall): RemotePartyInformation {
@@ -63,18 +69,6 @@ internal class CallFactory(private val contacts: Contacts, private val callManag
         -> org.openvoipalliance.androidphoneintegration.call.CallState.CONNECTED
         Error, Unknown -> org.openvoipalliance.androidphoneintegration.call.CallState.ERROR
         CallEnd, CallReleased -> org.openvoipalliance.androidphoneintegration.call.CallState.ENDED
-    }
-
-    override fun onEvent(event: Event) {
-        val call = callManager.voipLibCall ?: return
-
-        GlobalScope.launch {
-            if (!cachedContacts.containsKey(call)) {
-                contacts.find(call.phoneNumber)?.also {
-                    cachedContacts[call] = it
-                }
-            }
-        }
     }
 
     private fun extractCallerInformationFromAlternativeHeaders(header: String): RemotePartyInformation? {
