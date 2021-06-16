@@ -67,7 +67,9 @@ internal class PlatformIntegrator(private val pil: PIL, private val androidCallF
     private fun notifyIfMissedCall(call: Call) {
         if (call.duration > 0) return;
 
-        MissedCallNotification().notify(call)
+        if (pil.app.notifyOnMissedCall) {
+            MissedCallNotification().notify(call)
+        }
     }
 
     override fun onEvent(event: Event) {

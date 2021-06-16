@@ -20,6 +20,7 @@ internal class NotificationButtonReceiver : BroadcastReceiver() {
                 HANG_UP -> pil.actions.end()
                 ANSWER -> pil.actions.answer()
                 DECLINE -> pil.actions.decline()
+                MISSED_CALL_NOTIFICATION_PRESSED -> pil.app.onMissedCallNotificationPressed?.invoke()
             }
         } catch (e: IllegalArgumentException) {
             pil.writeLog(
@@ -30,6 +31,6 @@ internal class NotificationButtonReceiver : BroadcastReceiver() {
     }
 
     enum class Action {
-        HANG_UP, ANSWER, DECLINE
+        HANG_UP, ANSWER, DECLINE, MISSED_CALL_NOTIFICATION_PRESSED
     }
 }

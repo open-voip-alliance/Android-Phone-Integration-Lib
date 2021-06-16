@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration.example
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import androidx.preference.PreferenceManager
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidphoneintegration.configuration.Auth
@@ -40,7 +41,11 @@ class PILExampleApplication : Application() {
                 activities = ApplicationSetup.Activities(call = CallActivity::class.java, incomingCall = IncomingCallActivity::class.java),
                 middleware = VoIPGRIDMiddleware(this@PILExampleApplication),
                 logger = { message, _ -> Log.i("PIL-Logger", message) },
-                userAgent = "Android-PIL-Example-Application"
+                userAgent = "Android-PIL-Example-Application",
+                notifyOnMissedCall = true,
+                onMissedCallNotificationPressed = {
+                    Toast.makeText(this@PILExampleApplication, "Missed call pressed", Toast.LENGTH_LONG).show()
+                }
             )
         }
     }

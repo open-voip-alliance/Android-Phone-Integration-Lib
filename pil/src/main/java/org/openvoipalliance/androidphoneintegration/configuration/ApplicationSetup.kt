@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import org.openvoipalliance.androidphoneintegration.logging.Logger
 import org.openvoipalliance.androidphoneintegration.push.Middleware
+import org.openvoipalliance.androidphoneintegration.R
 
 data class ApplicationSetup(
     val application: Application,
@@ -40,6 +41,24 @@ data class ApplicationSetup(
      *
      */
     val userAgent: String = "AndroidPIL",
+
+    /**
+     * Show a notification to the user when a call is not answered.
+     *
+     * This notification can be customised by providing different resources:
+     * @see R.string.notification_missed_calls_channel_name
+     * @see R.drawable.ic_missed_calls_notification_icon
+     * @see R.plurals.notification_missed_call_title
+     * @see R.plurals.notification_missed_call_subtitle
+     */
+    val notifyOnMissedCall: Boolean = true,
+
+    /**
+     * A callback that will be delivered to the app when the user presses a missed call
+     * notification.
+     *
+     */
+    val onMissedCallNotificationPressed: (() -> Unit)? = null
 ) {
     enum class AutomaticallyLaunchCallActivity {
         // Activities will never be automatically launched (they will still be launched via direct user input)
