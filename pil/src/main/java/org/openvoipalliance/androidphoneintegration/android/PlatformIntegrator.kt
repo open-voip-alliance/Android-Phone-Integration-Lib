@@ -4,6 +4,7 @@ import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.call.Call
+import org.openvoipalliance.androidphoneintegration.call.CallDirection
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.*
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
@@ -66,6 +67,8 @@ internal class PlatformIntegrator(private val pil: PIL, private val androidCallF
 
     private fun notifyIfMissedCall(call: Call) {
         if (call.duration > 0) return;
+
+        if (call.direction != CallDirection.INBOUND) return;
 
         if (pil.app.notifyOnMissedCall) {
             MissedCallNotification().notify(call)
