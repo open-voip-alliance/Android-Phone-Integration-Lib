@@ -30,6 +30,11 @@
             app:title="Authentication Status"
             app:summary="Not Authenticated">
         </Preference>
+
+        <Preference
+            app:key="stop"
+            app:title="Stop PIL">
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory

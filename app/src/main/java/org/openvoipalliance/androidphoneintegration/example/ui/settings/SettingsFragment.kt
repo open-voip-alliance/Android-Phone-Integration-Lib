@@ -120,6 +120,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
 
+        findPreference<Preference>("stop")?.setOnPreferenceClickListener {
+            pil.stop()
+            true
+        }
+
         findPreference<Preference>("voipgrid_middleware_register")?.setOnPreferenceClickListener {
             GlobalScope.launch {
                 val message = if (voIPGRIDMiddleware.register()) "Registered!" else "Registration failed..."

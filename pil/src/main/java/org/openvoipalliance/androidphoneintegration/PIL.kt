@@ -2,13 +2,10 @@ package org.openvoipalliance.androidphoneintegration
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
 import org.openvoipalliance.androidphoneintegration.call.*
-import org.openvoipalliance.androidphoneintegration.call.CallFactory
 import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
-import org.openvoipalliance.androidphoneintegration.call.VoipLibEventTranslator
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidphoneintegration.configuration.Auth
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
@@ -31,7 +28,7 @@ import kotlin.coroutines.suspendCoroutine
 class PIL internal constructor(internal val app: ApplicationSetup) {
 
     private val androidCallFramework: AndroidCallFramework by di.koin.inject()
-    private val phoneLib: VoIPLib by di.koin.inject()
+    private val voipLib: VoIPLib by di.koin.inject()
     private val phoneLibHelper: VoIPLibHelper by di.koin.inject()
     private val platformIntegrator: PlatformIntegrator by di.koin.inject()
 
@@ -45,7 +42,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     val sessionState: CallSessionState
         get() = CallSessionState(calls.active, calls.inactive, audio.state)
 
-    var versionInfo: VersionInfo = VersionInfo.build(app.application, phoneLib)
+    var versionInfo: VersionInfo = VersionInfo.build(app.application, voipLib)
         set(value) {
             field = value
             logManager.logVersion()
@@ -97,7 +94,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
             }
 
             phoneLibHelper.initialise()
-            phoneLib.register { registrationState ->
+            voipLib.register { registrationState ->
                 when (registrationState) {
                     REGISTERED, FAILED -> {
                         continuation.resume(registrationState == REGISTERED)
@@ -143,7 +140,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         if (!auth.isValid) throw NoAuthenticationCredentialsException()
 
         if (forceInitialize) {
-            phoneLib.destroy()
+            voipLib.destroy()
         }
 
         phoneLibHelper.apply {
@@ -154,7 +151,17 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
             }
         }
 
-        versionInfo = VersionInfo.build(app.application, phoneLib)
+        versionInfo = VersionInfo.build(app.application, voipLib)
+    }
+
+    /**
+     * Stop the PIL, this will remove all authentication credentials from memory and destroy the
+     * underlying voip lib. This will not destroy the PIL.
+     *
+     */
+    fun stop() {
+        auth = null
+        voipLib.destroy()
     }
 
     private fun performPermissionCheck() {
@@ -169,7 +176,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     }
 
     private val isPreparedToStart: Boolean
-        get() = auth != null && phoneLib.isInitialised
+        get() = auth != null && voipLib.isInitialised
 
     companion object {
         lateinit var instance: PIL
