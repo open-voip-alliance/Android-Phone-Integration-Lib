@@ -158,6 +158,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
      * Stop the PIL, this will remove all authentication credentials from memory and destroy the
      * underlying voip lib. This will not destroy the PIL.
      *
+     * This should be called when a user logs-out (or similar action).
+     *
      */
     fun stop() {
         auth = null
