@@ -45,7 +45,7 @@ internal class AndroidCallFramework(
         telecomManager.registerPhoneAccount(phoneAccount)
 
         telecomManager.placeCall(
-            Uri.fromParts("", number, null),
+            Uri.fromParts(PhoneAccount.SCHEME_TEL, number, null),
             Bundle().apply {
                 putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, false)
                 putInt(
