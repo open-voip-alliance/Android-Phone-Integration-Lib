@@ -43,7 +43,7 @@ class TokenFetcher(private val middleware: Middleware?): OnCompleteListener<Stri
             log("""
                 Token fetching has failed too many times, no longer automatically retrying. 
                 
-                Manually call pil.token.request() to try again.
+                Manually call pil.pushToken.request() to try again.
             """.trimIndent())
             return
         }

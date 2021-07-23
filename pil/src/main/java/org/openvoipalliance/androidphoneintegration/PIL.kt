@@ -39,7 +39,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     val audio: AudioManager by di.koin.inject()
     val events: EventsManager by di.koin.inject()
     val calls: Calls by di.koin.inject()
-    val token = TokenFetcher(app.middleware)
+    val pushToken = TokenFetcher(app.middleware)
 
     val sessionState: CallSessionState
         get() = CallSessionState(calls.active, calls.inactive, audio.state)
@@ -81,7 +81,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     init {
         instance = this
         events.listen(platformIntegrator)
-        token.request()
+        pushToken.request()
     }
 
     /**
@@ -138,7 +138,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         forceReregister: Boolean = false,
         callback: ((Boolean) -> Unit)? = null
     ) {
-        token.request()
+        pushToken.request()
         
         val auth = auth ?: throw NoAuthenticationCredentialsException()
 
