@@ -6,7 +6,7 @@ plugins {
     id("com.palantir.git-version") version "0.12.3"
 }
 
-extra["voipLibVersion"] = "0.1.8"
+extra["voipLibVersion"] = "0.1.9"
 
 android {
     compileSdkVersion(30)
@@ -30,7 +30,7 @@ dependencies {
     implementation("com.takwolf.android:foreback:0.1.1")
     implementation("com.tomash:androidcontacts:1.14.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
-    implementation("org.koin:koin-android:2.2.0")
+    implementation("io.insert-koin:koin-android:2.2.0")
 
     testImplementation("junit:junit:4.+")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")

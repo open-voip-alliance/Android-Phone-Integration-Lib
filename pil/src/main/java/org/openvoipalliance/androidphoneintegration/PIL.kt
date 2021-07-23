@@ -3,9 +3,9 @@ package org.openvoipalliance.androidphoneintegration
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
 import org.openvoipalliance.androidphoneintegration.call.*
-import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidphoneintegration.configuration.Auth
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
@@ -18,6 +18,7 @@ import org.openvoipalliance.androidphoneintegration.exception.PermissionExceptio
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.androidphoneintegration.logging.LogManager
+import org.openvoipalliance.androidphoneintegration.push.TokenFetcher
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
@@ -38,6 +39,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     val audio: AudioManager by di.koin.inject()
     val events: EventsManager by di.koin.inject()
     val calls: Calls by di.koin.inject()
+    val token = TokenFetcher(app.middleware)
 
     val sessionState: CallSessionState
         get() = CallSessionState(calls.active, calls.inactive, audio.state)
@@ -79,6 +81,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     init {
         instance = this
         events.listen(platformIntegrator)
+        token.request()
     }
 
     /**
@@ -135,6 +138,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         forceReregister: Boolean = false,
         callback: ((Boolean) -> Unit)? = null
     ) {
+        token.request()
+        
         val auth = auth ?: throw NoAuthenticationCredentialsException()
 
         if (!auth.isValid) throw NoAuthenticationCredentialsException()
