@@ -2,6 +2,8 @@ package org.openvoipalliance.androidphoneintegration.push
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
@@ -13,19 +15,22 @@ internal class FcmService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+        processRemoteMessage(remoteMessage)
+    }
 
+    private fun processRemoteMessage(remoteMessage: RemoteMessage) = GlobalScope.launch {
         if (pil.app.middleware?.inspect(remoteMessage) == false) {
             pil.writeLog("Client has inspected push message and determined this is not a call")
-            return
+            return@launch
         }
 
-        if (!PIL.isInitialized) return
+        if (!PIL.isInitialized) return@launch
 
         pil.writeLog("Received FCM push message")
 
         if (androidCallFramework.isInCall) {
             pil.app.middleware?.respond(remoteMessage, false)
-            return
+            return@launch
         }
 
         pil.start {
