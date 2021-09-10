@@ -80,6 +80,8 @@ internal class PlatformIntegrator(private val pil: PIL, private val androidCallF
             return
         }
 
+        pil.notifications.dismissStale()
+
         handle(event, event.state.activeCall ?: return)
     }
 }

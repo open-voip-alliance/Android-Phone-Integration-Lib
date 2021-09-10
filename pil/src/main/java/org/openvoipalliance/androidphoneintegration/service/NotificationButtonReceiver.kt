@@ -11,25 +11,15 @@ import org.openvoipalliance.androidphoneintegration.service.NotificationButtonRe
 internal class NotificationButtonReceiver : BroadcastReceiver() {
 
     private val pil by lazy { PIL.instance }
-    private val incomingCallNotification by lazy { IncomingCallNotification() }
 
     override fun onReceive(context: Context, intent: Intent) {
         // If there is no PIL, we should no longer be responding to the notifications being
         // pressed.
         if (!PIL.isInitialized) {
-            incomingCallNotification.cancel()
-            context.stopVoipService()
             return
         }
 
-        // This exists to resolve a problem where the incoming call notification would remain
-        // visible even when there is no call. A solution should be found to fix the underlying
-        // issue but currently this at least provides a way out for users so their phone
-        // stops ringing.
-        if (!pil.calls.isInCall) {
-            incomingCallNotification.cancel()
-            return
-        }
+        pil.notifications.dismissStale()
 
         try {
             val action = valueOf(intent.action ?: "")

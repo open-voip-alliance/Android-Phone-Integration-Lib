@@ -5,13 +5,11 @@ import android.telecom.TelecomManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import org.openvoipalliance.androidphoneintegration.PIL
+import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
 import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
 import org.openvoipalliance.androidphoneintegration.call.*
-import org.openvoipalliance.androidphoneintegration.call.CallFactory
-import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
 import org.openvoipalliance.androidphoneintegration.call.Calls.Companion.MAX_CALLS
-import org.openvoipalliance.androidphoneintegration.call.VoipLibEventTranslator
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
@@ -68,4 +66,11 @@ val pilModule = module {
     single { LogManager(get()) }
 
     single { VoipLibEventTranslator(get(), get(), get()) }
+
+    single {
+        org.openvoipalliance.androidphoneintegration.notifications.NotificationManager(
+            get(),
+            get(),
+        )
+    }
 }
