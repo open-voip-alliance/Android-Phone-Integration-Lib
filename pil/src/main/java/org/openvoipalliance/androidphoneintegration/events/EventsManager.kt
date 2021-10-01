@@ -23,6 +23,8 @@ class EventsManager internal constructor(private val pil: PIL) {
     }
 
     internal fun broadcast(event: Event) = GlobalScope.launch(Dispatchers.Main) {
+        if (!pil.isStarted) return@launch
+
         eventListeners.forEach {
             it.onEvent(event)
         }
