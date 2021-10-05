@@ -18,7 +18,6 @@ import org.openvoipalliance.androidphoneintegration.exception.PermissionExceptio
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.androidphoneintegration.logging.LogManager
-import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
 import org.openvoipalliance.androidphoneintegration.notifications.NotificationManager
 import org.openvoipalliance.androidphoneintegration.push.TokenFetcher
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
@@ -33,7 +32,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     private val androidCallFramework: AndroidCallFramework by di.koin.inject()
     private val voipLib: VoIPLib by di.koin.inject()
     private val phoneLibHelper: VoIPLibHelper by di.koin.inject()
-    private val platformIntegrator: PlatformIntegrator by di.koin.inject()
+    internal val platformIntegrator: PlatformIntegrator by di.koin.inject()
 
     internal val logManager: LogManager by di.koin.inject()
     internal val notifications: NotificationManager by di.koin.inject()

@@ -12,6 +12,7 @@ sealed class Event {
         class OutgoingCallStarted(state: CallSessionState) : CallSessionEvent(state)
         class IncomingCallReceived(state: CallSessionState) : CallSessionEvent(state)
         class CallEnded(state: CallSessionState) : CallSessionEvent(state)
+        class CallReleased(state: CallSessionState) : CallSessionEvent(state)
         class CallConnected(state: CallSessionState) : CallSessionEvent(state)
         class CallDurationUpdated(state: CallSessionState) : CallSessionEvent(state)
         class AudioStateUpdated(state: CallSessionState) : CallSessionEvent(state)

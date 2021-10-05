@@ -1,5 +1,6 @@
 package org.openvoipalliance.androidphoneintegration.example.ui.call
 
+import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputType
@@ -9,7 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_call.*
-import org.openvoipalliance.androidphoneintegration.CallScreenLifecycleObserver
+import org.openvoipalliance.androidphoneintegration.android.CallScreenLifecycleObserver
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.audio.AudioRoute
 import org.openvoipalliance.androidphoneintegration.events.Event
@@ -113,6 +114,7 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         pil.events.stopListening(this)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun render(event: CallSessionEvent) {
         if (event is CallSessionEvent.CallDurationUpdated) {
             callDuration.text = event.state.activeCall?.prettyDuration

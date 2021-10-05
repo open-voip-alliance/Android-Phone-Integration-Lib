@@ -5,7 +5,6 @@ import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidphoneintegration.telecom.Connection
 import org.openvoipalliance.voiplib.VoIPLib
-import org.openvoipalliance.voiplib.model.AttendedTransferSession
 import org.openvoipalliance.voiplib.model.Call
 
 class CallActions internal constructor(

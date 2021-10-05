@@ -82,7 +82,7 @@ internal class VoipLibEventTranslator(
         events.broadcast(AttendedTransferEnded(currentSessionState))
     }
 
-    override fun callUpdated(call: Call) = events.broadcast(CallStateUpdated::class)
+    override fun callReleased(call: Call) = pil.platformIntegrator.notifyIfMissedCall(call)
 
-    override fun error(call: Call) = callEnded(call)
+    override fun callUpdated(call: Call) = events.broadcast(CallStateUpdated::class)
 }

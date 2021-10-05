@@ -1,5 +1,6 @@
 package org.openvoipalliance.androidphoneintegration.events
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -23,7 +24,10 @@ class EventsManager internal constructor(private val pil: PIL) {
     }
 
     internal fun broadcast(event: Event) = GlobalScope.launch(Dispatchers.Main) {
-        if (!pil.isStarted) return@launch
+        if (!pil.isStarted) {
+            Log.e("TEST123", "not started!!")
+            return@launch
+        }
 
         eventListeners.forEach {
             it.onEvent(event)
@@ -32,7 +36,7 @@ class EventsManager internal constructor(private val pil: PIL) {
 
     internal fun broadcast(eventClass: KClass<out Event.CallSessionEvent>) {
         val state = pil.sessionState
-
+Log.e("TEST123", "BROADCASTING==${eventClass.qualifiedName}")
         broadcast(
             when(eventClass) {
                 OutgoingCallStarted::class -> OutgoingCallStarted(state)
@@ -46,6 +50,7 @@ class EventsManager internal constructor(private val pil: PIL) {
                 AudioStateUpdated::class -> AudioStateUpdated(state)
                 CallDurationUpdated::class -> CallDurationUpdated(state)
                 CallStateUpdated::class -> CallStateUpdated(state)
+                CallReleased::class -> CallReleased(state)
                 else -> throw IllegalArgumentException("Attempted to broadcast an unregistered event (${eventClass.qualifiedName}), make sure to register in EventsManager")
             }
         )

@@ -99,7 +99,16 @@ class Connection internal constructor(
         callback.invoke(calls.activeVoipLibCall ?: return)
     }
 
-    override fun onCallAudioStateChanged(state: CallAudioState?) {
+    override fun onCallAudioStateChanged(state: CallAudioState) {
+        calls.activeVoipLibCall?.let {
+            when (state.route) {
+                CallAudioState.ROUTE_EARPIECE -> phoneLib.actions(it).routeAudioToEarpiece(it)
+                CallAudioState.ROUTE_SPEAKER -> phoneLib.actions(it).routeAudioToSpeaker(it)
+                CallAudioState.ROUTE_BLUETOOTH -> phoneLib.actions(it).routeAudioToBluetooth(it)
+                CallAudioState.ROUTE_WIRED_HEADSET -> phoneLib.actions(it).routeAudioToHeadset(it)
+            }
+        }
+
         pil.events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
     }
 }

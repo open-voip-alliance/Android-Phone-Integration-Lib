@@ -4,7 +4,8 @@ import android.telecom.DisconnectCause
 import android.telecom.TelecomManager
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.call.Call
-import org.openvoipalliance.androidphoneintegration.call.CallDirection
+import org.openvoipalliance.androidphoneintegration.call.CallFactory
+import org.openvoipalliance.androidphoneintegration.call.VoipLibCall
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.*
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
@@ -20,7 +21,11 @@ import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
  * Listens to PIL events and performs the necessary actions in the Android framework.
  *
  */
-internal class PlatformIntegrator(private val pil: PIL, private val androidCallFramework: AndroidCallFramework) : PILEventListener {
+internal class PlatformIntegrator(
+    private val pil: PIL, private val
+    androidCallFramework: AndroidCallFramework,
+    private val factory: CallFactory,
+) : PILEventListener {
 
     private fun handle(event: Event.CallSessionEvent, call: Call) = when(event) {
 
@@ -54,33 +59,30 @@ internal class PlatformIntegrator(private val pil: PIL, private val androidCallF
             androidCallFramework.connection?.setActive()
         }
 
-        is CallEnded ->  {
+        is CallEnded -> {
             pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
             androidCallFramework.connection = null
-            notifyIfMissedCall(call)
         }
 
        else -> {}
     }
 
-    private fun notifyIfMissedCall(call: Call) {
-        if (call.duration > 0) return;
-
-        if (call.direction != CallDirection.INBOUND) return;
-
-        if (pil.app.notifyOnMissedCall) {
-            MissedCallNotification().notify(call)
+    internal fun notifyIfMissedCall(call: VoipLibCall) {
+        if (call.wasMissed && pil.app.notifyOnMissedCall) {
+            factory.make(call)?.let {
+                MissedCallNotification().notify(it)
+            }
         }
     }
 
     override fun onEvent(event: Event) {
+        pil.notifications.dismissStale()
+
         if (event !is Event.CallSessionEvent) {
             return
         }
-
-        pil.notifications.dismissStale()
 
         handle(event, event.state.activeCall ?: return)
     }

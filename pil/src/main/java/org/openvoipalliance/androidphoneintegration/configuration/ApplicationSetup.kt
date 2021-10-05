@@ -2,9 +2,9 @@ package org.openvoipalliance.androidphoneintegration.configuration
 
 import android.app.Activity
 import android.app.Application
+import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.logging.Logger
 import org.openvoipalliance.androidphoneintegration.push.Middleware
-import org.openvoipalliance.androidphoneintegration.R
 
 data class ApplicationSetup(
     val application: Application,

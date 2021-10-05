@@ -1,12 +1,11 @@
 package org.openvoipalliance.androidphoneintegration.example.ui.call
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_call.callSubtitle
 import kotlinx.android.synthetic.main.activity_call.callTitle
 import kotlinx.android.synthetic.main.activity_incoming_call.*
-import org.openvoipalliance.androidphoneintegration.CallScreenLifecycleObserver
+import org.openvoipalliance.androidphoneintegration.android.CallScreenLifecycleObserver
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent

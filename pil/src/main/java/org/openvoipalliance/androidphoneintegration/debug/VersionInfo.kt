@@ -17,7 +17,7 @@ data class VersionInfo(
         fun build(context: Context, voipLib: VoIPLib) = VersionInfo(
             context.getString(R.string.pil_build_info_tag),
             context.getString(R.string.pil_build_info_voip_lib_version),
-            voipLib.version()
+            if (voipLib.isReady) voipLib.version() else "Not initialized"
         )
     }
 }

@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import org.openvoipalliance.androidphoneintegration.PIL
-import org.openvoipalliance.androidphoneintegration.helpers.stopVoipService
-import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
 import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver.Action.*
 
 internal class NotificationButtonReceiver : BroadcastReceiver() {

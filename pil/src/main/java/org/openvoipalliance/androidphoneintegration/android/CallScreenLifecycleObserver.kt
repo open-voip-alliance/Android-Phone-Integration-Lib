@@ -1,18 +1,14 @@
-package org.openvoipalliance.androidphoneintegration
+package org.openvoipalliance.androidphoneintegration.android
 
 import android.app.Activity
 import android.app.KeyguardManager
-import android.content.Context
 import android.media.AudioManager
 import android.os.Build
-import android.os.PowerManager
-import android.os.PowerManager.*
-import android.util.Log
 import android.view.WindowManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import org.openvoipalliance.androidphoneintegration.events.Event
+import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
 
 class CallScreenLifecycleObserver(private val activity: Activity) : LifecycleObserver {
