@@ -105,7 +105,7 @@ class AudioManager internal constructor(
             }
         }
 
-        val bluetoothName = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+        val bluetoothName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             connection.callAudioState.activeBluetoothDevice?.name
         } else {
             null
@@ -115,16 +115,7 @@ class AudioManager internal constructor(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             connection.callAudioState.supportedBluetoothDevices.forEach {
-                val name = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) it.alias else ""
-
-                bluetoothRoutes.add(BluetoothAudioRoute(
-                    if (name != null && name.isNotBlank()) {
-                        name
-                    } else {
-                        it.name
-                    },
-                    it.name
-                ))
+                bluetoothRoutes.add(BluetoothAudioRoute(it.name, it.name))
             }
         }
 
