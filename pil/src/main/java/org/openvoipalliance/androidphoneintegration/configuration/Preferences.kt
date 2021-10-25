@@ -6,4 +6,17 @@ data class Preferences(val codecs: Array<Codec>, val useApplicationProvidedRingt
     companion object {
         val DEFAULT = Preferences(arrayOf(Codec.OPUS), false)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is Preferences) return false
+
+        return useApplicationProvidedRingtone == other.useApplicationProvidedRingtone
+                && codecs contentEquals other.codecs
+    }
+
+    override fun hashCode(): Int {
+        var result = codecs.contentHashCode()
+        result = 31 * result + useApplicationProvidedRingtone.hashCode()
+        return result
+    }
 }

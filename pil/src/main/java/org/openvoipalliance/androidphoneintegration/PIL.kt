@@ -59,9 +59,10 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
      */
     var preferences: Preferences = Preferences.DEFAULT
         set(preferences) {
+            val previousValue = preferences
             field = preferences
 
-            if (isPreparedToStart) {
+            if (isPreparedToStart && previousValue != preferences) {
                 start(forceInitialize = true, forceReregister = true)
             }
         }
@@ -73,9 +74,10 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
      */
     var auth: Auth? = null
         set(auth) {
+            val previousValue = auth
             field = if (auth?.isValid == true) auth else null
 
-            if (isPreparedToStart) {
+            if (isPreparedToStart && previousValue != auth) {
                 start(forceInitialize = false, forceReregister = true)
             }
         }
