@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.*
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.*
+import org.openvoipalliance.androidphoneintegration.log
 import kotlin.reflect.KClass
 
 class EventsManager internal constructor(private val pil: PIL) {
@@ -25,7 +26,6 @@ class EventsManager internal constructor(private val pil: PIL) {
 
     internal fun broadcast(event: Event) = GlobalScope.launch(Dispatchers.Main) {
         if (!pil.isStarted) {
-            Log.e("TEST123", "not started!!")
             return@launch
         }
 
@@ -36,7 +36,11 @@ class EventsManager internal constructor(private val pil: PIL) {
 
     internal fun broadcast(eventClass: KClass<out Event.CallSessionEvent>) {
         val state = pil.sessionState
-Log.e("TEST123", "BROADCASTING==${eventClass.qualifiedName}")
+
+        if (eventClass != CallDurationUpdated::class) {
+            log("Broadcasting ${eventClass.qualifiedName}")
+        }
+
         broadcast(
             when(eventClass) {
                 OutgoingCallStarted::class -> OutgoingCallStarted(state)

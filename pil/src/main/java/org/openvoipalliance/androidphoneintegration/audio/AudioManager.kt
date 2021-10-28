@@ -31,8 +31,17 @@ class AudioManager internal constructor(
      * Route audio to a general type of audio device.
      *
      */
-    fun routeAudio(route: AudioRoute) =
-        androidCallFramework.connection?.setAudioRoute(pilRouteToNativeRoute(route))
+    fun routeAudio(route: AudioRoute) {
+        val connection = androidCallFramework.connection
+
+        if (connection == null) {
+            log("There is no android call framework connection, unable to route audio")
+            return
+        }
+
+        connection.setAudioRoute(pilRouteToNativeRoute(route))
+    }
+
 
     /**
      *  Route audio to a specific bluetooth device.
