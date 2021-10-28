@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.*
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.*
+import org.openvoipalliance.androidphoneintegration.log
 import kotlin.reflect.KClass
 
 class EventsManager internal constructor(private val pil: PIL) {
@@ -35,6 +36,10 @@ class EventsManager internal constructor(private val pil: PIL) {
 
     internal fun broadcast(eventClass: KClass<out Event.CallSessionEvent>) {
         val state = pil.sessionState
+
+        if (eventClass != CallDurationUpdated::class) {
+            log("Broadcasting ${eventClass.qualifiedName}")
+        }
 
         broadcast(
             when(eventClass) {
