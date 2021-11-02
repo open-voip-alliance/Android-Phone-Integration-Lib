@@ -33,7 +33,6 @@ class DialerFragment : Fragment(), PILEventListener {
     override fun onResume() {
         super.onResume()
         pil.events.listen(this)
-        requestCallingPermissions()
     }
 
     override fun onPause() {
@@ -59,6 +58,7 @@ class DialerFragment : Fragment(), PILEventListener {
         super.onViewCreated(view, savedInstanceState)
 
         dialer.onCallListener = Dialer.OnCallListener { number ->
+            requestCallingPermissions()
             pil.call(number)
         }
     }
