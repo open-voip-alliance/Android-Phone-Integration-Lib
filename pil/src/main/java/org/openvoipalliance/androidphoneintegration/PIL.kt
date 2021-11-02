@@ -14,7 +14,6 @@ import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.exception.NoAuthenticationCredentialsException
-import org.openvoipalliance.androidphoneintegration.exception.PermissionException
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.androidphoneintegration.logging.LogManager
@@ -121,8 +120,6 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
      *
      */
     fun call(number: String) {
-        performPermissionCheck()
-
         start { success ->
             if (success) {
                 androidCallFramework.placeCall(number)
@@ -142,6 +139,15 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         forceReregister: Boolean = false,
         callback: ((Boolean) -> Unit)? = null
     ) {
+        if (!hasRequiredPermissions()) {
+            writeLog(
+                "Unable to start PIL without required CALL_PHONE permission",
+                LogLevel.ERROR
+            )
+            callback?.invoke(false)
+            return
+        }
+
         pushToken.request()
         
         val auth = auth ?: throw NoAuthenticationCredentialsException()
@@ -175,12 +181,9 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         voipLib.destroy()
     }
 
-    private fun performPermissionCheck() {
-        if (ContextCompat.checkSelfPermission(app.application, Manifest.permission.CALL_PHONE)
-            == PackageManager.PERMISSION_DENIED) {
-            throw PermissionException(Manifest.permission.CALL_PHONE)
-        }
-    }
+    private fun hasRequiredPermissions() =
+        ContextCompat.checkSelfPermission(app.application,
+            Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_DENIED
 
     internal fun writeLog(message: String, level: LogLevel = LogLevel.INFO) {
         logManager.writeLog(message, level)
