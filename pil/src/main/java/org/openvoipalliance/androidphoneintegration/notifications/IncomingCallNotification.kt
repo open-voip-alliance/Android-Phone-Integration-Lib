@@ -3,7 +3,6 @@ package org.openvoipalliance.androidphoneintegration.notifications
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
@@ -13,16 +12,6 @@ import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.call.Call
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
 import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver
-import android.content.pm.PackageManager
-import android.os.Build.VERSION_CODES
-
-import android.os.Build.VERSION
-
-
-
-
-
-
 
 internal class IncomingCallNotification: Notification() {
 
@@ -66,15 +55,6 @@ internal class IncomingCallNotification: Notification() {
      */
     fun silence(call: Call) = notify(call, setOnlyAlertOnce = true)
 
-    private fun launchIntent(context: Context): PendingIntent {
-
-        val packageName = context.packageName
-        val packageManager = context.packageManager
-        val intent = packageManager.getLaunchIntentForPackage(packageName)
-        val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        return PendingIntent.getActivity(context, 1, intent, flags)
-    }
-
     /**
      * Begin ringing the user's phone.
      *
@@ -84,7 +64,11 @@ internal class IncomingCallNotification: Notification() {
 
         val notification = NotificationCompat.Builder(pil.app.application, channelId).apply {
             pil.app.activities.incomingCall?.let {
-                val pendingIntent = launchIntent(context)
+                val pendingIntent = PendingIntent.getActivity(pil.app.application, 1, Intent(Intent.ACTION_MAIN, null).apply {
+                    putExtra("is_incoming", true)
+                    flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION or Intent.FLAG_ACTIVITY_NEW_TASK
+                    setClass(pil.app.application, it)
+                }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                 setContentIntent(pendingIntent)
                 setFullScreenIntent(pendingIntent, true)
             }
