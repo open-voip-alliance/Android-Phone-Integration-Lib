@@ -79,11 +79,13 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
             if (it == RegistrationState.REGISTERED) {
                 pil.writeLog("Registration was successful!")
                 callback.invoke(true)
+                return@register
             }
 
             if (it == RegistrationState.FAILED) {
                 pil.writeLog("Unable to register...")
                 callback.invoke(false)
+                return@register
             }
         }
     }
