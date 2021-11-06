@@ -26,6 +26,7 @@ class EventsManager internal constructor(private val pil: PIL) {
 
     internal fun broadcast(event: Event) = GlobalScope.launch(Dispatchers.Main) {
         if (!pil.isStarted) {
+            log("Not broadcasting event as pil is not properly started")
             return@launch
         }
 

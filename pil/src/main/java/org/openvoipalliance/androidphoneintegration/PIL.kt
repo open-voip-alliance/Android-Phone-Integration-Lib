@@ -84,7 +84,6 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     init {
         instance = this
         events.listen(platformIntegrator)
-        pushToken.request()
     }
 
     /**
@@ -148,15 +147,11 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
             return
         }
 
-        pushToken.request()
-        
         val auth = auth ?: throw NoAuthenticationCredentialsException()
 
         if (!auth.isValid) throw NoAuthenticationCredentialsException()
 
-        if (forceInitialize) {
-            voipLib.destroy()
-        }
+        pushToken.request()
 
         phoneLibHelper.apply {
             initialise(forceInitialize)

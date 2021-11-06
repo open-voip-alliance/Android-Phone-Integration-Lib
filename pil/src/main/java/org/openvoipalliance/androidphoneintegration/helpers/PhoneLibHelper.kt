@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration.helpers
 
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.call.VoipLibEventTranslator
+import org.openvoipalliance.androidphoneintegration.log
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.config.Auth
 import org.openvoipalliance.voiplib.config.Config
@@ -19,13 +20,18 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
     fun initialise(forceInitialize: Boolean = false) {
         if (phoneLib.isInitialised && !forceInitialize) {
             phoneLib.wake()
-            pil.writeLog("The VoIP library is already initialized, skipping init.")
+            log("The VoIP library is already initialized, skipping init.")
             return
         }
 
         val auth = pil.auth ?: run {
-            pil.writeLog("There are no authentication credentials, not registering.")
+            log("There are no authentication credentials, not registering.")
             return
+        }
+
+        if (phoneLib.isInitialised && forceInitialize) {
+            log("The pil is initialized and we are forcing, so we must destroy it first.")
+            phoneLib.destroy()
         }
 
         phoneLib.initialise(
