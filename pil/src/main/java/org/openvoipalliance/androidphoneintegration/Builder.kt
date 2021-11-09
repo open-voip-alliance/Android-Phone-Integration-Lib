@@ -1,6 +1,5 @@
 package org.openvoipalliance.androidphoneintegration
 
-import com.takwolf.android.foreback.Foreback
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidphoneintegration.configuration.Auth
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
@@ -21,16 +20,10 @@ class Builder internal constructor() {
 
         val pil = PIL(applicationSetup)
 
-        setupApplicationBackgroundListeners(pil)
         pil.preferences = this.preferences
         auth?.let { pil.auth = it }
 
         return pil
-    }
-
-    private fun setupApplicationBackgroundListeners(pil: PIL) {
-        Foreback.init(pil.app.application)
-        Foreback.registerListener(ApplicationStateListener(pil))
     }
 }
 

@@ -1,43 +1,38 @@
 plugins {
     id("com.android.library")
-    kotlin("android")
+    id("kotlin-android")
     id("maven-publish")
-    id("com.jfrog.bintray")
-    id("com.palantir.git-version") version "0.12.3"
+    id("com.kezong.fat-aar")
+    id("com.palantir.git-version") version "0.12.2"
 }
 
-extra["voipLibVersion"] = "0.1.18"
-
 android {
-    compileSdkVersion(30)
+    compileSdk = 31
     defaultConfig {
-        minSdkVersion(26)
-        targetSdkVersion(30)
+        minSdk = 26
+        targetSdk = 31
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         createVersionInformation(this)
     }
 }
 
 dependencies {
-    val voipLibVersion = project.extra["voipLibVersion"]
+    api("com.google.firebase:firebase-messaging-ktx:23.0.0")
 
-    api("com.github.open-voip-alliance:Android-VoIP-Lib:$voipLibVersion")
-    api("com.google.firebase:firebase-messaging-ktx:21.0.1")
-
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.32")
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("com.takwolf.android:foreback:0.1.1")
-    implementation("com.tomash:androidcontacts:1.14.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
-    implementation("io.insert-koin:koin-android:2.2.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.31")
+    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation("com.github.blainepwnz:AndroidContacts:1.14.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
     implementation("androidx.media:media:1.4.3")
+    implementation("io.insert-koin:koin-android:3.1.3")
+    embed("org.linphone.minimal:linphone-sdk-android:5.0.49")
 
-    testImplementation("junit:junit:4.+")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
-    androidTestImplementation("org.mockito:mockito-android:+")
-    androidTestImplementation("androidx.test.ext:junit:1.1.2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+    androidTestImplementation("org.mockito:mockito-android:4.0.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
@@ -80,7 +75,6 @@ task("generateDummyGoogleServicesJsonFile") {
 
 
 fun createVersionInformation(defaultConfig: com.android.build.api.dsl.DefaultConfig) {
-    val voipLibVersion = project.extra["voipLibVersion"] as String
     val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
     version = versionDetails().version
     val lastTag = versionDetails().lastTag
@@ -89,5 +83,4 @@ fun createVersionInformation(defaultConfig: com.android.build.api.dsl.DefaultCon
     defaultConfig.resValue("string", "pil_build_info_version", version.toString())
     defaultConfig.resValue("string", "pil_build_info_tag", lastTag)
     defaultConfig.resValue("string", "pil_build_info_hash", gitHash)
-    defaultConfig.resValue("string", "pil_build_info_voip_lib_version", voipLibVersion)
 }
