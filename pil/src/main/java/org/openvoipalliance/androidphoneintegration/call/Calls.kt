@@ -1,9 +1,5 @@
 package org.openvoipalliance.androidphoneintegration.call
 
-import org.openvoipalliance.voiplib.model.AttendedTransferSession
-import org.openvoipalliance.voiplib.model.Call as VoipLibCall
-
-
 class Calls internal constructor(private val factory: CallFactory, private val list: CallList)
     : CallList by list {
 
@@ -13,18 +9,11 @@ class Calls internal constructor(private val factory: CallFactory, private val l
     val isInTransfer: Boolean
         get() = list.size >= 2
 
-    internal val activeVoipLibCall: VoipLibCall?
+    internal val activeVoipLibCall: org.linphone.core.Call?
         get() = list.lastOrNull()
 
     internal val inactiveVoipLibCall
         get() = if (isInTransfer) list.firstOrNull() else null
-
-    internal val transferSession: AttendedTransferSession?
-        get() = activeVoipLibCall?.let { active ->
-            inactiveVoipLibCall?.let { inactive ->
-                AttendedTransferSession(active, inactive)
-            }
-        }
 
     /**
      * The currently active call that is setup to send/receive audio.

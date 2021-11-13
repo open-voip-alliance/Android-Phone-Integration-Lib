@@ -1,7 +1,6 @@
 package org.openvoipalliance.androidphoneintegration.helpers
 
 import org.openvoipalliance.androidphoneintegration.PIL
-import org.openvoipalliance.androidphoneintegration.call.VoipLibEventTranslator
 import org.openvoipalliance.androidphoneintegration.log
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.config.Auth

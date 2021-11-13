@@ -1,7 +1,7 @@
 package org.openvoipalliance.androidphoneintegration.call
 
 import org.openvoipalliance.androidphoneintegration.helpers.identifier
-import org.openvoipalliance.voiplib.model.Call
+import org.linphone.core.Call as Call
 
 interface CallList: MutableList<Call>  {
     /**
