@@ -37,7 +37,11 @@ class Connection internal constructor(
 
     fun toggleHold() {
         callExists {
-            phoneLib.actions(it).hold(!it.isOnHold)
+            if (it.isOnHold) {
+                onUnhold()
+            } else {
+                onHold()
+            }
         }
     }
 

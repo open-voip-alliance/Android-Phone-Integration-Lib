@@ -67,6 +67,7 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         }
 
         transferButton.setOnClickListener {
+            pil.actions.hold()
             TransferDialog().apply {
                 onTransferListener = TransferDialog.OnTransferListener { number ->
                     pil.actions.beginAttendedTransfer(number)
