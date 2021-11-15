@@ -27,12 +27,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class PIL internal constructor(internal val app: ApplicationSetup) {
-
-    private val androidCallFramework: AndroidCallFramework by di.koin.inject()
     private val voipLib: VoIPLib by di.koin.inject()
     private val phoneLibHelper: VoIPLibHelper by di.koin.inject()
-    internal val platformIntegrator: PlatformIntegrator by di.koin.inject()
 
+    internal val androidCallFramework: AndroidCallFramework by di.koin.inject()
+    internal val platformIntegrator: PlatformIntegrator by di.koin.inject()
     internal val logManager: LogManager by di.koin.inject()
     internal val notifications: NotificationManager by di.koin.inject()
 
