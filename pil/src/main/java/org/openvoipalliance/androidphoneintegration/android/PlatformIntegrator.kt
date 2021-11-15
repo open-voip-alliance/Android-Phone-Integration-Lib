@@ -56,7 +56,6 @@ internal class PlatformIntegrator(
             }
 
             pil.app.application.startCallActivity()
-            androidCallFramework.connection?.setActive()
         }
 
         is CallEnded -> {

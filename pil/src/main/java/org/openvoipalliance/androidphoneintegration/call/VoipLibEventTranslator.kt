@@ -49,6 +49,8 @@ internal class VoipLibEventTranslator(
     override fun callConnected(call: Call) {
         log("callConnected: ${call.identifier}")
 
+        pil.androidCallFramework.connection?.setActive()
+
         events.broadcast(
             if (!calls.isInTransfer)
                 CallConnected::class
