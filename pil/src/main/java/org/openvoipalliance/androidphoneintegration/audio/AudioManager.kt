@@ -1,6 +1,9 @@
 package org.openvoipalliance.androidphoneintegration.audio
 
+import android.media.AudioManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.telecom.CallAudioState.*
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
@@ -12,7 +15,8 @@ import org.openvoipalliance.voiplib.model.Codec
 class AudioManager internal constructor(
     private val phoneLib: VoIPLib,
     private val androidCallFramework: AndroidCallFramework,
-    private val events: EventsManager
+    private val events: EventsManager,
+    private val audioManager: AudioManager,
 ) {
 
     val availableCodecs = arrayOf(Codec.OPUS, Codec.ILBC, Codec.G729, Codec.SPEEX)
@@ -41,6 +45,26 @@ class AudioManager internal constructor(
 
         connection.setAudioRoute(pilRouteToNativeRoute(route))
 
+        if (route != AudioRoute.SPEAKER) return
+
+        // After changing the audio route to speaker, on some devices, the volume will be set to
+        // 0 internally, for some reason. By changing the volume by one, the volume is back.
+        Handler(Looper.getMainLooper()).postDelayed(
+            {
+                val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL)
+                val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL)
+
+                audioManager.setStreamVolume(
+                    AudioManager.STREAM_VOICE_CALL,
+                    // There needs to be a volume *change*, otherwise there's no effect.
+                    if (currentVolume >= maxVolume) currentVolume - 1 else currentVolume + 1,
+                    0
+                )
+            },
+            // A delay is necessary since the volume change under the hood does not
+            // happen immediately. A delay less than 1000ms seems to not always work.
+            1000
+        )
     }
 
     /**

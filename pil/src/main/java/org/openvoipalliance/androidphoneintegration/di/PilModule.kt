@@ -43,7 +43,7 @@ val pilModule = module {
 
     single { CallActions(get(), get(), get(), get()) }
 
-    single { AudioManager(get(), get(), get()) }
+    single { AudioManager(get(), get(), get(), get()) }
 
     single { EventsManager(get()) }
 
