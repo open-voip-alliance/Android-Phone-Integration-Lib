@@ -19,7 +19,7 @@ internal abstract class Notification {
 
     protected abstract fun createNotificationChannel()
 
-    fun cancel() {
+    open fun cancel() {
         notificationManger.cancel(notificationId)
     }
 

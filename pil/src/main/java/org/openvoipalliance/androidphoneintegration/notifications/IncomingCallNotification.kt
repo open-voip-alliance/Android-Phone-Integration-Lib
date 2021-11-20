@@ -101,6 +101,14 @@ internal class IncomingCallNotification: Notification() {
         notificationManger.notify(notificationId, notification)
     }
 
+    override fun cancel() {
+        super.cancel()
+        Intent().also { intent ->
+            intent.action = "org.openvoipalliance.androidphoneintegration.INCOMING_CALL_CANCEL"
+            pil.app.application.sendBroadcast(intent)
+        }
+    }
+
     companion object {
         private const val INCOMING_CALLS_CHANNEL_ID = "VoIP Incoming Calls"
         private const val INCOMING_CALLS_APP_RING_CHANNEL_ID = "VoIP Incoming Calls (App Ring)"
