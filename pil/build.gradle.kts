@@ -4,9 +4,8 @@ plugins {
     id("maven-publish")
     id("com.jfrog.bintray")
     id("com.palantir.git-version") version "0.12.3"
+    id("com.kezong.fat-aar")
 }
-
-extra["voipLibVersion"] = "0.1.21"
 
 android {
     compileSdkVersion(30)
@@ -19,9 +18,6 @@ android {
 }
 
 dependencies {
-    val voipLibVersion = project.extra["voipLibVersion"]
-
-    api("com.github.open-voip-alliance:Android-VoIP-Lib:$voipLibVersion")
     api("com.google.firebase:firebase-messaging-ktx:21.0.1")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.32")
@@ -32,12 +28,15 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
     implementation("io.insert-koin:koin-android:2.2.0")
     implementation("androidx.media:media:1.4.3")
+    implementation("io.insert-koin:koin-android:2.2.2")
+    implementation("com.google.code.gson:gson:2.8.9")
 
     testImplementation("junit:junit:4.+")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     androidTestImplementation("org.mockito:mockito-android:+")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    embed("org.linphone.minimal:linphone-sdk-android:5.0.49")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
@@ -80,7 +79,6 @@ task("generateDummyGoogleServicesJsonFile") {
 
 
 fun createVersionInformation(defaultConfig: com.android.build.api.dsl.DefaultConfig) {
-    val voipLibVersion = project.extra["voipLibVersion"] as String
     val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
     version = versionDetails().version
     val lastTag = versionDetails().lastTag
@@ -89,5 +87,4 @@ fun createVersionInformation(defaultConfig: com.android.build.api.dsl.DefaultCon
     defaultConfig.resValue("string", "pil_build_info_version", version.toString())
     defaultConfig.resValue("string", "pil_build_info_tag", lastTag)
     defaultConfig.resValue("string", "pil_build_info_hash", gitHash)
-    defaultConfig.resValue("string", "pil_build_info_voip_lib_version", voipLibVersion)
 }
