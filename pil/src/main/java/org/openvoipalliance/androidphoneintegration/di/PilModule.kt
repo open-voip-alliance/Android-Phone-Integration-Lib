@@ -19,6 +19,11 @@ import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNo
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidphoneintegration.telecom.Connection
 import org.openvoipalliance.voiplib.VoIPLib
+import org.openvoipalliance.voiplib.repository.LinphoneCoreInstanceManager
+import org.openvoipalliance.voiplib.repository.call.controls.LinphoneSipActiveCallControlsRepository
+import org.openvoipalliance.voiplib.repository.call.session.LinphoneSipSessionRepository
+import org.openvoipalliance.voiplib.repository.initialise.LinphoneSipInitialiseRepository
+import org.openvoipalliance.voiplib.repository.registration.LinphoneSipRegisterRepository
 
 fun getModules() = listOf(pilModule)
 
@@ -73,4 +78,11 @@ val pilModule = module {
             get(),
         )
     }
+
+    single { LinphoneCoreInstanceManager(get()) }
+    single { LinphoneSipInitialiseRepository(get(), get()) }
+    single { LinphoneSipRegisterRepository(get()) }
+
+    single { LinphoneSipActiveCallControlsRepository(get()) }
+    single { LinphoneSipSessionRepository(get()) }
 }
