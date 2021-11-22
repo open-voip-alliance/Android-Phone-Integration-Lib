@@ -36,9 +36,13 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
 
         phoneLib.initialise(
             Config(
-                auth = Auth("", "", "", 0),
+                auth = Auth(
+                    auth.username,
+                    auth.password,
+                    auth.domain,
+                    auth.port
+                ),
                 callListener = voipLibEventTranslator,
-                encryption = auth.secure,
                 logListener = voipLibraryLogListener,
                 codecs = pil.preferences.codecs,
                 userAgent = pil.app.userAgent
@@ -56,17 +60,6 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
         forceReRegistration: Boolean = false,
         callback: (Boolean) -> Unit
     ) {
-        phoneLib.swapConfig(
-            phoneLib.currentConfig.copy(
-                auth = Auth(
-                    auth.username,
-                    auth.password,
-                    auth.domain,
-                    auth.port
-                )
-            )
-        )
-
         if (phoneLib.isRegistered && !forceReRegistration) {
             pil.writeLog("We are already registered!")
             callback.invoke(true)
