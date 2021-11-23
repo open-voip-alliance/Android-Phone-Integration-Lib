@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.openvoipalliance.androidphoneintegration">
+    package="org.openvoipalliance.androidphoneintegration" >
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS"/>
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
@@ -12,31 +12,32 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <application
-        android:largeHeap="true">
+    <application android:largeHeap="true" >
 
-        <service android:name="org.openvoipalliance.androidphoneintegration.telecom.ConnectionService"
-            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE">
+        <service
+            android:name=".telecom.ConnectionService"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.telecom.ConnectionService" />
             </intent-filter>
         </service>
 
         <service
-            android:name="org.openvoipalliance.androidphoneintegration.service.VoIPService"
+            android:name=".service.VoIPService"
             android:foregroundServiceType="phoneCall" />
 
         <receiver
-            android:name="org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver"
-            android:exported="true"
-            android:enabled="true" />
+            android:name=".service.NotificationButtonReceiver"
+            android:enabled="true"
+            android:exported="true" />
 
         <service
-            android:name="org.openvoipalliance.androidphoneintegration.push.FcmService"
-            android:exported="false">
+            android:name=".push.FcmService"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
