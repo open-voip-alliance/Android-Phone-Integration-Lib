@@ -5,6 +5,7 @@ plugins {
     id("com.jfrog.bintray")
     id("com.palantir.git-version") version "0.12.3"
     id("com.kezong.fat-aar")
+    id("kotlin-android")
 }
 
 android {
@@ -37,6 +38,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
     embed("org.linphone.minimal:linphone-sdk-android:5.0.49")
+    implementation("androidx.media:media:1.4.3")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {

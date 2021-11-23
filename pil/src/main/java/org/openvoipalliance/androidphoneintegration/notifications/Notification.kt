@@ -17,7 +17,7 @@ internal abstract class Notification {
     protected abstract val channelId: String
     protected abstract val notificationId: Int
 
-    protected abstract fun createNotificationChannel()
+    abstract fun createNotificationChannel()
 
     open fun cancel() {
         notificationManger.cancel(notificationId)

@@ -6,15 +6,6 @@ import com.takwolf.android.foreback.Foreback
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup.AutomaticallyLaunchCallActivity.NEVER
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup.AutomaticallyLaunchCallActivity.ONLY_FROM_BACKGROUND
-import org.openvoipalliance.androidphoneintegration.service.VoIPService
-
-fun Context.startVoipService() {
-    startForegroundService(Intent(this, VoIPService::class.java))
-}
-
-fun Context.stopVoipService() {
-    stopService((Intent(this, VoIPService::class.java)))
-}
 
 fun Context.startCallActivity() {
     val automaticallyLaunchCallActivity = PIL.instance.app.automaticallyLaunchCallActivity

@@ -9,7 +9,7 @@ import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.call.Call
 import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver
 
-internal class CallNotification: Notification() {
+internal class CallNotification : Notification() {
 
     override val channelId = CHANNEL_ID
 
@@ -37,10 +37,8 @@ internal class CallNotification: Notification() {
         )
     }
 
-    fun build(): NotificationCompat.Builder {
-        createNotificationChannel()
-
-        return NotificationCompat.Builder(context, channelId)
+    fun build(display: Boolean = false): NotificationCompat.Builder =
+        NotificationCompat.Builder(context, channelId)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentTitle(context.getString(R.string.notification_default_title))
             .setContentText(context.getString(R.string.notification_default_subtitle))
@@ -60,8 +58,11 @@ internal class CallNotification: Notification() {
                 0,
                 Intent(context, pil.app.activities.call),
                 0
-            ))
-    }
+            )).also {
+                if (display) {
+                    notificationManger.notify(notificationId, it.build())
+                }
+            }
 
     companion object {
         private const val NOTIFICATION_ID = 341
