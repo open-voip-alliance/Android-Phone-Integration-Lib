@@ -10,11 +10,8 @@ import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.*
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
 import org.openvoipalliance.androidphoneintegration.helpers.startCallActivity
-import org.openvoipalliance.androidphoneintegration.helpers.startVoipService
-import org.openvoipalliance.androidphoneintegration.helpers.stopVoipService
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.androidphoneintegration.notifications.MissedCallNotification
-import org.openvoipalliance.androidphoneintegration.service.VoIPService
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 
 /**
@@ -50,16 +47,10 @@ internal class PlatformIntegrator(
         }
 
         is CallConnected -> {
-            if (!VoIPService.isRunning) {
-                pil.writeLog("The VoIP service is not running, starting it.")
-                pil.app.application.startVoipService()
-            }
-
             pil.app.application.startCallActivity()
         }
 
         is CallEnded -> {
-            pil.app.application.stopVoipService()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
             androidCallFramework.connection = null
