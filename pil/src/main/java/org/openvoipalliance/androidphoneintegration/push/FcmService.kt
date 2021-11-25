@@ -33,8 +33,8 @@ internal class FcmService : FirebaseMessagingService() {
             return@launch
         }
 
-        pil.start {
-            pil.app.middleware?.respond(remoteMessage, true)
+        pil.start { success ->
+            pil.app.middleware?.respond(remoteMessage, success)
         }
     }
 
