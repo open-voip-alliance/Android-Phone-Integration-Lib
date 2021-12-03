@@ -18,7 +18,7 @@ internal class ApplicationStateListener(private val pil: PIL) : Foreback.Listene
         try {
             pil.start()
         } catch (e: Exception) {
-            pil.writeLog("Unable to start PIL when entering foreground")
+            pil.writeLog("Unable to start PIL when entering foreground: ${e.localizedMessage}")
         }
     }
 
