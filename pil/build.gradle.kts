@@ -37,7 +37,7 @@ dependencies {
     androidTestImplementation("org.mockito:mockito-android:+")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
-    embed("org.linphone.minimal:linphone-sdk-android:5.0.49")
+    embed("org.linphone.minimal:linphone-sdk-android:5.0.57")
     implementation("androidx.media:media:1.4.3")
 }
 

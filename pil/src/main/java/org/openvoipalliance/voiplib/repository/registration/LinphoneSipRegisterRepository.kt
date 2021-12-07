@@ -99,8 +99,7 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
             state: RegistrationState?,
             message: String
         ) {
-
-            linphoneCoreInstanceManager.log("Received registration state change: ${state?.name}")
+            linphoneCoreInstanceManager.log("Registration state change: ${state?.name} - $message")
 
             if (state == RegistrationState.Failed || state == RegistrationState.Ok) {
                 linphoneCoreInstanceManager.state.isRegistered = state == RegistrationState.Ok
