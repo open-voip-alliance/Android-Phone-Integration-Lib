@@ -30,8 +30,9 @@ class Dns(private val context: Context) {
         }
 
     private enum class PublicDnsServer(val ip: String) {
-        GOOGLE("8.8.8.8"),
         CLOUDFLARE("1.1.1.1"),
+        GOOGLE("8.8.8.8"),
+        OPEN_NIC("94.247.43.254"),
         QUAD9("9.9.9.9");
 
         companion object {
