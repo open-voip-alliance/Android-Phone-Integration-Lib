@@ -19,6 +19,7 @@ import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNo
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidphoneintegration.telecom.Connection
 import org.openvoipalliance.voiplib.VoIPLib
+import org.openvoipalliance.voiplib.repository.Dns
 import org.openvoipalliance.voiplib.repository.LinphoneCoreInstanceManager
 import org.openvoipalliance.voiplib.repository.call.controls.LinphoneSipActiveCallControlsRepository
 import org.openvoipalliance.voiplib.repository.call.session.LinphoneSipSessionRepository
@@ -79,7 +80,8 @@ val pilModule = module {
         )
     }
 
-    single { LinphoneCoreInstanceManager(get()) }
+    single { Dns(get()) }
+    single { LinphoneCoreInstanceManager(get(), get()) }
     single { LinphoneSipInitialiseRepository(get(), get()) }
     single { LinphoneSipRegisterRepository(get()) }
 
