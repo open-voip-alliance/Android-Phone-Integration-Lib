@@ -18,7 +18,7 @@ import org.linphone.core.Call as LinphoneCall
 
 private const val LINPHONE_DEBUG_TAG = "SIMPLE_LINPHONE"
 
-internal class LinphoneCoreInstanceManager(private val context: Context): SimpleCoreListener, LoggingServiceListener {
+internal class LinphoneCoreInstanceManager(private val context: Context, private val dns: Dns): SimpleCoreListener, LoggingServiceListener {
 
     internal val state = CoreState()
 
@@ -90,8 +90,11 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
         mediaEncryption = MediaEncryption.SRTP
         isMediaEncryptionMandatory = true
         enableIpv6(false)
-        enableDnsSrv(false)
+        enableDnsSrv(true)
         enableDnsSearch(false)
+        setDnsServers(dns.getServers().also {
+            log("Using DNS: ${it.joinToString(", ")}", LogLevel.MESSAGE)
+        })
         setUserAgent(voipLibConfig.userAgent, null)
         maxCalls = 2
         ring = null
