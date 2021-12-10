@@ -15,5 +15,5 @@ interface Middleware {
      * @return If TRUE Is returned, processing of the push message will continue as if it
      * is a call. If FALSE is returned, nothing further will be done with this notification.
      */
-    suspend fun inspect(remoteMessage: RemoteMessage): Boolean = true
+    fun inspect(remoteMessage: RemoteMessage): Boolean = true
 }

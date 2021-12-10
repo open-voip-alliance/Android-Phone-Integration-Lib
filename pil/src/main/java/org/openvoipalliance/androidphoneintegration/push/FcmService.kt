@@ -15,22 +15,19 @@ internal class FcmService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        processRemoteMessage(remoteMessage)
-    }
 
-    private fun processRemoteMessage(remoteMessage: RemoteMessage) = GlobalScope.launch {
         if (pil.app.middleware?.inspect(remoteMessage) == false) {
             pil.writeLog("Client has inspected push message and determined this is not a call")
-            return@launch
+            return
         }
 
-        if (!PIL.isInitialized) return@launch
+        if (!PIL.isInitialized) return
 
         pil.writeLog("Received FCM push message")
 
         if (androidCallFramework.isInCall) {
             pil.app.middleware?.respond(remoteMessage, false)
-            return@launch
+            return
         }
 
         pil.start { success ->
