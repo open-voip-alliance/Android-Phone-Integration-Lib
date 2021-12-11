@@ -12,7 +12,9 @@ data class Call(
     val isOnHold: Boolean,
     val uuid: String,
     val mos: Float,
-    val contact: Contact?
+    val contact: Contact?,
+    val callId: String,
+    val reason: String,
 ) {
     val remotePartyHeading: String
         get() {

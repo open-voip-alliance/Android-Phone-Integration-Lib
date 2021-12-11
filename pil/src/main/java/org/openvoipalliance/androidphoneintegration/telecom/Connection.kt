@@ -2,13 +2,13 @@ package org.openvoipalliance.androidphoneintegration.telecom
 
 import android.annotation.SuppressLint
 import android.telecom.CallAudioState
+import org.linphone.core.Reason
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.call.Calls
 import org.openvoipalliance.androidphoneintegration.call.VoipLibCall
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
 import org.openvoipalliance.voiplib.VoIPLib
-import org.openvoipalliance.voiplib.model.Reason
 import android.telecom.Connection as AndroidConnection
 
 class Connection internal constructor(
@@ -62,7 +62,7 @@ class Connection internal constructor(
     @SuppressLint("MissingPermission")
     override fun onReject() {
         callExists {
-            phoneLib.actions(it).decline(Reason.BUSY)
+            phoneLib.actions(it).decline(Reason.Busy)
             destroy()
         }
     }

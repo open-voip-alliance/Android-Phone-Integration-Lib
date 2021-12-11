@@ -29,7 +29,9 @@ internal class CallFactory(private val contacts: Contacts) {
             call.isOnHold,
             UUID.randomUUID().toString(),
             call.quality.average,
-            findContact(voipLibCall)
+            findContact(voipLibCall),
+            voipLibCall.callId,
+            voipLibCall.reason,
         )
     }
 

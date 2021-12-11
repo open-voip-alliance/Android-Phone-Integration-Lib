@@ -3,10 +3,10 @@ package org.openvoipalliance.voiplib
 import android.Manifest
 import android.content.Context
 import androidx.annotation.RequiresPermission
+import org.linphone.core.Reason
 import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.voiplib.model.AttendedTransferSession
 import org.openvoipalliance.voiplib.model.Call
-import org.openvoipalliance.voiplib.model.Reason
 import org.openvoipalliance.voiplib.repository.call.controls.LinphoneSipActiveCallControlsRepository
 import org.openvoipalliance.voiplib.repository.call.session.LinphoneSipSessionRepository
 

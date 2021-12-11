@@ -2,8 +2,8 @@ package org.openvoipalliance.voiplib.repository.call.session
 
 import org.linphone.core.Address
 import org.linphone.core.CoreException
+import org.linphone.core.Reason
 import org.openvoipalliance.voiplib.model.Call
-import org.openvoipalliance.voiplib.model.Reason
 import org.openvoipalliance.voiplib.repository.LinphoneCoreInstanceManager
 import org.linphone.core.Call as LinphoneCall
 
@@ -19,7 +19,7 @@ internal class LinphoneSipSessionRepository(private val linphoneCoreInstanceMana
 
     fun declineIncoming(call: Call, reason: Reason) {
         try {
-            call.linphoneCall.decline(org.linphone.core.Reason.fromInt(reason.value))
+            call.linphoneCall.decline(reason)
         } catch (e: CoreException) {
             e.printStackTrace()
         }
