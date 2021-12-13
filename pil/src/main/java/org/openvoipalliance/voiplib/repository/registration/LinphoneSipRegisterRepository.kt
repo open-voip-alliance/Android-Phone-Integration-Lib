@@ -3,6 +3,8 @@ package org.openvoipalliance.voiplib.repository.registration
 import android.util.Log
 import org.linphone.core.*
 import org.openvoipalliance.voiplib.RegistrationCallback
+import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
+import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
 import org.openvoipalliance.voiplib.repository.LinphoneCoreInstanceManager
 import org.openvoipalliance.voiplib.repository.SimpleCoreListener
 
@@ -41,7 +43,7 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         val proxyConfig = createProxyConfig(core, config.auth.name, config.auth.domain, config.auth.port.toString())
 
         if (core.addProxyConfig(proxyConfig) == -1) {
-            callback.invoke(org.openvoipalliance.voiplib.model.RegistrationState.FAILED)
+            callback.invoke(FAILED)
             return
         }
 
@@ -103,12 +105,7 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
 
             if (state == RegistrationState.Failed || state == RegistrationState.Ok) {
                 linphoneCoreInstanceManager.state.isRegistered = state == RegistrationState.Ok
-                callback?.invoke(
-                    if (state == RegistrationState.Ok)
-                        org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
-                    else
-                        org.openvoipalliance.voiplib.model.RegistrationState.FAILED
-                )
+                callback?.invoke(if (state == RegistrationState.Ok) REGISTERED else FAILED)
                 callback = null
 
                 // If the registration state has failed, we want to remove the proxy config
