@@ -103,8 +103,19 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
 
             if (state == RegistrationState.Failed || state == RegistrationState.Ok) {
                 linphoneCoreInstanceManager.state.isRegistered = state == RegistrationState.Ok
-                callback?.invoke(if (state == RegistrationState.Ok) org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED else org.openvoipalliance.voiplib.model.RegistrationState.FAILED)
+                callback?.invoke(
+                    if (state == RegistrationState.Ok)
+                        org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
+                    else
+                        org.openvoipalliance.voiplib.model.RegistrationState.FAILED
+                )
                 callback = null
+
+                // If the registration state has failed, we want to remove the proxy config
+                // so it is possible to retry in the future.
+                if (state == RegistrationState.Failed) {
+                    unregister()
+                }
             }
         }
     }
