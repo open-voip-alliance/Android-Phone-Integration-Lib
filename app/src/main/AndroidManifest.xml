@@ -20,7 +20,8 @@
             android:exported="true" />
         <activity
             android:name="org.openvoipalliance.androidphoneintegration.example.MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

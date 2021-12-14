@@ -29,6 +29,6 @@ internal abstract class Notification {
         Intent(context, NotificationButtonReceiver::class.java).apply {
             setAction(action.name)
         },
-        0
+        PendingIntent.FLAG_IMMUTABLE
     )
 }
