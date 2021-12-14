@@ -31,12 +31,12 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         this.callback = callback
 
         if (core.proxyConfigList.isNotEmpty()) {
-            linphoneCoreInstanceManager.log("Proxy config found, re-registering.")
+            registerLog("Proxy config found, re-registering.")
             core.refreshRegisters()
             return
         }
 
-        linphoneCoreInstanceManager.log("No proxy config found, registering for the first time.")
+        registerLog("No proxy config found, registering for the first time.")
 
         if (config.auth.port < 1 || config.auth.port > 65535) {
             throw IllegalArgumentException("Unable to register with a server when port is invalid: ${config.auth.port}")
@@ -121,10 +121,10 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
             state: RegistrationState?,
             message: String,
         ) {
-            log("Registration state change: ${state?.name} - $message")
+            registerLog("State change: ${state?.name} - $message")
 
             val callback = this@LinphoneSipRegisterRepository.callback ?: run {
-                log("There is no callback set so registration state change has not done anything.")
+                registerLog("Callback set so registration state change has not done anything.")
                 reset()
                 return
             }
@@ -132,7 +132,7 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
             // If the registration was successful, just immediately invoke the callback and reset
             // all timers.
             if (state == RegistrationState.Ok) {
-                log("Registration was successful, resetting timers.")
+                registerLog("Successful, resetting timers.")
                 callback.invoke(REGISTERED)
                 reset()
                 return
@@ -142,12 +142,12 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
             val startTime = this.startTime ?: run {
                 val startTime = currentTime
                 this.startTime = startTime
-                log("Started registration timer: $startTime.")
+                registerLog("Started registration timer: $startTime.")
                 startTime
             }
 
             if (hasExceededTimeout(startTime)) {
-                log("Registration timeout has been exceeding, registration failed.")
+                registerLog("Registration timeout has been exceeded, registration failed.")
                 callback.invoke(FAILED)
                 reset()
                 return
@@ -184,7 +184,7 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         /**
          * The amount of time to wait before determining registration has failed.
          */
-        const val registrationTimeoutMs = 10000L
+        const val registrationTimeoutMs = 5000L
 
         /**
          * The time that we will wait before executing the method again to clean-up.
@@ -192,3 +192,5 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         const val cleanUpDelay = 1000L
     }
 }
+
+private fun registerLog(message: String) = log("SIP-REGISTER: $message")
