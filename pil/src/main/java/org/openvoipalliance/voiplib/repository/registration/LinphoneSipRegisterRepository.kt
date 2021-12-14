@@ -7,6 +7,8 @@ import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
 import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
 import org.openvoipalliance.voiplib.repository.LinphoneCoreInstanceManager
 import org.openvoipalliance.voiplib.repository.SimpleCoreListener
+import java.util.*
+import kotlin.concurrent.schedule
 
 internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceManager: LinphoneCoreInstanceManager) {
 
@@ -106,6 +108,8 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         private val currentTime: Long
             get() = System.currentTimeMillis()
 
+        private val timer = Timer("Registration")
+
         override fun onAccountRegistrationStateChanged(
             core: Core,
             account: Account,
@@ -143,6 +147,17 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
                 reset()
                 return
             }
+
+            // Queuing call of this method so we ensure that the callback is eventually invoked
+            // even if there are no future registration updates.
+            timer.schedule(cleanUpDelay) {
+                onAccountRegistrationStateChanged(
+                    core,
+                    account,
+                    state,
+                    "Automatically called to ensure callback is executed"
+                )
+            }
         }
 
         private fun hasExceededTimeout(startTime: Long): Boolean =
@@ -151,6 +166,10 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         private fun reset() {
             this@LinphoneSipRegisterRepository.callback = null
             startTime = null
+            timer.apply {
+                cancel()
+                purge()
+            }
         }
     }
 
@@ -159,5 +178,10 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
          * The amount of time to wait before determining registration has failed.
          */
         const val registrationTimeoutMs = 10000L
+
+        /**
+         * The time that we will wait before executing the method again to clean-up.
+         */
+        const val cleanUpDelay = 1000L
     }
 }
