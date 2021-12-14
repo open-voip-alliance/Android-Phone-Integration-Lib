@@ -122,7 +122,7 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
 
             // If the registration was successful, just immediately invoke the callback and reset
             // all timers.
-            if (state == RegistrationState.Failed) {
+            if (state == RegistrationState.Ok) {
                 log("Registration was successful, resetting timers.")
                 callback.invoke(REGISTERED)
                 reset()
