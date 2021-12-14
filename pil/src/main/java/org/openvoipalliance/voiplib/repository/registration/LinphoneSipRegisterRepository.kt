@@ -1,7 +1,7 @@
 package org.openvoipalliance.voiplib.repository.registration
 
-import android.util.Log
 import org.linphone.core.*
+import org.openvoipalliance.androidphoneintegration.log
 import org.openvoipalliance.voiplib.RegistrationCallback
 import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
 import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
@@ -95,25 +95,69 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
     fun isRegistered() = linphoneCoreInstanceManager.state.isRegistered
 
     private inner class RegistrationListener : SimpleCoreListener {
+
+        /**
+         * It is sometimes possible that a failed registration will occur before a successful one
+         * so we will track the time of the first registration update before determining it has
+         * failed.
+         */
+        private var startTime: Long? = null
+
+        private val currentTime: Long
+            get() = System.currentTimeMillis()
+
         override fun onAccountRegistrationStateChanged(
             core: Core,
             account: Account,
             state: RegistrationState?,
-            message: String
+            message: String,
         ) {
-            linphoneCoreInstanceManager.log("Registration state change: ${state?.name} - $message")
+            log("Registration state change: ${state?.name} - $message")
 
-            if (state == RegistrationState.Failed || state == RegistrationState.Ok) {
-                linphoneCoreInstanceManager.state.isRegistered = state == RegistrationState.Ok
-                callback?.invoke(if (state == RegistrationState.Ok) REGISTERED else FAILED)
-                callback = null
+            val callback = this@LinphoneSipRegisterRepository.callback ?: run {
+                log("There is no callback set so registration state change has not done anything.")
+                reset()
+                return
+            }
 
-                // If the registration state has failed, we want to remove the proxy config
-                // so it is possible to retry in the future.
-                if (state == RegistrationState.Failed) {
-                    unregister()
-                }
+            // If the registration was successful, just immediately invoke the callback and reset
+            // all timers.
+            if (state == RegistrationState.Failed) {
+                log("Registration was successful, resetting timers.")
+                callback.invoke(REGISTERED)
+                reset()
+                return
+            }
+
+            // If there is no start time, we want to set it to begin the timer.
+            val startTime = this.startTime ?: run {
+                val startTime = currentTime
+                this.startTime = startTime
+                log("Started registration timer: $startTime.")
+                startTime
+            }
+
+            if (hasExceededTimeout(startTime)) {
+                log("Registration timeout has been exceeding, registration failed.")
+                callback.invoke(FAILED)
+                reset()
+                return
             }
         }
+
+        private fun hasExceededTimeout(startTime: Long): Boolean =
+            (startTime + registrationTimeoutMs) < currentTime
+
+        private fun reset() {
+            this@LinphoneSipRegisterRepository.callback = null
+            startTime = null
+        }
+    }
+
+    companion object {
+        /**
+         * The amount of time to wait before determining registration has failed.
+         */
+        const val registrationTimeoutMs = 10000L
     }
 }
