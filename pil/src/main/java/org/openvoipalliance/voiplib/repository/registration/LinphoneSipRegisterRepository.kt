@@ -147,6 +147,7 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
             }
 
             if (hasExceededTimeout(startTime)) {
+                unregister()
                 registerLog("Registration timeout has been exceeded, registration failed.")
                 callback.invoke(FAILED)
                 reset()
