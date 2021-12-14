@@ -108,7 +108,12 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         private val currentTime: Long
             get() = System.currentTimeMillis()
 
-        private val timer = Timer("Registration")
+        private var timer: Timer? = null
+            set(timer) {
+                timer?.cancel()
+                timer?.purge()
+                field = timer
+            }
 
         override fun onAccountRegistrationStateChanged(
             core: Core,
@@ -150,13 +155,15 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
 
             // Queuing call of this method so we ensure that the callback is eventually invoked
             // even if there are no future registration updates.
-            timer.schedule(cleanUpDelay) {
-                onAccountRegistrationStateChanged(
-                    core,
-                    account,
-                    state,
-                    "Automatically called to ensure callback is executed"
-                )
+            timer = Timer("Registration").also {
+                it.schedule(cleanUpDelay) {
+                    onAccountRegistrationStateChanged(
+                        core,
+                        account,
+                        state,
+                        "Automatically called to ensure callback is executed"
+                    )
+                }
             }
         }
 
@@ -166,7 +173,7 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         private fun reset() {
             this@LinphoneSipRegisterRepository.callback = null
             startTime = null
-            timer.apply {
+            timer?.apply {
                 cancel()
                 purge()
             }
