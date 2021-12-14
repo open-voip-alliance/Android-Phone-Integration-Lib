@@ -57,7 +57,7 @@ internal class CallNotification : Notification() {
                 context,
                 0,
                 Intent(context, pil.app.activities.call),
-                0
+                PendingIntent.FLAG_IMMUTABLE
             )).also {
                 if (display) {
                     notificationManger.notify(notificationId, it.build())
