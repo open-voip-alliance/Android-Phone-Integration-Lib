@@ -7,28 +7,31 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
+import android.util.Log
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.call.Call
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
+import org.openvoipalliance.androidphoneintegration.log
+import org.openvoipalliance.androidphoneintegration.logWithContext
 import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver
 
 internal class IncomingCallNotification: Notification() {
 
-    private val preferences: Preferences
-        get() = pil.preferences
-
     override val channelId: String
-        get() = if (preferences.useApplicationProvidedRingtone) INCOMING_CALLS_APP_RING_CHANNEL_ID else INCOMING_CALLS_CHANNEL_ID
-
-    override val notificationId = NOTIFICATION_ID
+        get() = when(pil.preferences.useApplicationProvidedRingtone) {
+            true -> INCOMING_CALLS_APP_RING_CHANNEL_ID
+            false -> INCOMING_CALLS_CHANNEL_ID
+        }
 
     private val ringtone: Uri
-        get() = if (preferences.useApplicationProvidedRingtone) {
-            Uri.parse("android.resource://${context.packageName}/raw/ringtone")
-        } else {
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+        get() = when (pil.preferences.useApplicationProvidedRingtone) {
+            true -> Uri.parse("android.resource://${context.packageName}/raw/ringtone")
+            false -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
         }
+
+    override val notificationId = NOTIFICATION_ID
 
     override fun createNotificationChannel() {
         val channel = NotificationChannel(
@@ -53,45 +56,50 @@ internal class IncomingCallNotification: Notification() {
      * Silence the incoming notification, stop the ringing.
      *
      */
-    fun silence(call: Call) = notify(call, setOnlyAlertOnce = true)
+    fun silence(call: Call) {
+        notify(call, setOnlyAlertOnce = true)
+        log("Silenced $channelId")
+    }
 
     /**
      * Begin ringing the user's phone.
      *
      */
     fun notify(call: Call, setOnlyAlertOnce: Boolean = false) {
+        log("Starting using CHANNEL: $channelId and RINGTONE: $ringtone")
         createNotificationChannel()
 
-        val notification = NotificationCompat.Builder(pil.app.application, channelId).apply {
-            pil.app.activities.incomingCall?.let {
-                val pendingIntent = PendingIntent.getActivity(pil.app.application, 1, Intent(Intent.ACTION_MAIN, null).apply {
-                    putExtra("is_incoming", true)
-                    putExtra("remote_party_heading", call.remotePartyHeading)
-                    putExtra("remote_party_subheading", call.remotePartySubheading)
-                    flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION or Intent.FLAG_ACTIVITY_NEW_TASK
-                    setClass(pil.app.application, it)
-                }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                setContentIntent(pendingIntent)
-                setFullScreenIntent(pendingIntent, true)
-            }
-            setOngoing(true)
+        val fullScreenIntent = Intent(context, pil.app.activities.incomingCall).apply {
+            putExtra("is_incoming", true)
+            putExtra("remote_party_heading", call.remotePartyHeading)
+            putExtra("remote_party_subheading", call.remotePartySubheading)
+            flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION or Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            fullScreenIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+
+        val notification = NotificationCompat.Builder(context, channelId).apply {
+            setFullScreenIntent(fullScreenPendingIntent, true)
             setOnlyAlertOnce(setOnlyAlertOnce)
             setSmallIcon(R.drawable.ic_service)
             setContentTitle(call.remotePartyHeading)
             setCategory(android.app.Notification.CATEGORY_CALL)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            setContentText(pil.app.application.getString(R.string.notification_incoming_context_text))
-            color = pil.app.application.getColor(R.color.notification_background)
-            setColorized(true)
+            setContentText(context.getString(R.string.notification_incoming_context_text))
             priority = NotificationCompat.PRIORITY_HIGH
             addAction(
                 R.drawable.ic_service,
-                pil.app.application.getString(R.string.notification_answer_action),
+                context.getString(R.string.notification_answer_action),
                 createActionIntent(NotificationButtonReceiver.Action.ANSWER, pil.app.application)
             )
             addAction(
                 R.drawable.ic_service,
-                pil.app.application.getString(R.string.notification_decline_action),
+                context.getString(R.string.notification_decline_action),
                 createActionIntent(NotificationButtonReceiver.Action.DECLINE, pil.app.application)
             )
         }.build().also {
@@ -103,15 +111,15 @@ internal class IncomingCallNotification: Notification() {
 
     override fun cancel() {
         super.cancel()
-        Intent().also { intent ->
-            intent.action = "org.openvoipalliance.androidphoneintegration.INCOMING_CALL_CANCEL"
-            pil.app.application.sendBroadcast(intent)
-        }
+        context.sendBroadcast(Intent(CANCEL_INCOMING_CALL_ACTION))
     }
+
+    private fun log(message: String) = logWithContext(message, "INCOMING-CALL-NOTIFICATION")
 
     companion object {
         private const val INCOMING_CALLS_CHANNEL_ID = "VoIP Incoming Calls"
         private const val INCOMING_CALLS_APP_RING_CHANNEL_ID = "VoIP Incoming Calls (App Ring)"
+        private const val CANCEL_INCOMING_CALL_ACTION = "org.openvoipalliance.androidphoneintegration.INCOMING_CALL_CANCEL"
         private const val NOTIFICATION_ID = 676
     }
 }

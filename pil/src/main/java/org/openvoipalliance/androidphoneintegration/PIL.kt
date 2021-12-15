@@ -214,3 +214,9 @@ internal fun log(message: String, level: LogLevel = LogLevel.INFO) {
 
     PIL.instance.writeLog(message, level)
 }
+
+/**
+ * Log a string with the context (what part of the library the log refers to) appended to the front
+ * and formatted correctly.
+ */
+internal fun logWithContext(message: String, context: String) = log("$context: $message")
