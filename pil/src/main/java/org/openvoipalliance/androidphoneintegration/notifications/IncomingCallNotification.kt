@@ -7,13 +7,9 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
-import android.util.Log
-import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.call.Call
-import org.openvoipalliance.androidphoneintegration.configuration.Preferences
-import org.openvoipalliance.androidphoneintegration.log
 import org.openvoipalliance.androidphoneintegration.logWithContext
 import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver
 
