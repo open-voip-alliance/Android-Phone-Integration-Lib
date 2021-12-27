@@ -9,10 +9,13 @@ import org.linphone.core.*
 import org.linphone.core.GlobalState.Off
 import org.linphone.core.GlobalState.On
 import org.linphone.core.LogLevel.*
+import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.voiplib.config.Config
 import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.model.Codec
 import org.openvoipalliance.voiplib.repository.initialise.LogLevel
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import org.linphone.core.Call as LinphoneCall
 
@@ -40,6 +43,15 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
             }
         }
 
+    /**
+     * Certain files need to be available to Linphone via the file system, rather than through a
+     * native resource. Each time we initialise Linphone we will copy the resource to the file
+     * location listed.
+     */
+    private val filesToPublish = mapOf(
+        R.raw.ringback to "ringback.wav"
+    )
+
     init {
         Factory.instance().setDebugMode(false, LINPHONE_DEBUG_TAG)
     }
@@ -53,6 +65,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         }
 
         try {
+            publishResources()
             startLibLinphone()
         } catch (e: Exception) {
             config.logListener?.onLogMessageWritten(LogLevel.ERROR, "Failed to start Linphone: ${e.localizedMessage}")
@@ -98,6 +111,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         setUserAgent(voipLibConfig.userAgent, null)
         maxCalls = 2
         ring = null
+        ringback = publishedFile("ringback.wav").absolutePath
         isNativeRingingEnabled = false
         enableVideoDisplay(false)
         enableVideoCapture(false)
@@ -135,6 +149,51 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
             enableAudioAdaptiveJittcomp(voipLibConfig.advancedVoIPSettings.jitterCompensation)
         }
     }
+
+    /**
+     * Iterate over the [filesToPublish] and publish any that are necessary into the appropriate
+     * file system directory.
+     *
+     * @param overwrite
+     */
+    private fun publishResources(overwrite: Boolean = true) {
+        filesToPublish.forEach { (id, filename) ->
+            log("Publishing resource $id to $filename")
+
+            val publishedFile = publishedFile(filename)
+
+            val parent = publishedFile.parentFile ?: return
+
+            if (!parent.exists()) {
+                parent.mkdir()
+            }
+
+            when {
+                publishedFile.exists() && overwrite -> publishedFile.delete()
+                publishedFile.exists() && !overwrite -> return
+            }
+
+            val outStream = FileOutputStream(publishedFile)
+            val inStream = context.resources.openRawResource(id)
+            val buffer = ByteArray(1024)
+            var length: Int = inStream.read(buffer)
+
+            while (length > 0) {
+                outStream.write(buffer, 0, length)
+                length = inStream.read(buffer)
+            }
+
+            inStream.close()
+            outStream.flush()
+            outStream.close()
+        }
+    }
+
+    /**
+     * Get the full file object for a published filename.
+     */
+    private fun publishedFile(filename: String) =
+        File("${context.filesDir}/${PUBLISH_DIRECTORY_NAME}/$filename")
 
     /**
      * Creates the Linphone core by reading in the linphone raw configuration file.
@@ -244,6 +303,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
     companion object {
         const val TAG = "VOIPLIB-LINPHONE"
         var globalState: GlobalState = Off
+        const val PUBLISH_DIRECTORY_NAME = "apl-resources"
     }
 
     inner class CoreState {
