@@ -1,18 +1,24 @@
 package org.openvoipalliance.androidphoneintegration.audio
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.telecom.CallAudioState.*
+import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.log
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
+import org.openvoipalliance.androidphoneintegration.telecom.Connection
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.Codec
 
 class AudioManager internal constructor(
+    private val context: Context,
     private val phoneLib: VoIPLib,
     private val androidCallFramework: AndroidCallFramework,
     private val events: EventsManager,
@@ -133,17 +139,31 @@ class AudioManager internal constructor(
         val supportedRoutes = mutableListOf<AudioRoute>()
 
         routes.forEach {
+            if (it == ROUTE_BLUETOOTH && !hasBluetoothPermission) {
+                return@forEach
+            }
+
             if (connection.callAudioState.supportedRouteMask and it == it) {
                 supportedRoutes.add(nativeRouteToPilRoute(it))
             }
         }
 
-        val bluetoothName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            connection.callAudioState.activeBluetoothDevice?.name
-        } else {
-            null
-        }
+        return AudioState(
+            currentRoute,
+            supportedRoutes.toTypedArray(),
+            bluetoothAudioRouteName(connection),
+            phoneLib.microphoneMuted,
+            bluetoothAudioRoutes(connection).toTypedArray()
+        )
+    }
 
+    private fun bluetoothAudioRouteName(connection: Connection): String? = when {
+        !hasBluetoothPermission -> null
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> connection.callAudioState.activeBluetoothDevice?.name
+        else -> null
+    }
+
+    private fun bluetoothAudioRoutes(connection: Connection): List<BluetoothAudioRoute> {
         val bluetoothRoutes = mutableListOf<BluetoothAudioRoute>()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -152,13 +172,13 @@ class AudioManager internal constructor(
             }
         }
 
-        return AudioState(
-            currentRoute,
-            supportedRoutes.toTypedArray(),
-            bluetoothName,
-            phoneLib.microphoneMuted,
-            bluetoothRoutes.toTypedArray()
-        )
+        return bluetoothRoutes
+    }
+
+    private val hasBluetoothPermission = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
+            ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+        else -> true
     }
 
     private fun nativeRouteToPilRoute(nativeRoute: Int) = when (nativeRoute) {
