@@ -44,7 +44,13 @@ class DialerFragment : Fragment(), PILEventListener {
     }
 
     private fun requestCallingPermissions() {
-        val requiredPermissions = arrayOf(Manifest.permission.CALL_PHONE, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_PHONE_STATE)
+        val requiredPermissions = arrayOf(
+            Manifest.permission.CALL_PHONE,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.BLUETOOTH_CONNECT,
+        )
 
         requiredPermissions.forEach { permission ->
             if (ContextCompat.checkSelfPermission(requireActivity(), permission) == PERMISSION_DENIED) {
