@@ -139,10 +139,6 @@ class AudioManager internal constructor(
         val supportedRoutes = mutableListOf<AudioRoute>()
 
         routes.forEach {
-            if (it == ROUTE_BLUETOOTH && !hasBluetoothPermission) {
-                return@forEach
-            }
-
             if (connection.callAudioState.supportedRouteMask and it == it) {
                 supportedRoutes.add(nativeRouteToPilRoute(it))
             }
@@ -166,10 +162,12 @@ class AudioManager internal constructor(
     private fun bluetoothAudioRoutes(connection: Connection): List<BluetoothAudioRoute> {
         val bluetoothRoutes = mutableListOf<BluetoothAudioRoute>()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            connection.callAudioState.supportedBluetoothDevices.forEach {
-                bluetoothRoutes.add(BluetoothAudioRoute(it.name, it.name))
-            }
+        if (!hasBluetoothPermission) return bluetoothRoutes
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return bluetoothRoutes
+
+        connection.callAudioState.supportedBluetoothDevices.forEach {
+            bluetoothRoutes.add(BluetoothAudioRoute(it.name, it.name))
         }
 
         return bluetoothRoutes
