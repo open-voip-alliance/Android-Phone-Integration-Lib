@@ -18,7 +18,7 @@ import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.Codec
 
 class AudioManager internal constructor(
-    private val context: Context,
+    context: Context,
     private val phoneLib: VoIPLib,
     private val androidCallFramework: AndroidCallFramework,
     private val events: EventsManager,
@@ -167,7 +167,9 @@ class AudioManager internal constructor(
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return bluetoothRoutes
 
         connection.callAudioState.supportedBluetoothDevices.forEach {
-            bluetoothRoutes.add(BluetoothAudioRoute(it.name, it.name))
+            if (!it.name.isNullOrEmpty()) {
+                bluetoothRoutes.add(BluetoothAudioRoute(it.name, it.name))
+            }
         }
 
         return bluetoothRoutes
