@@ -128,7 +128,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("voipgrid_middleware_register")?.setOnPreferenceClickListener {
             GlobalScope.launch {
                 val message = if (voIPGRIDMiddleware.register()) "Registered!" else "Registration failed..."
-                requireActivity().runOnUiThread { Toast.makeText(requireActivity(), message, Toast.LENGTH_LONG).show() }
+
+                if (activity == null || activity?.isFinishing == true) return@launch
+
+                requireActivity().runOnUiThread {
+                    Toast.makeText(requireActivity(), message, Toast.LENGTH_LONG).show()
+                }
             }
             true
         }

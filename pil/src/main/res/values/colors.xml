@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="notification_background">#fff</color>
+    <color name="incoming_call_notification_answer_color">#FF28CA42</color>
+    <color name="incoming_call_notification_decline_color">#FFDA534F</color>
 </resources>

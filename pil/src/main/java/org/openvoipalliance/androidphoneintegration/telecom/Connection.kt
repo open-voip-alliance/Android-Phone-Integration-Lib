@@ -24,6 +24,7 @@ class Connection internal constructor(
     }
 
     override fun onSilence() {
+        super.onSilence()
         pil.writeLog("Received request to silence the ringer")
         incomingCallNotification.silence(call = pil.calls.active ?: return)
     }

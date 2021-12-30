@@ -3,10 +3,15 @@ package org.openvoipalliance.androidphoneintegration.notifications
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.call.Call
@@ -90,12 +95,12 @@ internal class IncomingCallNotification: Notification() {
             priority = NotificationCompat.PRIORITY_HIGH
             addAction(
                 R.drawable.ic_service,
-                context.getString(R.string.notification_answer_action),
+                context.createColoredActionText(R.string.notification_answer_action, R.color.incoming_call_notification_answer_color),
                 createActionIntent(NotificationButtonReceiver.Action.ANSWER, pil.app.application)
             )
             addAction(
                 R.drawable.ic_service,
-                context.getString(R.string.notification_decline_action),
+                context.createColoredActionText(R.string.notification_decline_action, R.color.incoming_call_notification_decline_color),
                 createActionIntent(NotificationButtonReceiver.Action.DECLINE, pil.app.application)
             )
         }.build().also {
@@ -119,3 +124,10 @@ internal class IncomingCallNotification: Notification() {
         private const val NOTIFICATION_ID = 676
     }
 }
+
+private fun Context.createColoredActionText(@StringRes stringRes: Int, @ColorRes colorRes: Int) =
+    SpannableString(getText(stringRes)).apply {
+        setSpan(
+            ForegroundColorSpan(getColor(colorRes)), 0, length, 0
+        )
+    }
