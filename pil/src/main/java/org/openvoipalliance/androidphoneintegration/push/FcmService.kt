@@ -2,10 +2,9 @@ package org.openvoipalliance.androidphoneintegration.push
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.di.di
+import org.openvoipalliance.androidphoneintegration.logWithContext
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 
 internal class FcmService : FirebaseMessagingService() {
@@ -16,16 +15,19 @@ internal class FcmService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
+        pil.pruneStaleAndroidCallFrameworkCalls()
+
         if (pil.app.middleware?.inspect(remoteMessage) == false) {
-            pil.writeLog("Client has inspected push message and determined this is not a call")
+            log("Client has inspected push message and determined this is not a call")
             return
         }
 
         if (!PIL.isInitialized) return
 
-        pil.writeLog("Received FCM push message")
+        log("Received FCM push message")
 
         if (androidCallFramework.isInCall) {
+            log("The android call framework is reporting as in a call, responding as unavailable")
             pil.app.middleware?.respond(remoteMessage, false)
             return
         }
@@ -40,8 +42,10 @@ internal class FcmService : FirebaseMessagingService() {
 
         if (!PIL.isInitialized) return
 
-        pil.writeLog("Received new FCM token")
+        log("Received new FCM token")
 
         pil.app.middleware?.tokenReceived(token)
     }
+
+    private fun log(message: String) = logWithContext("FCM-SERVICE", message)
 }

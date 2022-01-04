@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.telecom.DisconnectCause
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
@@ -118,6 +119,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
      *
      */
     fun call(number: String) {
+        pruneStaleAndroidCallFrameworkCalls()
+
         start { success ->
             if (success) {
                 androidCallFramework.placeCall(number)
@@ -175,6 +178,23 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         voipLib.destroy()
     }
 
+    /**
+     * When the Android Call Framework connection isn't properly cleaned up it can cause issues
+     * not allowing other calls. Prune will check if we have a call and if not will make sure
+     * the call framework is updated accordingly.
+     */
+    internal fun pruneStaleAndroidCallFrameworkCalls() {
+        if (calls.isInCall) return
+
+        androidCallFramework.connection?.apply {
+            log("Removing stale android call framework call")
+            setDisconnected(DisconnectCause(DisconnectCause.UNKNOWN))
+            destroy()
+        }
+
+        androidCallFramework.connection = null
+    }
+
     private fun hasRequiredPermissions() =
         ContextCompat.checkSelfPermission(app.application,
             Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_DENIED
@@ -219,4 +239,5 @@ internal fun log(message: String, level: LogLevel = LogLevel.INFO) {
  * Log a string with the context (what part of the library the log refers to) appended to the front
  * and formatted correctly.
  */
-internal fun logWithContext(message: String, context: String) = log("$context: $message")
+internal fun logWithContext(message: String, context: String, level: LogLevel = LogLevel.INFO) =
+    log("$context: $message", level)
