@@ -12,7 +12,8 @@ import org.openvoipalliance.androidphoneintegration.configuration.Auth
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
 import org.openvoipalliance.androidphoneintegration.debug.VersionInfo
 import org.openvoipalliance.androidphoneintegration.di.di
-import org.openvoipalliance.androidphoneintegration.events.Event
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailedEvent.OutgoingCallSetupFailed
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailedEvent.Reason.UNABLE_TO_REGISTER
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.exception.NoAuthenticationCredentialsException
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
@@ -121,12 +122,20 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     fun call(number: String) {
         pruneStaleAndroidCallFrameworkCalls()
 
+        log("Attempting to make outgoing call")
+
+        if (!androidCallFramework.canMakeOutgoingCall()) {
+            log("Android telecom framework is not permitting outgoing call", LogLevel.ERROR)
+            return
+        }
+
         start { success ->
             if (success) {
+                log("Started and registered, placing call via Android Call Framework")
                 androidCallFramework.placeCall(number)
             } else {
-                writeLog("Unable to register so not continuing with placing a call", LogLevel.ERROR)
-                events.broadcast(Event.CallSetupFailedEvent.OutgoingCallSetupFailed(Event.CallSetupFailedEvent.Reason.UNABLE_TO_REGISTER))
+                log("Unable to register so not continuing with placing a call", LogLevel.ERROR)
+                events.broadcast(OutgoingCallSetupFailed(UNABLE_TO_REGISTER))
             }
         }
     }

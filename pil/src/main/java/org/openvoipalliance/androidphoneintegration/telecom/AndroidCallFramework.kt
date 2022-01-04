@@ -57,6 +57,8 @@ internal class AndroidCallFramework(
         )
     }
 
+    fun canMakeOutgoingCall() = telecomManager.isOutgoingCallPermitted(handle)
+
     fun addNewIncomingCall(from: String) {
         telecomManager.registerPhoneAccount(phoneAccount)
 

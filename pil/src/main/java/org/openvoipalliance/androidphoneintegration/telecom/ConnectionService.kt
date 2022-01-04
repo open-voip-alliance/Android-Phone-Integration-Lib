@@ -7,7 +7,11 @@ import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.di.di
-import org.openvoipalliance.androidphoneintegration.events.Event
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailedEvent.IncomingCallSetupFailed
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailedEvent.OutgoingCallSetupFailed
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailedEvent.Reason.REJECTED_BY_ANDROID_TELECOM_FRAMEWORK
+import org.openvoipalliance.androidphoneintegration.logWithContext
+import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.voiplib.VoIPLib
 import android.telecom.ConnectionService as AndroidConnectionService
 
@@ -27,46 +31,46 @@ internal class ConnectionService : AndroidConnectionService() {
     @SuppressLint("MissingPermission")
     override fun onCreateOutgoingConnection(
         connectionManagerPhoneAccount: PhoneAccountHandle,
-        request: ConnectionRequest
-    ): Connection {
-        val connection = baseConnection.apply {
+        request: ConnectionRequest,
+    ) = baseConnection.apply {
             videoState = request.videoState
-        }.also {
-            androidCallFramework.connection = it
-        }
-
-        phoneLib.callTo(request.address.schemeSpecificPart)
-
-        connection.apply {
+            androidCallFramework.connection = this
             setCallerDisplayName(pil.calls.active?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
             setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
+        }.also {
+            phoneLib.callTo(request.address.schemeSpecificPart)
+            log("Handled onCreateOutgoingConnection")
         }
-
-        return connection
-    }
 
     override fun onCreateOutgoingConnectionFailed(
         connectionManagerPhoneAccount: PhoneAccountHandle?,
-        request: ConnectionRequest?
+        request: ConnectionRequest?,
     ) {
-        pil.events.broadcast(Event.CallSetupFailedEvent.OutgoingCallSetupFailed(Event.CallSetupFailedEvent.Reason.REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
+        pil.events.broadcast(OutgoingCallSetupFailed(REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
+        log("Unable to create outgoing connection", LogLevel.ERROR)
     }
 
     override fun onCreateIncomingConnection(
         connectionManagerPhoneAccount: PhoneAccountHandle,
-        request: ConnectionRequest
-    ): Connection {
-        return baseConnection.apply {
-            videoState = request.videoState
-            setCallerDisplayName(pil.calls.active?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
-            setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
-        }.also { androidCallFramework.connection = it }
+        request: ConnectionRequest,
+    ) = baseConnection.apply {
+        videoState = request.videoState
+        setCallerDisplayName(pil.calls.active?.remotePartyHeading,
+            TelecomManager.PRESENTATION_ALLOWED)
+        setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
+    }.also {
+        androidCallFramework.connection = it
+        log("Handled onCreateIncomingConnection")
     }
 
     override fun onCreateIncomingConnectionFailed(
         connectionManagerPhoneAccount: PhoneAccountHandle,
-        request: ConnectionRequest
+        request: ConnectionRequest,
     ) {
-        pil.events.broadcast(Event.CallSetupFailedEvent.IncomingCallSetupFailed(Event.CallSetupFailedEvent.Reason.REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
+        pil.events.broadcast(IncomingCallSetupFailed(REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
+        log("Unable to create incoming connection", LogLevel.ERROR)
     }
+
+    private fun log(message: String, level: LogLevel = LogLevel.INFO) =
+        logWithContext(message, "ANDROID-CONNECTION-SERVICE", level)
 }

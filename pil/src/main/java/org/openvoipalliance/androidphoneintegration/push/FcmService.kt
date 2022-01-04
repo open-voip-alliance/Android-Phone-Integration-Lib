@@ -47,5 +47,5 @@ internal class FcmService : FirebaseMessagingService() {
         pil.app.middleware?.tokenReceived(token)
     }
 
-    private fun log(message: String) = logWithContext("FCM-SERVICE", message)
+    private fun log(message: String) = logWithContext(message, "FCM-SERVICE")
 }
