@@ -15,8 +15,6 @@ internal class FcmService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        pil.pruneStaleAndroidCallFrameworkCalls()
-
         if (pil.app.middleware?.inspect(remoteMessage) == false) {
             log("Client has inspected push message and determined this is not a call")
             return
@@ -27,7 +25,13 @@ internal class FcmService : FirebaseMessagingService() {
         log("Received FCM push message")
 
         if (androidCallFramework.isInCall) {
-            log("The android call framework is reporting as in a call, responding as unavailable")
+            log("Currently in call, rejecting incoming call")
+            pil.app.middleware?.respond(remoteMessage, false)
+            return
+        }
+
+        if (!androidCallFramework.canHandleIncomingCall) {
+            log("The android call framework cannot handle incoming call, responding as unavailable")
             pil.app.middleware?.respond(remoteMessage, false)
             return
         }

@@ -11,39 +11,30 @@ import android.telecom.TelecomManager
 import android.telecom.VideoProfile
 import org.openvoipalliance.androidphoneintegration.BuildConfig
 
-/**
- * A class designed to make using the Android telecom manager easier
- * and less verbose.
- *
- */
 internal class AndroidCallFramework(
-    private val context: Context,
+    context: Context,
     private val telecomManager: TelecomManager
 ) {
-
     internal var connection: Connection? = null
 
-    private val handle: PhoneAccountHandle by lazy {
-        PhoneAccountHandle(
-            ComponentName(context, ConnectionService::class.java),
-            PHONE_ACCOUNT_HANDLE_ID
-        )
-    }
+    private val handle: PhoneAccountHandle = PhoneAccountHandle(
+        ComponentName(context, ConnectionService::class.java),
+        PHONE_ACCOUNT_HANDLE_ID
+    )
 
-    private val phoneAccount: PhoneAccount by lazy {
-        PhoneAccount.builder(handle, BuildConfig.LIBRARY_PACKAGE_NAME).setCapabilities(
-            PhoneAccount.CAPABILITY_SELF_MANAGED
-        ).build()
-    }
+    private val phoneAccount: PhoneAccount = PhoneAccount.builder(
+        handle,
+        BuildConfig.LIBRARY_PACKAGE_NAME,
+    )
+        .setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED)
+        .build()
 
-    val isInCall: Boolean
-        @SuppressLint("MissingPermission")
-        get() = telecomManager.isInCall
+    init {
+        telecomManager.registerPhoneAccount(phoneAccount)
+    }
 
     @SuppressLint("MissingPermission")
     fun placeCall(number: String) {
-        telecomManager.registerPhoneAccount(phoneAccount)
-
         telecomManager.placeCall(
             Uri.fromParts(PhoneAccount.SCHEME_TEL, number, null),
             Bundle().apply {
@@ -57,11 +48,17 @@ internal class AndroidCallFramework(
         )
     }
 
-    fun canMakeOutgoingCall() = telecomManager.isOutgoingCallPermitted(handle)
+    val isInCall
+        @SuppressLint("MissingPermission")
+        get() = telecomManager.isInCall
+
+    val canMakeOutgoingCall
+        get() = telecomManager.isOutgoingCallPermitted(handle)
+
+    val canHandleIncomingCall
+        get() = telecomManager.isIncomingCallPermitted(handle)
 
     fun addNewIncomingCall(from: String) {
-        telecomManager.registerPhoneAccount(phoneAccount)
-
         telecomManager.addNewIncomingCall(
             handle,
             Bundle().apply {

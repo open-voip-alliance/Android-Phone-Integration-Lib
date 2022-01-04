@@ -67,7 +67,6 @@ internal class VoIPService : CoreService(), PILEventListener {
     override fun onDestroy() {
         super.onDestroy()
         pil.writeLog("Stopping VoIPService")
-        pil.pruneStaleAndroidCallFrameworkCalls()
 
         timer?.cancel()
         wakeLock?.let {

@@ -21,26 +21,14 @@ internal class ConnectionService : AndroidConnectionService() {
     private val phoneLib: VoIPLib by di.koin.inject()
     private val androidCallFramework: AndroidCallFramework by di.koin.inject()
 
-    private val baseConnection: Connection
-        get() = di.koin.get(Connection::class).apply {
-            connectionProperties = PROPERTY_SELF_MANAGED
-            connectionCapabilities = CAPABILITY_HOLD or CAPABILITY_SUPPORT_HOLD or CAPABILITY_MUTE
-            audioModeIsVoip = true
-        }
-
     @SuppressLint("MissingPermission")
     override fun onCreateOutgoingConnection(
         connectionManagerPhoneAccount: PhoneAccountHandle,
         request: ConnectionRequest,
-    ) = baseConnection.apply {
-            videoState = request.videoState
-            androidCallFramework.connection = this
-            setCallerDisplayName(pil.calls.active?.remotePartyHeading, TelecomManager.PRESENTATION_ALLOWED)
-            setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
-        }.also {
-            phoneLib.callTo(request.address.schemeSpecificPart)
-            log("Handled onCreateOutgoingConnection")
-        }
+    ) = connectionForRequest(request).also {
+        phoneLib.callTo(request.address.schemeSpecificPart)
+        log("Handled onCreateOutgoingConnection")
+    }
 
     override fun onCreateOutgoingConnectionFailed(
         connectionManagerPhoneAccount: PhoneAccountHandle?,
@@ -53,13 +41,7 @@ internal class ConnectionService : AndroidConnectionService() {
     override fun onCreateIncomingConnection(
         connectionManagerPhoneAccount: PhoneAccountHandle,
         request: ConnectionRequest,
-    ) = baseConnection.apply {
-        videoState = request.videoState
-        setCallerDisplayName(pil.calls.active?.remotePartyHeading,
-            TelecomManager.PRESENTATION_ALLOWED)
-        setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
-    }.also {
-        androidCallFramework.connection = it
+    ) = connectionForRequest(request).also {
         log("Handled onCreateIncomingConnection")
     }
 
@@ -70,6 +52,24 @@ internal class ConnectionService : AndroidConnectionService() {
         pil.events.broadcast(IncomingCallSetupFailed(REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
         log("Unable to create incoming connection", LogLevel.ERROR)
     }
+
+    /**
+     * Create the connection object for this request, it will automatically use the connection
+     * object we already have as it is very important we always hold onto that connection
+     * object.
+     */
+    private fun connectionForRequest(request: ConnectionRequest) =
+        (androidCallFramework.connection ?: di.koin.get(Connection::class)).apply {
+            connectionProperties = PROPERTY_SELF_MANAGED
+            connectionCapabilities = CAPABILITY_HOLD or CAPABILITY_SUPPORT_HOLD or CAPABILITY_MUTE
+            audioModeIsVoip = true
+            videoState = request.videoState
+            setCallerDisplayName(pil.calls.active?.remotePartyHeading,
+                TelecomManager.PRESENTATION_ALLOWED)
+            setAddress(request.address, TelecomManager.PRESENTATION_ALLOWED)
+        }.also {
+            androidCallFramework.connection = it
+        }
 
     private fun log(message: String, level: LogLevel = LogLevel.INFO) =
         logWithContext(message, "ANDROID-CONNECTION-SERVICE", level)

@@ -120,11 +120,14 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
      *
      */
     fun call(number: String) {
-        pruneStaleAndroidCallFrameworkCalls()
-
         log("Attempting to make outgoing call")
 
-        if (!androidCallFramework.canMakeOutgoingCall()) {
+        if (androidCallFramework.isInCall) {
+            log("Currently in call and so cannot proceed with another", LogLevel.ERROR)
+            return
+        }
+
+        if (!androidCallFramework.canMakeOutgoingCall) {
             log("Android telecom framework is not permitting outgoing call", LogLevel.ERROR)
             return
         }
@@ -185,23 +188,6 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     fun stop() {
         auth = null
         voipLib.destroy()
-    }
-
-    /**
-     * When the Android Call Framework connection isn't properly cleaned up it can cause issues
-     * not allowing other calls. Prune will check if we have a call and if not will make sure
-     * the call framework is updated accordingly.
-     */
-    internal fun pruneStaleAndroidCallFrameworkCalls() {
-        if (calls.isInCall) return
-
-        androidCallFramework.connection?.apply {
-            log("Removing stale android call framework call")
-            setDisconnected(DisconnectCause(DisconnectCause.UNKNOWN))
-            destroy()
-        }
-
-        androidCallFramework.connection = null
     }
 
     private fun hasRequiredPermissions() =
