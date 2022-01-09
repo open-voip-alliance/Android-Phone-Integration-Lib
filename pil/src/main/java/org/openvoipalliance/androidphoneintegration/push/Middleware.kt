@@ -4,7 +4,7 @@ import com.google.firebase.messaging.RemoteMessage
 
 interface Middleware {
 
-    fun respond(remoteMessage: RemoteMessage, available: Boolean)
+    fun respond(remoteMessage: RemoteMessage, available: Boolean, reason: UnavailableReason? = null)
 
     fun tokenReceived(token: String)
 

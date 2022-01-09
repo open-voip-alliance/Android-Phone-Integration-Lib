@@ -3,11 +3,12 @@ package org.openvoipalliance.voiplib.repository.call.session
 import org.linphone.core.Address
 import org.linphone.core.CoreException
 import org.linphone.core.Reason
+import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.repository.LinphoneCoreInstanceManager
 import org.linphone.core.Call as LinphoneCall
 
-internal class LinphoneSipSessionRepository(private val linphoneCoreInstanceManager: LinphoneCoreInstanceManager) {
+internal class LinphoneSipSessionRepository(private val pil: PIL, private val linphoneCoreInstanceManager: LinphoneCoreInstanceManager) {
 
     fun acceptIncoming(call: Call) {
         try {
@@ -34,7 +35,9 @@ internal class LinphoneSipSessionRepository(private val linphoneCoreInstanceMana
             throw IllegalArgumentException("Phone number is not valid")
         }
 
-        val connectionParameters = ConnectionParameters(number, linphoneCoreInstanceManager.voipLibConfig.auth.domain)
+        val auth = pil.auth ?: throw IllegalArgumentException("No authentication")
+
+        val connectionParameters = ConnectionParameters(number, auth.domain)
 
         return Call(callTo(connectionParameters) ?: throw Exception("Call failed"))
     }

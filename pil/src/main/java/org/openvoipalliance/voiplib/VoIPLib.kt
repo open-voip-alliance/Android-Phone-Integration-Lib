@@ -38,12 +38,6 @@ class VoIPLib private constructor(private val context: Context) {
     val isInitialised: Boolean
         get() = sipInitialiseRepository.isInitialised()
 
-    val isRegistered: Boolean
-        get() = sipRegisterRepository.isRegistered()
-
-    val isReady: Boolean
-        get() = isInitialised && isRegistered
-
     /**
      * This registers your user on SIP. You need this before placing a call.
      *

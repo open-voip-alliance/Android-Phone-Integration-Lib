@@ -1,7 +1,12 @@
 package org.openvoipalliance.voiplib.repository.registration
 
 import org.linphone.core.*
-import org.openvoipalliance.androidphoneintegration.log
+import org.openvoipalliance.androidphoneintegration.PIL
+import org.openvoipalliance.androidphoneintegration.configuration.Auth
+import org.openvoipalliance.androidphoneintegration.logWithContext
+import org.openvoipalliance.androidphoneintegration.logging.LogLevel
+import org.openvoipalliance.androidphoneintegration.logging.LogLevel.ERROR
+import org.openvoipalliance.androidphoneintegration.logging.LogLevel.INFO
 import org.openvoipalliance.voiplib.RegistrationCallback
 import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
 import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
@@ -10,18 +15,38 @@ import org.openvoipalliance.voiplib.repository.SimpleCoreListener
 import java.util.*
 import kotlin.concurrent.schedule
 
-internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceManager: LinphoneCoreInstanceManager) {
-
-    private val config
-        get() = linphoneCoreInstanceManager.voipLibConfig
-
+internal class LinphoneSipRegisterRepository(
+    private val pil: PIL,
+    private val linphoneCoreInstanceManager: LinphoneCoreInstanceManager,
+) {
     private val registrationListener = RegistrationListener()
 
     private var callback: RegistrationCallback? = null
 
+    /**
+     * We're going to store the auth object that we used to authenticate with successfully, so we
+     * know we need to re-register if it has changed.
+     */
+    private var lastRegisteredCredentials: Auth? = null
+
     @Throws(CoreException::class)
     fun register(callback: RegistrationCallback) {
-        val core = linphoneCoreInstanceManager.safeLinphoneCore ?: return
+        val core = linphoneCoreInstanceManager.safeLinphoneCore ?: run {
+            log("Unable to register, no linphone core", ERROR)
+            callback(FAILED)
+            return
+        }
+
+        val auth = pil.auth ?: run {
+            log("Unable to register with no auth", ERROR)
+            callback(FAILED)
+            return
+        }
+
+        if (lastRegisteredCredentials != pil.auth) {
+            log("Auth appears to have changed, unregistering old.")
+            unregister()
+        }
 
         core.apply {
             removeListener(registrationListener)
@@ -31,36 +56,44 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         this.callback = callback
 
         if (core.proxyConfigList.isNotEmpty()) {
-            registerLog("Proxy config found, re-registering.")
+            log("Proxy config found, re-registering.")
             core.refreshRegisters()
             return
         }
 
-        registerLog("No proxy config found, registering for the first time.")
+        log("No proxy config found, registering for the first time.")
 
-        if (config.auth.port < 1 || config.auth.port > 65535) {
-            throw IllegalArgumentException("Unable to register with a server when port is invalid: ${config.auth.port}")
+        if (auth.port < 1 || auth.port > 65535) {
+            throw IllegalArgumentException("Unable to register with a server when port is invalid: ${auth.port}")
         }
 
-        val proxyConfig = createProxyConfig(core, config.auth.name, config.auth.domain, config.auth.port.toString())
+        val proxyConfig = createProxyConfig(core, auth.username, auth.domain, auth.port.toString())
 
         if (core.addProxyConfig(proxyConfig) == -1) {
-            callback.invoke(FAILED)
+            callback(FAILED)
             return
         }
 
         core.apply {
-            addAuthInfo(createAuthInfo())
+            addAuthInfo(createAuthInfo(auth))
             defaultProxyConfig = core.proxyConfigList.first()
         }
+
+        lastRegisteredCredentials = auth
     }
 
-    private fun createAuthInfo() = Factory.instance().createAuthInfo(config.auth.name, config.auth.name, config.auth.password,
-        null, null, "${config.auth.domain}:${config.auth.port}").apply {
-        algorithm = null
-    }
+    private fun createAuthInfo(auth: Auth) =
+        Factory.instance().createAuthInfo(auth.username, auth.username, auth.password,
+            null, null, "${auth.domain}:${auth.port}").apply {
+            algorithm = null
+        }
 
-    private fun createProxyConfig(core: Core, name: String, domain: String, port: String): ProxyConfig {
+    private fun createProxyConfig(
+        core: Core,
+        name: String,
+        domain: String,
+        port: String
+    ): ProxyConfig {
         val identify = "sip:$name@$domain:$port"
         val proxy = "sip:$domain:$port"
         val identifyAddress = Factory.instance().createAddress(identify)
@@ -92,9 +125,9 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         core.authInfoList.forEach {
             core.removeAuthInfo(it)
         }
-    }
 
-    fun isRegistered() = linphoneCoreInstanceManager.state.isRegistered
+        core.defaultProxyConfig = null
+    }
 
     private inner class RegistrationListener : SimpleCoreListener {
 
@@ -121,10 +154,10 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
             state: RegistrationState?,
             message: String,
         ) {
-            registerLog("State change: ${state?.name} - $message")
+            log("State change: ${state?.name} - $message")
 
             val callback = this@LinphoneSipRegisterRepository.callback ?: run {
-                registerLog("Callback set so registration state change has not done anything.")
+                log("Callback set so registration state change has not done anything.")
                 reset()
                 return
             }
@@ -132,7 +165,7 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
             // If the registration was successful, just immediately invoke the callback and reset
             // all timers.
             if (state == RegistrationState.Ok) {
-                registerLog("Successful, resetting timers.")
+                log("Successful, resetting timers.")
                 callback.invoke(REGISTERED)
                 reset()
                 return
@@ -142,13 +175,13 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
             val startTime = this.startTime ?: run {
                 val startTime = currentTime
                 this.startTime = startTime
-                registerLog("Started registration timer: $startTime.")
+                log("Started registration timer: $startTime.")
                 startTime
             }
 
             if (hasExceededTimeout(startTime)) {
                 unregister()
-                registerLog("Registration timeout has been exceeded, registration failed.")
+                log("Registration timeout has been exceeded, registration failed.", ERROR)
                 callback.invoke(FAILED)
                 reset()
                 return
@@ -181,6 +214,9 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         }
     }
 
+    private fun log(message: String, level: LogLevel = INFO) =
+        logWithContext(message, "SIP-REGISTER", level)
+
     companion object {
         /**
          * The amount of time to wait before determining registration has failed.
@@ -193,5 +229,3 @@ internal class LinphoneSipRegisterRepository(private val linphoneCoreInstanceMan
         const val cleanUpDelay = 1000L
     }
 }
-
-private fun registerLog(message: String) = log("SIP-REGISTER: $message")

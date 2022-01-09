@@ -2,7 +2,6 @@ package org.openvoipalliance.androidphoneintegration
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.telecom.DisconnectCause
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
@@ -13,7 +12,7 @@ import org.openvoipalliance.androidphoneintegration.configuration.Preferences
 import org.openvoipalliance.androidphoneintegration.debug.VersionInfo
 import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailedEvent.OutgoingCallSetupFailed
-import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailedEvent.Reason.UNABLE_TO_REGISTER
+import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailedEvent.Reason.*
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.exception.NoAuthenticationCredentialsException
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
@@ -52,35 +51,9 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
             logManager.logVersion()
         }
 
-    /**
-     * The user preferences for the PIL, when this value is updated it will trigger
-     * a full PIL restart and re-register.
-     *
-     */
     var preferences: Preferences = Preferences.DEFAULT
-        set(preferences) {
-            val previousValue = preferences
-            field = preferences
 
-            if (isPreparedToStart && previousValue != preferences) {
-                start(forceInitialize = true, forceReregister = true)
-            }
-        }
-
-    /**
-     * The authentication details for the PIL, when this value is updated it will
-     * trigger a full re-register.
-     *
-     */
     var auth: Auth? = null
-        set(auth) {
-            val previousValue = auth
-            field = if (auth?.isValid == true) auth else null
-
-            if (isPreparedToStart && previousValue != auth) {
-                start(forceInitialize = false, forceReregister = true)
-            }
-        }
 
     init {
         instance = this
@@ -88,47 +61,21 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     }
 
     /**
-     * Attempt to boot and register to see if user credentials are correct. This can be used
-     * to check the user's credentials after they have supplied them.
-     *
-     */
-    suspend fun performRegistrationCheck(): Boolean = suspendCoroutine { continuation ->
-        try {
-            if (auth?.isValid == false) {
-                continuation.resume(false)
-                return@suspendCoroutine
-            }
-
-            phoneLibHelper.initialise()
-            voipLib.register { registrationState ->
-                when (registrationState) {
-                    REGISTERED, FAILED -> {
-                        continuation.resume(registrationState == REGISTERED)
-                    }
-                    else -> {
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            continuation.resume(false)
-        }
-    }
-
-    /**
      * Place a call to the given number, this will also boot the voip library
      * if it is not already booted.
-     *
      */
     fun call(number: String) {
         log("Attempting to make outgoing call")
 
         if (androidCallFramework.isInCall) {
             log("Currently in call and so cannot proceed with another", LogLevel.ERROR)
+            events.broadcast(OutgoingCallSetupFailed(IN_CALL))
             return
         }
 
         if (!androidCallFramework.canMakeOutgoingCall) {
             log("Android telecom framework is not permitting outgoing call", LogLevel.ERROR)
+            events.broadcast(OutgoingCallSetupFailed(REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
             return
         }
 
@@ -145,8 +92,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
 
     /**
      * Start the PIL, unless the force options are provided, the method will not restart or re-register.
-     *
      */
+    @Deprecated("Force parameters no longer used, use new start() method instead.")
     fun start(
         forceInitialize: Boolean = false,
         forceReregister: Boolean = false,
@@ -161,15 +108,13 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
             return
         }
 
-        val auth = auth ?: throw NoAuthenticationCredentialsException()
-
-        if (!auth.isValid) throw NoAuthenticationCredentialsException()
+        if (auth.isNullOrInvalid) throw NoAuthenticationCredentialsException()
 
         pushToken.request()
 
         phoneLibHelper.apply {
-            initialise(forceInitialize)
-            register(auth, forceReregister) { success ->
+            initialise()
+            register { success ->
                 writeLog("The VoIP library has been initialized and the user has been registered!")
                 callback?.invoke(success)
             }
@@ -177,6 +122,13 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
 
         versionInfo = VersionInfo.build(app.application, voipLib)
     }
+
+    fun start(callback: ((Boolean) -> Unit)? = null) =
+        start(
+            forceInitialize = false,
+            forceReregister = false,
+            callback = callback,
+        )
 
     /**
      * Stop the PIL, this will remove all authentication credentials from memory and destroy the
@@ -207,6 +159,33 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     internal val isStarted: Boolean
         get() = isPreparedToStart
 
+    /**
+     * Attempt to boot and register to see if user credentials are correct. This can be used
+     * to check the user's credentials after they have supplied them.
+     *
+     */
+    suspend fun performRegistrationCheck(): Boolean = suspendCoroutine { continuation ->
+        try {
+            if (auth?.isValid == false) {
+                continuation.resume(false)
+                return@suspendCoroutine
+            }
+
+            phoneLibHelper.initialise()
+            voipLib.register { registrationState ->
+                when (registrationState) {
+                    REGISTERED, FAILED -> {
+                        continuation.resume(registrationState == REGISTERED)
+                    }
+                    else -> {
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            continuation.resume(false)
+        }
+    }
+
     companion object {
         lateinit var instance: PIL
 
@@ -236,3 +215,10 @@ internal fun log(message: String, level: LogLevel = LogLevel.INFO) {
  */
 internal fun logWithContext(message: String, context: String, level: LogLevel = LogLevel.INFO) =
     log("$context: $message", level)
+
+val Auth?.isNullOrInvalid: Boolean
+    get() = if (this == null) {
+        true
+    } else {
+        !this.isValid
+    }
