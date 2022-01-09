@@ -75,7 +75,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
 
         if (!androidCallFramework.canMakeOutgoingCall) {
             log("Android telecom framework is not permitting outgoing call", LogLevel.ERROR)
-            events.broadcast(OutgoingCallSetupFailed(IN_CALL))
+            events.broadcast(OutgoingCallSetupFailed(REJECTED_BY_ANDROID_TELECOM_FRAMEWORK))
             return
         }
 
@@ -217,4 +217,8 @@ internal fun logWithContext(message: String, context: String, level: LogLevel = 
     log("$context: $message", level)
 
 val Auth?.isNullOrInvalid: Boolean
-    get() = this?.isValid == true
+    get() = if (this == null) {
+        true
+    } else {
+        !this.isValid
+    }
