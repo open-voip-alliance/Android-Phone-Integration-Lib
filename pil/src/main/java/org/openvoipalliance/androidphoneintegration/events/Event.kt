@@ -31,6 +31,7 @@ sealed class Event {
         class IncomingCallSetupFailed(reason: Reason): CallSetupFailedEvent(reason)
 
         enum class Reason {
+            IN_CALL,
             REJECTED_BY_ANDROID_TELECOM_FRAMEWORK,
             UNABLE_TO_REGISTER
         }

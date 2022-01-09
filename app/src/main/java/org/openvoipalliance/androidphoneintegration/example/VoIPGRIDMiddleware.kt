@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import org.openvoipalliance.androidphoneintegration.push.Middleware
+import org.openvoipalliance.androidphoneintegration.push.UnavailableReason
 import java.io.IOException
 
 class VoIPGRIDMiddleware(private val context: Context) : Middleware {
@@ -52,8 +53,11 @@ class VoIPGRIDMiddleware(private val context: Context) : Middleware {
         .url(url)
         .addHeader("Authorization", "Token ${prefs.getString("voipgrid_username", "")}:${prefs.getString("voipgrid_api_token", "")}")
 
-    override fun respond(remoteMessage: RemoteMessage, available: Boolean) {
-
+    override fun respond(
+        remoteMessage: RemoteMessage,
+        available: Boolean,
+        reason: UnavailableReason?,
+    ) {
         val data = FormBody.Builder().apply {
             add("unique_key", remoteMessage.data["unique_key"]!!)
             add("available", if (available) "true" else "false")

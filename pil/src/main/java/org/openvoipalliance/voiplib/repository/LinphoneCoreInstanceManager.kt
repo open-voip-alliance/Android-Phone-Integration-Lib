@@ -85,7 +85,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
             it.start()
             applyPostStartConfiguration(it)
             configureCodecs(it)
-            applyAdvancedVoipSettings(it)
             log("Started Linphone with config:\n ${it.config.dump()}")
         }
 
@@ -135,19 +134,10 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
     private fun applyPostStartConfiguration(core: Core) = core.apply {
         useInfoForDtmf = true
         useRfc2833ForDtmf = true
-    }
-
-    private fun applyAdvancedVoipSettings(core: Core) {
-        log("Applying ${voipLibConfig.advancedVoIPSettings}")
-
-        core.apply {
-            enableEchoCancellation(voipLibConfig.advancedVoIPSettings.echoCancellation)
-            enableAdaptiveRateControl(voipLibConfig.advancedVoIPSettings.adaptiveRateControl)
-            mtu = voipLibConfig.advancedVoIPSettings.mtu
-            adaptiveRateAlgorithm = voipLibConfig.advancedVoIPSettings.adaptiveRateAlgorithm.name.toLowerCase(Locale.ROOT)
-            enableRtpBundle(voipLibConfig.advancedVoIPSettings.mediaMultiplexing)
-            enableAudioAdaptiveJittcomp(voipLibConfig.advancedVoIPSettings.jitterCompensation)
-        }
+        enableEchoCancellation(true)
+        enableAdaptiveRateControl(true)
+        enableRtpBundle(false)
+        enableAudioAdaptiveJittcomp(true)
     }
 
     /**
@@ -199,8 +189,8 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
      * Creates the Linphone core by reading in the linphone raw configuration file.
      *
      */
-    private fun createLinphoneCore(context: Context)
-    = Factory.instance().createCore("", "", context)
+    private fun createLinphoneCore(context: Context) =
+        Factory.instance().createCore("", "", context)
 
     internal fun log(message: String, level: LogLevel = LogLevel.DEBUG) {
         voipLibConfig.logListener?.onLogMessageWritten(message = message, lev = level)
@@ -292,7 +282,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
     @Synchronized
     fun destroy() {
         state.destroyed = true
-        state.isRegistered = false
         Factory.instance().loggingService.removeListener(this@LinphoneCoreInstanceManager)
         linphoneCore?.isNetworkReachable = false
         linphoneCore?.stop()
@@ -308,7 +297,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
 
     inner class CoreState {
         var destroyed: Boolean = false
-        var isRegistered: Boolean = false
         val initialised: Boolean get() = linphoneCore != null && !destroyed
     }
 }

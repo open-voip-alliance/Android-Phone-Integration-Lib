@@ -83,8 +83,8 @@ val pilModule = module {
     single { Dns(get()) }
     single { LinphoneCoreInstanceManager(get(), get()) }
     single { LinphoneSipInitialiseRepository(get(), get()) }
-    single { LinphoneSipRegisterRepository(get()) }
+    single { LinphoneSipRegisterRepository(get(), get()) }
 
     single { LinphoneSipActiveCallControlsRepository(get()) }
-    single { LinphoneSipSessionRepository(get()) }
+    single { LinphoneSipSessionRepository(get(), get()) }
 }

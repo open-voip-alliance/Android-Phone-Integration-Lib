@@ -2,11 +2,13 @@ package org.openvoipalliance.androidphoneintegration.helpers
 
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.call.VoipLibEventTranslator
-import org.openvoipalliance.androidphoneintegration.log
+import org.openvoipalliance.androidphoneintegration.isNullOrInvalid
+import org.openvoipalliance.androidphoneintegration.logWithContext
+import org.openvoipalliance.androidphoneintegration.logging.LogLevel.ERROR
 import org.openvoipalliance.voiplib.VoIPLib
-import org.openvoipalliance.voiplib.config.Auth
 import org.openvoipalliance.voiplib.config.Config
-import org.openvoipalliance.voiplib.model.RegistrationState
+import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
+import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
 import org.openvoipalliance.voiplib.repository.initialise.LogLevel
 import org.openvoipalliance.voiplib.repository.initialise.LogListener
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel as PilLogLevel
@@ -17,31 +19,15 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
      * Boots the VoIP library.
      *
      */
-    fun initialise(forceInitialize: Boolean = false) {
-        if (phoneLib.isInitialised && !forceInitialize) {
+    fun initialise() {
+        if (phoneLib.isInitialised) {
             phoneLib.wake()
             log("The VoIP library is already initialized, skipping init.")
             return
         }
 
-        val auth = pil.auth ?: run {
-            log("There are no authentication credentials, not registering.")
-            return
-        }
-
-        if (phoneLib.isInitialised && forceInitialize) {
-            log("The pil is initialized and we are forcing, so we must destroy it first.")
-            phoneLib.destroy()
-        }
-
         phoneLib.initialise(
             Config(
-                auth = Auth(
-                    auth.username,
-                    auth.password,
-                    auth.domain,
-                    auth.port
-                ),
                 callListener = voipLibEventTranslator,
                 logListener = voipLibraryLogListener,
                 codecs = pil.preferences.codecs,
@@ -55,33 +41,32 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
      *
      *
      */
-    fun register(
-        auth: org.openvoipalliance.androidphoneintegration.configuration.Auth,
-        forceReRegistration: Boolean = false,
-        callback: (Boolean) -> Unit
-    ) {
-        if (phoneLib.isRegistered && !forceReRegistration) {
-            pil.writeLog("We are already registered!")
-            callback.invoke(true)
+    fun register(callback: (Boolean) -> Unit) {
+        if (pil.auth.isNullOrInvalid) {
+            log("Unable to register as we have no authentication credentials", ERROR)
+            callback.invoke(false)
             return
         }
 
         pil.writeLog("Attempting registration...")
 
-        phoneLib.register {
-            if (it == RegistrationState.REGISTERED) {
-                pil.writeLog("Registration was successful!")
-                callback.invoke(true)
-                return@register
-            }
-
-            if (it == RegistrationState.FAILED) {
-                pil.writeLog("Unable to register...")
-                callback.invoke(false)
-                return@register
+        phoneLib.register { registrationState ->
+            when (registrationState) {
+                REGISTERED -> {
+                    log("Registration was successful!")
+                    callback.invoke(true)
+                }
+                FAILED -> {
+                    log("Unable to register...")
+                    callback.invoke(false)
+                }
+                else -> {}
             }
         }
     }
+
+    private fun log(message: String, level: PilLogLevel = PilLogLevel.INFO) =
+        logWithContext(message, "PHONE-LIB-HELPER", level)
 
     private val voipLibraryLogListener = object : LogListener {
         override fun onLogMessageWritten(lev: LogLevel, message: String) {
@@ -92,8 +77,8 @@ internal class VoIPLibHelper(private val pil: PIL, private val phoneLib: VoIPLib
                     LogLevel.TRACE -> PilLogLevel.DEBUG
                     LogLevel.MESSAGE -> PilLogLevel.INFO
                     LogLevel.WARNING -> PilLogLevel.WARNING
-                    LogLevel.ERROR -> PilLogLevel.ERROR
-                    LogLevel.FATAL -> PilLogLevel.ERROR
+                    LogLevel.ERROR -> ERROR
+                    LogLevel.FATAL -> ERROR
                 }
             )
         }
