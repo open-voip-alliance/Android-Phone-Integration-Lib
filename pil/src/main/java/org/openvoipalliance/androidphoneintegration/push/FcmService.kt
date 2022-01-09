@@ -5,6 +5,7 @@ import com.google.firebase.messaging.RemoteMessage
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.androidphoneintegration.logWithContext
+import org.openvoipalliance.androidphoneintegration.push.UnavailableReason.*
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 
 internal class FcmService : FirebaseMessagingService() {
@@ -15,29 +16,34 @@ internal class FcmService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        if (pil.app.middleware?.inspect(remoteMessage) == false) {
+        if (!PIL.isInitialized) return
+
+        val middleware = pil.app.middleware ?: return
+
+        if (!middleware.inspect(remoteMessage)) {
             log("Client has inspected push message and determined this is not a call")
             return
         }
-
-        if (!PIL.isInitialized) return
 
         log("Received FCM push message")
 
         if (androidCallFramework.isInCall) {
             log("Currently in call, rejecting incoming call")
-            pil.app.middleware?.respond(remoteMessage, false)
+            middleware.respond(remoteMessage, false, IN_CALL)
             return
         }
 
         if (!androidCallFramework.canHandleIncomingCall) {
             log("The android call framework cannot handle incoming call, responding as unavailable")
-            pil.app.middleware?.respond(remoteMessage, false)
+            middleware.respond(remoteMessage, false, REJECTED_BY_ANDROID_TELECOM_FRAMEWORK)
             return
         }
 
         pil.start { success ->
-            pil.app.middleware?.respond(remoteMessage, success)
+            when (success) {
+                true -> middleware.respond(remoteMessage, true)
+                false -> middleware.respond(remoteMessage, false, UNABLE_TO_REGISTER)
+            }
         }
     }
 
@@ -52,4 +58,10 @@ internal class FcmService : FirebaseMessagingService() {
     }
 
     private fun log(message: String) = logWithContext(message, "FCM-SERVICE")
+}
+
+enum class UnavailableReason {
+    IN_CALL,
+    REJECTED_BY_ANDROID_TELECOM_FRAMEWORK,
+    UNABLE_TO_REGISTER,
 }
