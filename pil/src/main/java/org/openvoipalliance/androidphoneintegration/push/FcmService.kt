@@ -20,7 +20,7 @@ internal class FcmService : FirebaseMessagingService() {
         if (!PIL.isInitialized) return
 
         if (pil.auth.isNullOrInvalid) {
-            log("Ignoring notification as there is no auth, will wait for the next one.")
+            log("Ignoring notification as there is no auth.")
             return
         }
 
