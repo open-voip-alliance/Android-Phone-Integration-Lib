@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.di.di
+import org.openvoipalliance.androidphoneintegration.isNullOrInvalid
 import org.openvoipalliance.androidphoneintegration.logWithContext
 import org.openvoipalliance.androidphoneintegration.push.UnavailableReason.*
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
@@ -17,6 +18,11 @@ internal class FcmService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
 
         if (!PIL.isInitialized) return
+
+        if (pil.auth.isNullOrInvalid) {
+            log("Ignoring notification as there is no auth.")
+            return
+        }
 
         val middleware = pil.app.middleware ?: return
 
