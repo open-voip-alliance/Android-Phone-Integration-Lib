@@ -92,6 +92,7 @@ internal class IncomingCallNotification: Notification() {
             setCategory(android.app.Notification.CATEGORY_CALL)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setContentText(context.getString(R.string.notification_incoming_context_text))
+            setSound(ringtone)
             priority = NotificationCompat.PRIORITY_HIGH
             addAction(
                 R.drawable.ic_service,

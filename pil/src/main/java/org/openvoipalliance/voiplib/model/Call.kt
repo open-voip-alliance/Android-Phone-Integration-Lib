@@ -2,7 +2,6 @@ package org.openvoipalliance.voiplib.model
 
 import org.linphone.core.Call.Dir.Incoming
 import org.linphone.core.Call.Dir.Outgoing
-import org.linphone.core.Reason
 import org.openvoipalliance.voiplib.repository.PreservedInviteData
 import org.linphone.core.Call as LinphoneCall
 
@@ -48,10 +47,12 @@ class Call(val linphoneCall: LinphoneCall) {
     val callId: String
         get() = linphoneCall.callLog.callId
 
-    val direction = when (linphoneCall.callLog.dir) {
-        Outgoing -> Direction.OUTGOING
-        Incoming -> Direction.INCOMING
-    }
+    val direction
+        get() = when (linphoneCall.callLog.dir) {
+            Outgoing -> Direction.OUTGOING
+            Incoming -> Direction.INCOMING
+            null -> Direction.INCOMING
+        }
 
     val remotePartyId: String
         get() {
