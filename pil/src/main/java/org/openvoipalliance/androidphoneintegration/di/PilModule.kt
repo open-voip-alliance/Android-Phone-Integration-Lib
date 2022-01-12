@@ -33,6 +33,7 @@ val pilModule = module {
     single {
         AndroidCallFramework(
             androidContext(),
+            get(),
             androidContext().getSystemService(TelecomManager::class.java)
         )
     }

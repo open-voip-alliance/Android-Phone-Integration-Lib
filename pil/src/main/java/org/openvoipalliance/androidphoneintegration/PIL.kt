@@ -108,6 +108,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
             return
         }
 
+        androidCallFramework.prune()
+
         if (auth.isNullOrInvalid) throw NoAuthenticationCredentialsException()
 
         pushToken.request()

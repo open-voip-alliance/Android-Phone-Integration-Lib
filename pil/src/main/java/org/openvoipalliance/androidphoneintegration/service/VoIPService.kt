@@ -84,7 +84,6 @@ internal class VoIPService : CoreService(), PILEventListener {
         super.onTaskRemoved(rootIntent)
         pil.writeLog("Task has been killed, ending calls and stopping pil.")
         pil.calls.forEach { _ -> pil.actions.end() }
-        pil.stop()
     }
 
     override fun onEvent(event: Event) {
