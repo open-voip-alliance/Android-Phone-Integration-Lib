@@ -5,14 +5,13 @@ import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.telecom.PhoneAccount
-import android.telecom.PhoneAccountHandle
-import android.telecom.TelecomManager
-import android.telecom.VideoProfile
+import android.telecom.*
 import org.openvoipalliance.androidphoneintegration.BuildConfig
+import org.openvoipalliance.androidphoneintegration.call.Calls
 
 internal class AndroidCallFramework(
     context: Context,
+    private val calls: Calls,
     private val telecomManager: TelecomManager
 ) {
     internal var connection: Connection? = null
@@ -69,6 +68,22 @@ internal class AndroidCallFramework(
                 putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle)
             }
         )
+    }
+
+    /**
+     * When the Android Call Framework connection isn't properly cleaned up it can cause issues
+     * not allowing other calls. Prune will check if we have a call and if not will make sure
+     * the call framework is updated accordingly.
+     */
+    internal fun prune() {
+        if (calls.isInCall) return
+
+        connection?.apply {
+            setDisconnected(DisconnectCause(DisconnectCause.UNKNOWN))
+            destroy()
+        }
+
+        connection = null
     }
 
     companion object {
