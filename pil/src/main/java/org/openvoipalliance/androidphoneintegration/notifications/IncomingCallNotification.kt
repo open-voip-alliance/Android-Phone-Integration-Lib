@@ -5,9 +5,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
-import android.media.RingtoneManager
-import android.net.Uri
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import androidx.annotation.ColorRes
@@ -18,20 +15,9 @@ import org.openvoipalliance.androidphoneintegration.call.Call
 import org.openvoipalliance.androidphoneintegration.logWithContext
 import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver
 
-internal class IncomingCallNotification: Notification() {
+internal class IncomingCallNotification(private val incomingCallRinger: IncomingCallRinger): Notification() {
 
-    override val channelId: String
-        get() = when(pil.preferences.useApplicationProvidedRingtone) {
-            true -> INCOMING_CALLS_APP_RING_CHANNEL_ID
-            false -> INCOMING_CALLS_CHANNEL_ID
-        }
-
-    private val ringtone: Uri
-        get() = when (pil.preferences.useApplicationProvidedRingtone) {
-            true -> Uri.parse("android.resource://${context.packageName}/raw/ringtone")
-            false -> RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-        }
-
+    override val channelId = INCOMING_CALLS_CHANNEL_ID
     override val notificationId = NOTIFICATION_ID
 
     override fun createNotificationChannel() {
@@ -40,13 +26,7 @@ internal class IncomingCallNotification: Notification() {
             context.getString(R.string.notification_incoming_calls_channel_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            setSound(
-                ringtone,
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-            )
+            setSound(null, null)
             setShowBadge(false)
         }
 
@@ -59,6 +39,7 @@ internal class IncomingCallNotification: Notification() {
      */
     fun silence(call: Call) {
         notify(call, setOnlyAlertOnce = true)
+        incomingCallRinger.stop()
         log("Silenced $channelId")
     }
 
@@ -67,7 +48,7 @@ internal class IncomingCallNotification: Notification() {
      *
      */
     fun notify(call: Call, setOnlyAlertOnce: Boolean = false) {
-        log("Starting using CHANNEL: $channelId and RINGTONE: $ringtone")
+        log("Starting using CHANNEL: $channelId")
         createNotificationChannel()
 
         val fullScreenIntent = Intent(context, pil.app.activities.incomingCall).apply {
@@ -92,7 +73,6 @@ internal class IncomingCallNotification: Notification() {
             setCategory(android.app.Notification.CATEGORY_CALL)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setContentText(context.getString(R.string.notification_incoming_context_text))
-            setSound(ringtone)
             priority = NotificationCompat.PRIORITY_HIGH
             addAction(
                 R.drawable.ic_service,
@@ -109,18 +89,19 @@ internal class IncomingCallNotification: Notification() {
         }
 
         notificationManger.notify(notificationId, notification)
+        incomingCallRinger.start()
     }
 
     override fun cancel() {
         super.cancel()
+        incomingCallRinger.stop()
         context.sendBroadcast(Intent(CANCEL_INCOMING_CALL_ACTION))
     }
 
     private fun log(message: String) = logWithContext(message, "INCOMING-CALL-NOTIFICATION")
 
     companion object {
-        private const val INCOMING_CALLS_CHANNEL_ID = "VoIP Incoming Calls"
-        private const val INCOMING_CALLS_APP_RING_CHANNEL_ID = "VoIP Incoming Calls (App Ring)"
+        private const val INCOMING_CALLS_CHANNEL_ID = "Incoming Calls"
         private const val CANCEL_INCOMING_CALL_ACTION = "org.openvoipalliance.androidphoneintegration.INCOMING_CALL_CANCEL"
         private const val NOTIFICATION_ID = 676
     }

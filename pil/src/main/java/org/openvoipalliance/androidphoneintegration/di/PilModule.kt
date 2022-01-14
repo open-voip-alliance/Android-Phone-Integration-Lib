@@ -16,6 +16,7 @@ import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
 import org.openvoipalliance.androidphoneintegration.logging.LogManager
 import org.openvoipalliance.androidphoneintegration.notifications.CallNotification
 import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
+import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallRinger
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidphoneintegration.telecom.Connection
 import org.openvoipalliance.voiplib.VoIPLib
@@ -64,7 +65,9 @@ val pilModule = module {
 
     single { androidContext().getSystemService(android.media.AudioManager::class.java) }
 
-    single { IncomingCallNotification() }
+    single { IncomingCallNotification(get()) }
+
+    single { IncomingCallRinger(androidContext(), get(), get()) }
 
     single { CallNotification() }
 
