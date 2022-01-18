@@ -190,7 +190,10 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
      *
      */
     private fun createLinphoneCore(context: Context) =
-        Factory.instance().createCore("", "", context)
+        Factory.instance().createCoreWithConfig(
+            Factory.instance().createConfigFromString(linphoneConfig),
+            context,
+        )
 
     internal fun log(message: String, level: LogLevel = LogLevel.DEBUG) {
         voipLibConfig.logListener?.onLogMessageWritten(message = message, lev = level)
@@ -293,6 +296,15 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         const val TAG = "VOIPLIB-LINPHONE"
         var globalState: GlobalState = Off
         const val PUBLISH_DIRECTORY_NAME = "apl-resources"
+
+        /**
+         * The initial Linphone config, this should only be used for properties that cannot be
+         * set in Kotlin.
+         */
+        private val linphoneConfig = """
+            [audio]
+            android_pause_calls_when_audio_focus_lost=0
+        """.trimIndent()
     }
 
     inner class CoreState {
