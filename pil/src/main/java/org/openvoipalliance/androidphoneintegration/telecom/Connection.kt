@@ -2,11 +2,13 @@ package org.openvoipalliance.androidphoneintegration.telecom
 
 import android.annotation.SuppressLint
 import android.telecom.CallAudioState
+import android.telecom.DisconnectCause
 import org.linphone.core.Reason
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.call.Calls
 import org.openvoipalliance.androidphoneintegration.call.VoipLibCall
 import org.openvoipalliance.androidphoneintegration.events.Event
+import org.openvoipalliance.androidphoneintegration.logWithContext
 import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
 import org.openvoipalliance.voiplib.VoIPLib
 import android.telecom.Connection as AndroidConnection
@@ -93,6 +95,8 @@ class Connection internal constructor(
         if (state != STATE_RINGING) {
             incomingCallNotification.cancel()
         }
+
+        destroyIfNoCallsExist()
     }
 
     /**
@@ -101,6 +105,7 @@ class Connection internal constructor(
      */
     private fun callExists(callback: (voipLibCall: VoipLibCall) -> Unit) {
         callback.invoke(calls.activeVoipLibCall ?: return)
+            .also { destroyIfNoCallsExist() }
     }
 
     override fun onCallAudioStateChanged(state: CallAudioState) {
@@ -111,8 +116,21 @@ class Connection internal constructor(
                 CallAudioState.ROUTE_BLUETOOTH -> phoneLib.actions(it).routeAudioToBluetooth(it)
                 CallAudioState.ROUTE_WIRED_HEADSET -> phoneLib.actions(it).routeAudioToHeadset(it)
             }
+
+            pil.events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
         }
 
-        pil.events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
+        destroyIfNoCallsExist()
     }
+
+    private fun destroyIfNoCallsExist() {
+        if (calls.isInCall) return
+
+        setDisconnected(DisconnectCause(DisconnectCause.UNKNOWN))
+        destroy()
+
+        log("Destroying no active call")
+    }
+
+    private fun log(message: String) = logWithContext(message, "TELECOM-CONNECTION")
 }
