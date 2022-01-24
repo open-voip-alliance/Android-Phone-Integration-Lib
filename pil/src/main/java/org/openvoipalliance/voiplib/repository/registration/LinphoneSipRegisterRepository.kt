@@ -205,7 +205,6 @@ internal class LinphoneSipRegisterRepository(
             (startTime + registrationTimeoutMs) < currentTime
 
         private fun reset() {
-            this@LinphoneSipRegisterRepository.callback = null
             startTime = null
             timer?.apply {
                 cancel()
