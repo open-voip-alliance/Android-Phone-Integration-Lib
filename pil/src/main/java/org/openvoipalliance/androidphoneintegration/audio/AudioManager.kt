@@ -111,7 +111,6 @@ class AudioManager internal constructor(
     }
 
     private fun createAudioStateObject(): AudioState {
-
         val default = AudioState(
             AudioRoute.PHONE,
             arrayOf(),

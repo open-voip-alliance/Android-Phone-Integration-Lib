@@ -113,7 +113,7 @@ class VoIPLib private constructor(private val context: Context) {
      * Perform actions on the given call.
      *
      */
-    fun actions(call: Call) = Actions(context, call)
+    fun actions(call: Call) = Actions(call)
 
     /**
      * Return the current version of the underlying voip library.
