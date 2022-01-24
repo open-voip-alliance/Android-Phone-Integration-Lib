@@ -205,7 +205,6 @@ internal class LinphoneSipRegisterRepository(
             (startTime + registrationTimeoutMs) < currentTime
 
         private fun reset() {
-            this@LinphoneSipRegisterRepository.callback = null
             startTime = null
             timer?.apply {
                 cancel()
@@ -221,7 +220,7 @@ internal class LinphoneSipRegisterRepository(
         /**
          * The amount of time to wait before determining registration has failed.
          */
-        const val registrationTimeoutMs = 5000L
+        const val registrationTimeoutMs = 2000L
 
         /**
          * The time that we will wait before executing the method again to clean-up.
