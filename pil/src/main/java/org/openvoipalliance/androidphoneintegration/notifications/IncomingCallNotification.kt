@@ -69,7 +69,7 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
             setFullScreenIntent(fullScreenPendingIntent, true)
             setOnlyAlertOnce(setOnlyAlertOnce)
             setSmallIcon(R.drawable.ic_service)
-            setContentTitle(call.remotePartyHeading)
+            setContentTitle(call.prettyRemoteParty)
             setCategory(android.app.Notification.CATEGORY_CALL)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setContentText(context.getString(R.string.notification_incoming_context_text))
