@@ -42,4 +42,10 @@ data class Call(
         get() {
             return DateUtils.formatElapsedTime(duration.toLong())
         }
+
+    val prettyRemoteParty: String
+        get() = when {
+            remotePartySubheading.isBlank() -> remotePartyHeading
+            else -> "$remotePartyHeading ($remotePartySubheading)"
+        }
 }
