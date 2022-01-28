@@ -19,7 +19,6 @@ internal fun initPilKoin(context: Context) {
 
 @KoinApiExtension
 internal interface PilKoinComponent : KoinComponent {
-    @KoinApiExtension
     override fun getKoin(): Koin {
         return di.koin
     }
