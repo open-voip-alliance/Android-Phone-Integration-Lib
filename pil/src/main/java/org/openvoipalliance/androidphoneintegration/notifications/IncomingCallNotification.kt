@@ -5,6 +5,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import androidx.annotation.ColorRes
@@ -69,6 +74,11 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
             setFullScreenIntent(fullScreenPendingIntent, true)
             setOnlyAlertOnce(setOnlyAlertOnce)
             setSmallIcon(R.drawable.ic_service)
+            call.contact?.imageUri?.let {
+                context.imageUriToBitmap(it)?.let { bitmap ->
+                    setLargeIcon(bitmap)
+                }
+            }
             setContentTitle(call.prettyRemoteParty)
             setCategory(android.app.Notification.CATEGORY_CALL)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -113,3 +123,14 @@ private fun Context.createColoredActionText(@StringRes stringRes: Int, @ColorRes
             ForegroundColorSpan(getColor(colorRes)), 0, length, 0
         )
     }
+
+private fun Context.imageUriToBitmap(imageUri: Uri): Bitmap? = try {
+    if (Build.VERSION.SDK_INT < 28) {
+        MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+    } else {
+        val source: ImageDecoder.Source = ImageDecoder.createSource(contentResolver, imageUri)
+        ImageDecoder.decodeBitmap(source)
+    }
+} catch (e: Exception) {
+    null
+}

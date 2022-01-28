@@ -21,13 +21,12 @@ android {
 dependencies {
     api("com.google.firebase:firebase-messaging-ktx:21.0.1")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.32")
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
+    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("com.takwolf.android:foreback:0.1.1")
-    implementation("com.tomash:androidcontacts:1.14.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
-    implementation("io.insert-koin:koin-android:2.2.0")
+    implementation("com.github.vestrel00:contacts-android:0.1.10")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
     implementation("io.insert-koin:koin-android:2.2.2")
     implementation("com.google.code.gson:gson:2.8.9")
 
@@ -36,7 +35,7 @@ dependencies {
     androidTestImplementation("org.mockito:mockito-android:+")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
-    embed("org.linphone.minimal:linphone-sdk-android:5.0.57")
+    embed("org.linphone.minimal:linphone-sdk-android:5.0.66")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {

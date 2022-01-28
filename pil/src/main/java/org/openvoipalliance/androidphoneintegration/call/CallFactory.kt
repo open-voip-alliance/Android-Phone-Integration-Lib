@@ -1,8 +1,6 @@
 package org.openvoipalliance.androidphoneintegration.call
 
-import org.openvoipalliance.androidphoneintegration.contacts.Contact
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
-import org.openvoipalliance.androidphoneintegration.helpers.identifier
 import org.openvoipalliance.voiplib.model.CallState
 import org.openvoipalliance.voiplib.model.CallState.*
 import org.openvoipalliance.voiplib.model.Direction
@@ -13,8 +11,6 @@ import java.util.regex.Pattern
 typealias VoipLibCall = org.openvoipalliance.voiplib.model.Call
 
 internal class CallFactory(private val contacts: Contacts) {
-
-    private val cachedContacts = mutableMapOf<String, Contact?>()
 
     fun make(voipLibCall: VoipLibCall?): Call? {
         val call = voipLibCall ?: return null
@@ -29,20 +25,10 @@ internal class CallFactory(private val contacts: Contacts) {
             call.isOnHold,
             UUID.randomUUID().toString(),
             call.quality.average,
-            findContact(voipLibCall),
+            contacts.find(voipLibCall),
             voipLibCall.callId,
             voipLibCall.reason,
         )
-    }
-
-    private fun findContact(voipLibCall: VoipLibCall): Contact? {
-        if (cachedContacts.contains(voipLibCall.identifier)) {
-            return cachedContacts[voipLibCall.identifier]
-        }
-
-        return contacts.find(voipLibCall.phoneNumber).also {
-            cachedContacts[voipLibCall.identifier] = it
-        }
     }
 
     private fun findAppropriateRemotePartyInformation(call: VoipLibCall): RemotePartyInformation {
