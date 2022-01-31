@@ -55,6 +55,9 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
             putExtra("is_incoming", true)
             putExtra("remote_party_heading", call.remotePartyHeading)
             putExtra("remote_party_subheading", call.remotePartySubheading)
+            call.contact?.imageUri?.let {
+                putExtra("remote_party_image_uri", it.toString())
+            }
             flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION or Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
