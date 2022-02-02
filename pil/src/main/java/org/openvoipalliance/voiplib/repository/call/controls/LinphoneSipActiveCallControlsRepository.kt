@@ -73,12 +73,16 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
 
         val currentCall = call ?: (core.currentCall ?: core.calls[0])
 
+        logAudioDevices()
+
         findAudioDeviceForRoute(types, Capabilities.CapabilityPlay)?.let {
             currentCall.outputAudioDevice = it
         }
 
-        findAudioDeviceForRoute(types, Capabilities.CapabilityRecord)?.let {
-            currentCall.inputAudioDevice = it
+        if (types.shouldAdjustAudioInput) {
+            findAudioDeviceForRoute(types, Capabilities.CapabilityRecord)?.let {
+                currentCall.inputAudioDevice = it
+            }
         }
     }
 
@@ -88,7 +92,7 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
     ): AudioDevice? {
         for (audioDevice in core.audioDevices) {
             if (types.contains(audioDevice.type) && audioDevice.hasCapability(capability)) {
-                log("Found [${audioDevice.type}] ${capability.displayName} audio device [${audioDevice.deviceName}], routing audio to it")
+                log("Routing to [${audioDevice.deviceName}] for [${capability.displayName}]")
                 return audioDevice
             }
         }
@@ -96,6 +100,10 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
         log("Couldn't find [${types.displayName}] ${capability.displayName} audio device")
 
         return null
+    }
+
+    private fun logAudioDevices() = core.audioDevices.forEach {
+        log("Audio Device: ${it.debugString}")
     }
 
     private fun log(message: String, level: LogLevel = LogLevel.INFO) =
@@ -178,9 +186,19 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
 private val List<AudioDevice.Type>.displayName
     get() = joinToString(separator = ", ") { it.name }
 
+private val List<AudioDevice.Type>.shouldAdjustAudioInput
+    get() = first() in listOf(
+        AudioDevice.Type.Headset,
+        AudioDevice.Type.Headphones,
+        AudioDevice.Type.Bluetooth,
+    )
+
 private val Capabilities.displayName
     get() = when (this) {
         Capabilities.CapabilityRecord -> "recorder"
         Capabilities.CapabilityPlay -> "playback"
         Capabilities.CapabilityAll -> "all"
     }
+
+private val AudioDevice.debugString
+    get() = "id=${id} name=${deviceName} type=${type} capability=${capabilities}"
