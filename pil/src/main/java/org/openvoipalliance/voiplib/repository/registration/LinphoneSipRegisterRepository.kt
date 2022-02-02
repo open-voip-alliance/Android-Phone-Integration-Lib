@@ -70,6 +70,7 @@ internal class LinphoneSipRegisterRepository(
         val proxyConfig = createProxyConfig(core, auth.username, auth.domain, auth.port.toString())
 
         if (core.addProxyConfig(proxyConfig) == -1) {
+            this.callback = null
             callback(FAILED)
             return
         }
@@ -157,7 +158,7 @@ internal class LinphoneSipRegisterRepository(
             log("State change: ${state?.name} - $message")
 
             val callback = this@LinphoneSipRegisterRepository.callback ?: run {
-                log("Callback set so registration state change has not done anything.")
+                log("Callback not set so registration state change has not done anything.")
                 reset()
                 return
             }
@@ -166,6 +167,7 @@ internal class LinphoneSipRegisterRepository(
             // all timers.
             if (state == RegistrationState.Ok) {
                 log("Successful, resetting timers.")
+                this@LinphoneSipRegisterRepository.callback = null
                 callback.invoke(REGISTERED)
                 reset()
                 return
@@ -180,6 +182,7 @@ internal class LinphoneSipRegisterRepository(
             }
 
             if (hasExceededTimeout(startTime)) {
+                this@LinphoneSipRegisterRepository.callback = null
                 unregister()
                 log("Registration timeout has been exceeded, registration failed.", ERROR)
                 callback.invoke(FAILED)
