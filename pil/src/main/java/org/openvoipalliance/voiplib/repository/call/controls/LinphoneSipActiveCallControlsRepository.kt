@@ -187,11 +187,11 @@ private val List<AudioDevice.Type>.displayName
     get() = joinToString(separator = ", ") { it.name }
 
 private val List<AudioDevice.Type>.shouldAdjustAudioInput
-    get() = arrayListOf(
+    get() = first() in listOf(
         AudioDevice.Type.Headset,
         AudioDevice.Type.Headphones,
         AudioDevice.Type.Bluetooth,
-    ).contains(first())
+    )
 
 private val Capabilities.displayName
     get() = when (this) {
