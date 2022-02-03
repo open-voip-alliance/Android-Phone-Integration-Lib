@@ -212,27 +212,40 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         log("Enabled codecs: " + core.audioPayloadTypes.filter { it.enabled() }.joinToString(", ") { it.mimeType })
     }
 
+    private var previousState = LinphoneCall.State.Idle
+
     override fun onCallStateChanged(lc: Core, linphoneCall: LinphoneCall, state: LinphoneCall.State, message: String) {
-        GlobalScope.launch(Dispatchers.Main) {
-            log("callState: $state, Message: $message, Duration = ${linphoneCall.duration}")
+        log("callState: $state, Message: $message, Duration = ${linphoneCall.duration}")
 
-            preserveInviteData(linphoneCall)
+        preserveInviteData(linphoneCall)
 
-            val call = Call(linphoneCall)
+        val call = Call(linphoneCall)
 
-            when (state) {
-                LinphoneCall.State.IncomingReceived -> voipLibConfig.callListener.incomingCallReceived(call)
-                LinphoneCall.State.OutgoingInit -> voipLibConfig.callListener.outgoingCallCreated(call)
-                LinphoneCall.State.Connected -> {
-                    safeLinphoneCore?.activateAudioSession(true)
-                    voipLibConfig.callListener.callConnected(call)
+        when (state) {
+            LinphoneCall.State.IncomingReceived -> voipLibConfig.callListener.incomingCallReceived(call)
+            LinphoneCall.State.OutgoingInit -> voipLibConfig.callListener.outgoingCallCreated(call)
+            LinphoneCall.State.StreamsRunning -> {
+                if (previousState == LinphoneCall.State.Connected) {
+                    voipLibConfig.callListener.streamsStarted()
                 }
-                LinphoneCall.State.End, LinphoneCall.State.Error -> voipLibConfig.callListener.callEnded(call)
-                LinphoneCall.State.Released -> voipLibConfig.callListener.callReleased(call)
-                else -> voipLibConfig.callListener.callUpdated(call)
             }
+            LinphoneCall.State.Connected -> {
+                safeLinphoneCore?.activateAudioSession(true)
+                voipLibConfig.callListener.callConnected(call)
+            }
+            LinphoneCall.State.End, LinphoneCall.State.Error -> voipLibConfig.callListener.callEnded(call)
+            LinphoneCall.State.Released -> voipLibConfig.callListener.callReleased(call)
+            else -> voipLibConfig.callListener.callUpdated(call)
         }
+
+        previousState = state
     }
+
+    override fun onAudioDeviceChanged(core: Core, audioDevice: AudioDevice) =
+        voipLibConfig.callListener.currentAudioDeviceHasChanged(audioDevice)
+
+    override fun onAudioDevicesListUpdated(core: Core) =
+        voipLibConfig.callListener.availableAudioDevicesUpdated()
 
     override fun onTransferStateChanged(lc: Core, transfered: org.linphone.core.Call, newCallState: org.linphone.core.Call.State) {
         voipLibConfig.callListener.attendedTransferMerged(Call(transfered))

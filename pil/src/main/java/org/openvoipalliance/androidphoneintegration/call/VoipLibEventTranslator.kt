@@ -1,5 +1,6 @@
 package org.openvoipalliance.androidphoneintegration.call
 
+import org.linphone.core.AudioDevice
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.*
 import org.openvoipalliance.androidphoneintegration.events.Event.CallSessionEvent.AttendedTransferEvent.*
@@ -87,6 +88,20 @@ internal class VoipLibEventTranslator(
     override fun callReleased(call: Call) {
         pil.platformIntegrator.notifyIfMissedCall(call)
         pil.androidCallFramework.prune()
+    }
+
+    override fun streamsStarted() {
+        log("Streams have started, properly routing audio.")
+        pil.androidCallFramework.connection?.updateCurrentRouteBasedOnAudioState()
+    }
+
+    override fun availableAudioDevicesUpdated() {
+        log("Available audio devices have been updated, sync with current selection.")
+        pil.androidCallFramework.connection?.updateCurrentRouteBasedOnAudioState()
+    }
+
+    override fun currentAudioDeviceHasChanged(audioDevice: AudioDevice) {
+        log("Audio device has been changed to [${audioDevice.deviceName}]")
     }
 
     override fun callUpdated(call: Call) = events.broadcast(CallStateUpdated::class)

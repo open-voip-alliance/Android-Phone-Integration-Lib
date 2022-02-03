@@ -109,8 +109,19 @@ class Connection internal constructor(
     }
 
     override fun onCallAudioStateChanged(state: CallAudioState) {
+        updateCurrentRouteBasedOnAudioState(state)
+        destroyIfNoCallsExist()
+    }
+
+    internal fun updateCurrentRouteBasedOnAudioState(state: CallAudioState? = null) =
         calls.activeVoipLibCall?.let {
-            when (state.route) {
+            val callAudioState = state ?: callAudioState
+
+            log("Updating route based on CallAudioState: [${callAudioState.route.asRouteString}]")
+
+            phoneLib.microphoneMuted = callAudioState.isMuted
+
+            when (callAudioState.route) {
                 CallAudioState.ROUTE_EARPIECE -> phoneLib.actions(it).routeAudioToEarpiece(it)
                 CallAudioState.ROUTE_SPEAKER -> phoneLib.actions(it).routeAudioToSpeaker(it)
                 CallAudioState.ROUTE_BLUETOOTH -> phoneLib.actions(it).routeAudioToBluetooth(it)
@@ -119,9 +130,6 @@ class Connection internal constructor(
 
             pil.events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
         }
-
-        destroyIfNoCallsExist()
-    }
 
     private fun destroyIfNoCallsExist() {
         if (calls.isInCall) return
@@ -134,3 +142,13 @@ class Connection internal constructor(
 
     private fun log(message: String) = logWithContext(message, "TELECOM-CONNECTION")
 }
+
+private val Int.asRouteString
+    get() = when(this) {
+        1 -> "ROUTE_EARPIECE"
+        2 -> "ROUTE_BLUETOOTH"
+        8 -> "ROUTE_SPEAKER"
+        4 -> "ROUTE_WIRED_HEADSET"
+        5 -> "ROUTE_WIRED_OR_EARPIECE"
+        else -> "ROUTE_UNKNOWN"
+    }

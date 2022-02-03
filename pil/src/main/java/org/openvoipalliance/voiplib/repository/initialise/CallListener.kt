@@ -1,5 +1,6 @@
 package org.openvoipalliance.voiplib.repository.initialise
 
+import org.linphone.core.AudioDevice
 import org.openvoipalliance.voiplib.model.Call
 
 interface CallListener {
@@ -48,4 +49,13 @@ interface CallListener {
      *
      */
     fun attendedTransferMerged(call: Call) {}
+
+    /**
+     * The first time the streams are started for a call.
+     */
+    fun streamsStarted() {}
+
+    fun availableAudioDevicesUpdated() {}
+
+    fun currentAudioDeviceHasChanged(audioDevice: AudioDevice) {}
 }

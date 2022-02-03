@@ -53,7 +53,9 @@ class Dialer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = 
         }
 
         callButton.setOnClickListener {
-            onCallListener?.onCall(digits)
+            if (digits.isNotBlank()) {
+                onCallListener?.onCall(digits)
+            }
         }
     }
 

@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration.example.ui.home
 
 import android.Manifest
 import android.content.pm.PackageManager.PERMISSION_DENIED
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -65,7 +66,9 @@ class DialerFragment : Fragment(), PILEventListener {
 
         dialer.onCallListener = Dialer.OnCallListener { number ->
             requestCallingPermissions()
-            pil.call(number)
+            if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PERMISSION_GRANTED) {
+                pil.call(number)
+            }
         }
     }
 }
