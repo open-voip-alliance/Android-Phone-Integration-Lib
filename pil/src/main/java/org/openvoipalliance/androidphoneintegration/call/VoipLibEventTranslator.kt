@@ -89,5 +89,10 @@ internal class VoipLibEventTranslator(
         pil.androidCallFramework.prune()
     }
 
+    override fun streamsStarted() {
+        log("Streams have started, properly routing audio.")
+        pil.androidCallFramework.connection?.updateCurrentRouteBasedOnAudioState()
+    }
+
     override fun callUpdated(call: Call) = events.broadcast(CallStateUpdated::class)
 }

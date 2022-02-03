@@ -48,4 +48,9 @@ interface CallListener {
      *
      */
     fun attendedTransferMerged(call: Call) {}
+
+    /**
+     * The first time the streams are started for a call.
+     */
+    fun streamsStarted() {}
 }
