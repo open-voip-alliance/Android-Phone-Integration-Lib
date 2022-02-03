@@ -241,6 +241,12 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         previousState = state
     }
 
+    override fun onAudioDeviceChanged(core: Core, audioDevice: AudioDevice) =
+        voipLibConfig.callListener.currentAudioDeviceHasChanged(audioDevice)
+
+    override fun onAudioDevicesListUpdated(core: Core) =
+        voipLibConfig.callListener.availableAudioDevicesUpdated()
+
     override fun onTransferStateChanged(lc: Core, transfered: org.linphone.core.Call, newCallState: org.linphone.core.Call.State) {
         voipLibConfig.callListener.attendedTransferMerged(Call(transfered))
     }
