@@ -45,7 +45,11 @@ class Call(val linphoneCall: LinphoneCall) {
         get() = linphoneCall.reason.name
 
     val callId: String
-        get() = linphoneCall.callLog.callId
+        get() = try {
+            linphoneCall.callLog.callId
+        } catch (e: NullPointerException) {
+            "unknown"
+        }
 
     val direction
         get() = when (linphoneCall.callLog.dir) {
