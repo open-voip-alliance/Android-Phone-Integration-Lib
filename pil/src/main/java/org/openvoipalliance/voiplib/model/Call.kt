@@ -29,7 +29,7 @@ class Call(val linphoneCall: LinphoneCall) {
      *
      */
     val wasMissed: Boolean
-        get() {
+        get() = try {
             val log = linphoneCall.callLog
 
             val missedStatuses = arrayOf(
@@ -38,7 +38,9 @@ class Call(val linphoneCall: LinphoneCall) {
                 LinphoneCall.Status.EarlyAborted,
             )
 
-            return log.dir == Incoming && missedStatuses.contains(log.status)
+            log.dir == Incoming && missedStatuses.contains(log.status)
+        } catch (e: NullPointerException) {
+            false
         }
 
     val reason
