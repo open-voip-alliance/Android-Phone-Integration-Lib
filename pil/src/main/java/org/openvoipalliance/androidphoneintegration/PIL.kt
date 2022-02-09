@@ -16,6 +16,7 @@ import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailed
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.exception.NoAuthenticationCredentialsException
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
+import org.openvoipalliance.androidphoneintegration.helpers.isInForeground
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.androidphoneintegration.logging.LogManager
 import org.openvoipalliance.androidphoneintegration.notifications.NotificationManager
@@ -82,7 +83,12 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         start { success ->
             if (success) {
                 log("Started and registered, placing call via Android Call Framework")
-                androidCallFramework.placeCall(number)
+
+                // Temporary fix to ensure calls don't happen while the app is in the background.
+                when(app.application.isInForeground) {
+                    true -> androidCallFramework.placeCall(number)
+                    false -> log("Not starting call as not in foreground", LogLevel.ERROR)
+                }
             } else {
                 log("Unable to register so not continuing with placing a call", LogLevel.ERROR)
                 events.broadcast(OutgoingCallSetupFailed(UNABLE_TO_REGISTER))
