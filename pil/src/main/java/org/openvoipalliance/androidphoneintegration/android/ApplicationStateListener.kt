@@ -18,7 +18,11 @@ internal class ApplicationStateListener(private val pil: PIL) : Foreback.Listene
             pil.app.application.startCallActivity()
         }
 
-        pil.start()
+        try {
+            pil.start()
+        } catch (e: Exception) {
+            pil.writeLog("Unable to start PIL when entering foreground: ${e.localizedMessage}")
+        }
     }
 
     override fun onApplicationEnterBackground(activity: Activity?) {
