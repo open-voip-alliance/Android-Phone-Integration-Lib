@@ -1,5 +1,6 @@
 package org.openvoipalliance.androidphoneintegration.helpers
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import com.takwolf.android.foreback.Foreback
@@ -20,3 +21,6 @@ fun Context.startCallActivity() {
         }
     )
 }
+
+val Application.isInForeground
+    get() = Foreback.isApplicationInTheForeground()
