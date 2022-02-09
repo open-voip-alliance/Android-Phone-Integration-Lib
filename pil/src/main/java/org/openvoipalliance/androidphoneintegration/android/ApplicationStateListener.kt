@@ -18,25 +18,10 @@ internal class ApplicationStateListener(private val pil: PIL) : Foreback.Listene
             pil.app.application.startCallActivity()
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(SECONDS_TO_DELAY_START)
-            try {
-                pil.start()
-            } catch (e: Exception) {
-                pil.writeLog("Unable to start PIL when entering foreground: ${e.localizedMessage}")
-            }
-        }
+        pil.start()
     }
 
     override fun onApplicationEnterBackground(activity: Activity?) {
         pil.writeLog("Application has entered the background")
-    }
-
-    companion object {
-        /**
-         * Delay the starting by a few seconds to prevent clashes with registering
-         * after push notification.
-         */
-        const val SECONDS_TO_DELAY_START = 3000L
     }
 }
