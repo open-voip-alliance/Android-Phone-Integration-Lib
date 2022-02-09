@@ -80,20 +80,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
             return
         }
 
-        start { success ->
-            if (success) {
-                log("Started and registered, placing call via Android Call Framework")
-
-                // Temporary fix to ensure calls don't happen while the app is in the background.
-                when(app.application.isInForeground) {
-                    true -> androidCallFramework.placeCall(number)
-                    false -> log("Not starting call as not in foreground", LogLevel.ERROR)
-                }
-            } else {
-                log("Unable to register so not continuing with placing a call", LogLevel.ERROR)
-                events.broadcast(OutgoingCallSetupFailed(UNABLE_TO_REGISTER))
-            }
-        }
+        androidCallFramework.placeCall(number)
     }
 
     /**
