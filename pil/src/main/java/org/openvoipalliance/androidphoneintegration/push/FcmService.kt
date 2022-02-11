@@ -73,8 +73,6 @@ internal class FcmService : FirebaseMessagingService() {
 
     /**
      * Wait for connectivity by continuously checking if the network is reachable in a loop.
-     *
-     * @param callback
      */
     private fun awaitConnectivity(
         remoteMessage: RemoteMessage,
