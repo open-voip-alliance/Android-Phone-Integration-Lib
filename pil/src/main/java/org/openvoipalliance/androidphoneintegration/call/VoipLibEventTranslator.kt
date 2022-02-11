@@ -8,7 +8,7 @@ import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.helpers.identifier
 import org.openvoipalliance.androidphoneintegration.log
 import org.openvoipalliance.voiplib.model.Call
-import org.openvoipalliance.voiplib.repository.initialise.CallListener
+import org.openvoipalliance.voiplib.repository.initialize.CallListener
 
 /**
  * Responsible for taking regular VoipLib events and translating them into a PIL Event.

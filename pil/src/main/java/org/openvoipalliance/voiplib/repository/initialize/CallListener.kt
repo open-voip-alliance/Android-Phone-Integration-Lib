@@ -1,4 +1,4 @@
-package org.openvoipalliance.voiplib.repository.initialise
+package org.openvoipalliance.voiplib.repository.initialize
 
 import org.linphone.core.AudioDevice
 import org.openvoipalliance.voiplib.model.Call
