@@ -17,7 +17,7 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
         get() = linphoneCoreInstanceManager.safeLinphoneCore!!
 
     fun setMicrophone(on: Boolean) {
-        linphoneCoreInstanceManager.safeLinphoneCore?.enableMic(on)
+        linphoneCoreInstanceManager.safeLinphoneCore?.isMicEnabled = on
     }
 
     fun setHold(call: Call, on: Boolean) {
@@ -31,7 +31,7 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
     fun isMicrophoneMuted(): Boolean {
         val core = linphoneCoreInstanceManager.safeLinphoneCore ?: return false
 
-        return !core.micEnabled()
+        return !core.isMicEnabled
     }
 
     fun transferUnattended(call: Call, to: String) {
@@ -133,10 +133,10 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
         ),
         "advanced-settings" to mapOf(
             "mtu" to call.core.mtu,
-            "echoCancellationEnabled" to call.core.echoCancellationEnabled(),
-            "adaptiveRateControlEnabled" to call.core.adaptiveRateControlEnabled(),
-            "audioAdaptiveJittcompEnabled" to call.core.audioAdaptiveJittcompEnabled(),
-            "rtpBundleEnabled" to call.core.rtpBundleEnabled(),
+            "echoCancellationEnabled" to call.core.isEchoCancellationEnabled,
+            "adaptiveRateControlEnabled" to call.core.isAdaptiveRateControlEnabled,
+            "audioAdaptiveJittcompEnabled" to call.core.isAudioAdaptiveJittcompEnabled,
+            "rtpBundleEnabled" to call.core.isRtpBundleEnabled,
             "adaptiveRateAlgorithm" to call.core.adaptiveRateAlgorithm,
         ),
         "to-address" to mapOf(
@@ -164,10 +164,10 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
             "duration" to call.duration
         ),
         "network" to mapOf(
-            "stunEnabled" to call.core.natPolicy?.stunEnabled(),
+            "stunEnabled" to call.core.natPolicy?.isStunEnabled,
             "stunServer" to call.core.natPolicy?.stunServer,
-            "upnpEnabled" to call.core.natPolicy?.upnpEnabled(),
-            "ipv6Enabled" to call.core.ipv6Enabled(),
+            "upnpEnabled" to call.core.natPolicy?.isUpnpEnabled,
+            "ipv6Enabled" to call.core.isIpv6Enabled,
         ),
         "error" to mapOf(
             "phrase" to call.errorInfo.phrase,

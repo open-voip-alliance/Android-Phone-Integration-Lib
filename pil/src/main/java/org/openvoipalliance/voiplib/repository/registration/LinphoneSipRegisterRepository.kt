@@ -55,21 +55,21 @@ internal class LinphoneSipRegisterRepository(
 
         this.callback = callback
 
-        if (core.proxyConfigList.isNotEmpty()) {
-            log("Proxy config found, re-registering.")
+        if (core.accountList.isNotEmpty()) {
+            log("SIP account not found, re-registering.")
             core.refreshRegisters()
             return
         }
 
-        log("No proxy config found, registering for the first time.")
+        log("No SIP account found, registering for the first time.")
 
         if (auth.port < 1 || auth.port > 65535) {
             throw IllegalArgumentException("Unable to register with a server when port is invalid: ${auth.port}")
         }
 
-        val proxyConfig = createProxyConfig(core, auth.username, auth.domain, auth.port.toString())
+        val account = createAccount(core, auth.username, auth.domain, auth.port.toString())
 
-        if (core.addProxyConfig(proxyConfig) == -1) {
+        if (core.addAccount(account) == -1) {
             this.callback = null
             callback(FAILED)
             return
@@ -77,7 +77,7 @@ internal class LinphoneSipRegisterRepository(
 
         core.apply {
             addAuthInfo(createAuthInfo(auth))
-            defaultProxyConfig = core.proxyConfigList.first()
+            defaultAccount = account
         }
 
         lastRegisteredCredentials = auth
@@ -89,45 +89,29 @@ internal class LinphoneSipRegisterRepository(
             algorithm = null
         }
 
-    private fun createProxyConfig(
+    private fun createAccount(
         core: Core,
         name: String,
         domain: String,
-        port: String
-    ): ProxyConfig {
-        val identify = "sip:$name@$domain:$port"
-        val proxy = "sip:$domain:$port"
-        val identifyAddress = Factory.instance().createAddress(identify)
-
-        return core.createProxyConfig().apply {
-            enableRegister(true)
-            enableQualityReporting(false)
-            qualityReportingCollector = null
-            qualityReportingInterval = 0
-            identityAddress = identifyAddress
-            isPushNotificationAllowed = false
-            avpfMode = AVPFMode.Default
-            serverAddr = proxy
-            natPolicy = null
-            done()
+        port: String,
+    ): Account = core.createAccount(
+        core.createAccountParams().apply {
+            identityAddress = core.interpretUrl("sip:$name@$domain:$port")
+            isRegisterEnabled = true
+            serverAddress = core.interpretUrl("sip:$domain:$port")
         }
-    }
+    )
 
     fun unregister() {
         val core = linphoneCoreInstanceManager.safeLinphoneCore ?: return
 
-        core.proxyConfigList.forEach {
-            it.edit()
-            it.enableRegister(false)
-            it.done()
-            core.removeProxyConfig(it)
-        }
+        core.clearAccounts()
 
         core.authInfoList.forEach {
             core.removeAuthInfo(it)
         }
 
-        core.defaultProxyConfig = null
+        core.defaultAccount = null
     }
 
     private inner class RegistrationListener : SimpleCoreListener {

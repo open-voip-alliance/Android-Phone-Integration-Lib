@@ -97,7 +97,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         automaticNetworkStateMonitoring = true
         registerOnlyWhenNetworkIsUp = true
         keepAlivePeriod = 30000
-        enableKeepAlive(true)
+        isKeepAliveEnabled = true
         isPushNotificationEnabled = false
         transports = transports.apply {
             udpPort = Port.DISABLED.value
@@ -106,19 +106,13 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         }
         mediaEncryption = MediaEncryption.SRTP
         isMediaEncryptionMandatory = true
-        enableIpv6(false)
-        enableDnsSrv(true)
-        enableDnsSearch(false)
-        setDnsServers(dns.getServers().also {
-            log("Using DNS: ${it.joinToString(", ")}", LogLevel.MESSAGE)
-        })
         setUserAgent(voipLibConfig.userAgent, null)
         maxCalls = 2
         ring = null
         ringback = publishedFile("ringback.wav").absolutePath
         isNativeRingingEnabled = false
-        enableVideoDisplay(false)
-        enableVideoCapture(false)
+        isVideoCaptureEnabled = false
+        isVideoDisplayEnabled = false
         isAutoIterateEnabled = true
         uploadBandwidth = Bandwidth.INFINITE.value
         downloadBandwidth = Bandwidth.INFINITE.value
@@ -130,8 +124,8 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         avpfMode = AVPFMode.Disabled
         stunServer = voipLibConfig.stun
         natPolicy = natPolicy?.apply {
-            enableStun(voipLibConfig.stun?.isNotEmpty() == true)
-            enableUpnp(false)
+            isStunEnabled = voipLibConfig.stun?.isNotEmpty() == true
+            isUpnpEnabled = false
         }
         audioJittcomp = 100
     }
@@ -139,10 +133,10 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
     private fun applyPostStartConfiguration(core: Core) = core.apply {
         useInfoForDtmf = true
         useRfc2833ForDtmf = true
-        enableEchoCancellation(true)
-        enableAdaptiveRateControl(true)
-        enableRtpBundle(false)
-        enableAudioAdaptiveJittcomp(true)
+        isEchoCancellationEnabled = true
+        isAdaptiveRateControlEnabled = true
+        isRtpBundleEnabled = false
+        isAudioAdaptiveJittcompEnabled = true
     }
 
     /**
