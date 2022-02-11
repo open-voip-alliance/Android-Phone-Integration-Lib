@@ -13,7 +13,7 @@ import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.voiplib.config.Config
 import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.model.Codec
-import org.openvoipalliance.voiplib.repository.initialise.LogLevel
+import org.openvoipalliance.voiplib.repository.initialize.LogLevel
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -35,7 +35,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
 
     val safeLinphoneCore: Core?
         get() {
-            return if (state.initialised) {
+            return if (state.initialized) {
                 linphoneCore
             } else {
                 Log.e(TAG, "Trying to get linphone core while not possible", Exception())
@@ -45,7 +45,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
 
     /**
      * Certain files need to be available to Linphone via the file system, rather than through a
-     * native resource. Each time we initialise Linphone we will copy the resource to the file
+     * native resource. Each time we initialize Linphone we will copy the resource to the file
      * location listed.
      */
     private val filesToPublish = mapOf(
@@ -56,7 +56,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         Factory.instance().setDebugMode(false, LINPHONE_DEBUG_TAG)
     }
 
-    fun initialiseLinphone(config: Config) {
+    fun initializeLinphone(config: Config) {
         this.voipLibConfig = config
 
         if (linphoneCore != null) {
@@ -93,9 +93,11 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
 
     private fun applyPreStartConfiguration(core:Core) = core.apply {
         addListener(this@LinphoneCoreInstanceManager)
-        core.config.apply {
-            setBool("audio", "android_pause_calls_when_audio_focus_lost", false)
-        }
+        pauseCallsWhenAudioFocusLost = false
+        automaticNetworkStateMonitoring = true
+        registerOnlyWhenNetworkIsUp = true
+        keepAlivePeriod = 30000
+        enableKeepAlive(true)
         isPushNotificationEnabled = false
         transports = transports.apply {
             udpPort = Port.DISABLED.value
@@ -313,7 +315,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
 
     inner class CoreState {
         var destroyed: Boolean = false
-        val initialised: Boolean get() = linphoneCore != null && !destroyed
+        val initialized: Boolean get() = linphoneCore != null && !destroyed
     }
 }
 

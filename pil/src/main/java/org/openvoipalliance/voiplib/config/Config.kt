@@ -2,8 +2,8 @@ package org.openvoipalliance.voiplib.config
 
 import org.openvoipalliance.voiplib.model.Codec
 import org.openvoipalliance.voiplib.model.Codec.*
-import org.openvoipalliance.voiplib.repository.initialise.CallListener
-import org.openvoipalliance.voiplib.repository.initialise.LogListener
+import org.openvoipalliance.voiplib.repository.initialize.CallListener
+import org.openvoipalliance.voiplib.repository.initialize.LogListener
 
 typealias GlobalStateCallback = () -> Unit
 

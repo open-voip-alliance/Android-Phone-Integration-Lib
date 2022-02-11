@@ -43,7 +43,7 @@ internal class LinphoneSipRegisterRepository(
             return
         }
 
-        if (lastRegisteredCredentials != pil.auth) {
+        if (lastRegisteredCredentials != pil.auth && lastRegisteredCredentials != null) {
             log("Auth appears to have changed, unregistering old.")
             unregister()
         }

@@ -16,26 +16,27 @@ import org.openvoipalliance.androidphoneintegration.events.Event.CallSetupFailed
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.exception.NoAuthenticationCredentialsException
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
-import org.openvoipalliance.androidphoneintegration.helpers.isInForeground
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel
 import org.openvoipalliance.androidphoneintegration.logging.LogManager
 import org.openvoipalliance.androidphoneintegration.notifications.NotificationManager
 import org.openvoipalliance.androidphoneintegration.push.TokenFetcher
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
+import org.openvoipalliance.voiplib.config.Config
 import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
 import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class PIL internal constructor(internal val app: ApplicationSetup) {
-    private val voipLib: VoIPLib by di.koin.inject()
-    private val phoneLibHelper: VoIPLibHelper by di.koin.inject()
+    internal val voipLib: VoIPLib by di.koin.inject()
+    internal val phoneLibHelper: VoIPLibHelper by di.koin.inject()
 
     internal val androidCallFramework: AndroidCallFramework by di.koin.inject()
     internal val platformIntegrator: PlatformIntegrator by di.koin.inject()
     internal val logManager: LogManager by di.koin.inject()
     internal val notifications: NotificationManager by di.koin.inject()
+    internal val voipLibEventTranslator: VoipLibEventTranslator by di.koin.inject()
 
     val actions: CallActions by di.koin.inject()
     val audio: AudioManager by di.koin.inject()
@@ -59,6 +60,15 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     init {
         instance = this
         events.listen(platformIntegrator)
+
+        voipLib.initialize(
+            Config(
+                callListener = voipLibEventTranslator,
+                logListener = logManager,
+                codecs = preferences.codecs,
+                userAgent = app.userAgent
+            )
+        )
     }
 
     /**
@@ -108,7 +118,6 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         pushToken.request()
 
         phoneLibHelper.apply {
-            initialise()
             register { success ->
                 writeLog("The VoIP library has been initialized and the user has been registered!")
                 callback?.invoke(success)
@@ -134,7 +143,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
      */
     fun stop() {
         auth = null
-        voipLib.destroy()
+        voipLib.unregister()
     }
 
     private fun hasRequiredPermissions() =
@@ -146,7 +155,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     }
 
     private val isPreparedToStart: Boolean
-        get() = auth != null && voipLib.isInitialised
+        get() = auth != null && voipLib.isInitialized
 
     /**
      * Currently this just defers to [isPreparedToStart] as they have the same conditions but this may change in the future.
@@ -166,7 +175,6 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
                 return@suspendCoroutine
             }
 
-            phoneLibHelper.initialise()
             voipLib.register { registrationState ->
                 when (registrationState) {
                     REGISTERED, FAILED -> {

@@ -27,7 +27,7 @@ internal class LinphoneSipSessionRepository(private val pil: PIL, private val li
     }
 
     fun callTo(number: String): Call {
-        if (!linphoneCoreInstanceManager.state.initialised) {
+        if (!linphoneCoreInstanceManager.state.initialized) {
             throw Exception("Linphone is not ready")
         }
 

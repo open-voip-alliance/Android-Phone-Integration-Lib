@@ -13,9 +13,9 @@ data class VersionInfo(
     }
 
     companion object {
-        fun build(context: Context, voipLib: VoIPLib) = VersionInfo(
+        internal fun build(context: Context, voipLib: VoIPLib) = VersionInfo(
             context.getString(R.string.pil_build_info_tag),
-            if (voipLib.isInitialised) voipLib.version() else "Not initialized"
+            if (voipLib.isInitialized) voipLib.version else "Not initialized"
         )
     }
 }

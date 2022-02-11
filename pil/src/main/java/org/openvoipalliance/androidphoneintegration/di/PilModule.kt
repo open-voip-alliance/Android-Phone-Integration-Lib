@@ -24,7 +24,6 @@ import org.openvoipalliance.voiplib.repository.Dns
 import org.openvoipalliance.voiplib.repository.LinphoneCoreInstanceManager
 import org.openvoipalliance.voiplib.repository.call.controls.LinphoneSipActiveCallControlsRepository
 import org.openvoipalliance.voiplib.repository.call.session.LinphoneSipSessionRepository
-import org.openvoipalliance.voiplib.repository.initialise.LinphoneSipInitialiseRepository
 import org.openvoipalliance.voiplib.repository.registration.LinphoneSipRegisterRepository
 
 fun getModules() = listOf(pilModule)
@@ -47,7 +46,7 @@ val pilModule = module {
 
     single { PIL.instance }
 
-    single { VoIPLib.getInstance(androidContext()) }
+    single { VoIPLib() }
 
     single { CallActions(get(), get(), get(), get()) }
 
@@ -55,7 +54,7 @@ val pilModule = module {
 
     single { EventsManager(get()) }
 
-    single { VoIPLibHelper(get(), get(), get()) }
+    single { VoIPLibHelper(get(), get()) }
 
     factory { Connection(get(), get(), get(), get()) }
 
@@ -86,7 +85,6 @@ val pilModule = module {
 
     single { Dns(get()) }
     single { LinphoneCoreInstanceManager(get(), get()) }
-    single { LinphoneSipInitialiseRepository(get(), get()) }
     single { LinphoneSipRegisterRepository(get(), get()) }
 
     single { LinphoneSipActiveCallControlsRepository(get()) }
