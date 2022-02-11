@@ -47,8 +47,8 @@ internal class FcmService : FirebaseMessagingService() {
         }
 
         // When booted from cold we often don't have network connectivity immediately,
-        // this can cause issues. So if we detect this situation we will just delay briefly
-        // before continuing.
+        // this can cause issues. So if we detect this situation we will just continually wait
+        // for the network to come back.
         awaitConnectivity(remoteMessage, middleware) {
             log("Continuing to register")
 
