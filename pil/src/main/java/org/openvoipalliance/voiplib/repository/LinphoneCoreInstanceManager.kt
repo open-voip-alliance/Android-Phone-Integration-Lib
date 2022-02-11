@@ -45,7 +45,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
 
     /**
      * Certain files need to be available to Linphone via the file system, rather than through a
-     * native resource. Each time we initialise Linphone we will copy the resource to the file
+     * native resource. Each time we initialize Linphone we will copy the resource to the file
      * location listed.
      */
     private val filesToPublish = mapOf(

@@ -21,10 +21,10 @@ class VoIPLib {
     private val linphoneCoreInstanceManager: LinphoneCoreInstanceManager by di.koin.inject()
 
     /**
-     * This needs to be called whenever this library needs to initialise. Without it, no other calls
+     * This needs to be called whenever this library needs to initialize. Without it, no other calls
      * can be done.
      */
-    fun initialise(config: Config): VoIPLib {
+    fun initialize(config: Config): VoIPLib {
         Factory.instance()
         linphoneCoreInstanceManager.initializeLinphone(config)
         return this

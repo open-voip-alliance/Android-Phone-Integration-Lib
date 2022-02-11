@@ -61,7 +61,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         instance = this
         events.listen(platformIntegrator)
 
-        voipLib.initialise(
+        voipLib.initialize(
             Config(
                 callListener = voipLibEventTranslator,
                 logListener = logManager,

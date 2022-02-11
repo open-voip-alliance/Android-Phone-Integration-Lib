@@ -35,7 +35,7 @@ class Builder internal constructor() {
 }
 
 /**
- * Initialise the Android PIL, this should be called in your Application's onCreate method.
+ * Initialize the Android PIL, this should be called in your Application's onCreate method.
  *
  */
 fun startAndroidPIL(init: Builder.() -> ApplicationSetup): PIL {
