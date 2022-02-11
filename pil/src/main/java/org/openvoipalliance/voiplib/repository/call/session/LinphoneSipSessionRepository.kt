@@ -53,7 +53,7 @@ internal class LinphoneSipSessionRepository(private val pil: PIL, private val li
         }
 
         val params = core.createCallParams(null)?.apply {
-            enableVideo(false)
+            isVideoEnabled = false
         } ?: return null
 
         return core.inviteAddressWithParams(address, params)
