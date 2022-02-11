@@ -77,11 +77,11 @@ internal class FcmService : FirebaseMessagingService() {
     private fun whenNetworkReachable(
         remoteMessage: RemoteMessage,
         middleware: Middleware,
-        callback: () -> Unit,
+        block: () -> Unit,
     ) {
         if (isNetworkReachable) {
             log("Executing immediately as the network is reachable")
-            callback()
+            block()
             return
         }
 
@@ -101,7 +101,7 @@ internal class FcmService : FirebaseMessagingService() {
             }
 
             log("We now have connectivity, resuming incoming call flow")
-            callback()
+            block()
         }
     }
 
