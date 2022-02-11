@@ -13,7 +13,7 @@ import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.voiplib.config.Config
 import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.model.Codec
-import org.openvoipalliance.voiplib.repository.initialise.LogLevel
+import org.openvoipalliance.voiplib.repository.initialize.LogLevel
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -35,7 +35,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
 
     val safeLinphoneCore: Core?
         get() {
-            return if (state.initialised) {
+            return if (state.initialized) {
                 linphoneCore
             } else {
                 Log.e(TAG, "Trying to get linphone core while not possible", Exception())
@@ -56,7 +56,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         Factory.instance().setDebugMode(false, LINPHONE_DEBUG_TAG)
     }
 
-    fun initialiseLinphone(config: Config) {
+    fun initializeLinphone(config: Config) {
         this.voipLibConfig = config
 
         if (linphoneCore != null) {
@@ -315,7 +315,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
 
     inner class CoreState {
         var destroyed: Boolean = false
-        val initialised: Boolean get() = linphoneCore != null && !destroyed
+        val initialized: Boolean get() = linphoneCore != null && !destroyed
     }
 }
 

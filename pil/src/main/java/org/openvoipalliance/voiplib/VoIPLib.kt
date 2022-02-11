@@ -26,16 +26,16 @@ class VoIPLib {
      */
     fun initialise(config: Config): VoIPLib {
         Factory.instance()
-        linphoneCoreInstanceManager.initialiseLinphone(config)
+        linphoneCoreInstanceManager.initializeLinphone(config)
         return this
     }
 
     /**
-     * Check to see if the phonelib is initialised and ready to make calls.
+     * Check to see if the phonelib is initialized and ready to make calls.
      *
      */
-    val isInitialised: Boolean
-        get() = linphoneCoreInstanceManager.state.initialised
+    val isInitialized: Boolean
+        get() = linphoneCoreInstanceManager.state.initialized
 
     val isNetworkReachable
         get() = linphoneCoreInstanceManager.safeLinphoneCore?.isNetworkReachable ?: false
@@ -89,7 +89,8 @@ class VoIPLib {
      * Return the current version of the underlying voip library.
      *
      */
-    fun version() = linphoneCoreInstanceManager.safeLinphoneCore?.version ?: ""
+    val version
+        get() = linphoneCoreInstanceManager.safeLinphoneCore?.version ?: ""
 
     fun refreshRegistration() {
         linphoneCoreInstanceManager.safeLinphoneCore?.refreshRegisters()

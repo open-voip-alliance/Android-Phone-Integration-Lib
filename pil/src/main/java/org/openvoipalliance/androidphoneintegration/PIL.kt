@@ -155,7 +155,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     }
 
     private val isPreparedToStart: Boolean
-        get() = auth != null && voipLib.isInitialised
+        get() = auth != null && voipLib.isInitialized
 
     /**
      * Currently this just defers to [isPreparedToStart] as they have the same conditions but this may change in the future.

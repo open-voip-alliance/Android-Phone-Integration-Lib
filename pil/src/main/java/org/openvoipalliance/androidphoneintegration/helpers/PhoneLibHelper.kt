@@ -1,16 +1,12 @@
 package org.openvoipalliance.androidphoneintegration.helpers
 
 import org.openvoipalliance.androidphoneintegration.PIL
-import org.openvoipalliance.androidphoneintegration.call.VoipLibEventTranslator
 import org.openvoipalliance.androidphoneintegration.isNullOrInvalid
 import org.openvoipalliance.androidphoneintegration.logWithContext
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel.ERROR
 import org.openvoipalliance.voiplib.VoIPLib
-import org.openvoipalliance.voiplib.config.Config
 import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
 import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
-import org.openvoipalliance.voiplib.repository.initialise.LogLevel
-import org.openvoipalliance.voiplib.repository.initialise.LogListener
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel as PilLogLevel
 
 internal class VoIPLibHelper(

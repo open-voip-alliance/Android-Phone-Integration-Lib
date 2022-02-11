@@ -2,7 +2,8 @@ package org.openvoipalliance.androidphoneintegration.logging
 
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.logging.LogLevel.*
-import org.openvoipalliance.voiplib.repository.initialise.LogListener
+import org.openvoipalliance.voiplib.repository.initialize.LogListener
+import org.openvoipalliance.voiplib.repository.initialize.LogLevel as VoipLibLogLevel
 
 internal class LogManager(private val pil: PIL) : LogListener {
 
@@ -21,17 +22,17 @@ internal class LogManager(private val pil: PIL) : LogListener {
      * @param message
      */
     override fun onLogMessageWritten(
-        lev: org.openvoipalliance.voiplib.repository.initialise.LogLevel,
+        lev: VoipLibLogLevel,
         message: String,
     ) = writeLog(
             message,
             when (lev) {
-                org.openvoipalliance.voiplib.repository.initialise.LogLevel.DEBUG -> DEBUG
-                org.openvoipalliance.voiplib.repository.initialise.LogLevel.TRACE -> DEBUG
-                org.openvoipalliance.voiplib.repository.initialise.LogLevel.MESSAGE -> INFO
-                org.openvoipalliance.voiplib.repository.initialise.LogLevel.WARNING -> WARNING
-                org.openvoipalliance.voiplib.repository.initialise.LogLevel.ERROR -> ERROR
-                org.openvoipalliance.voiplib.repository.initialise.LogLevel.FATAL -> ERROR
+                VoipLibLogLevel.DEBUG -> DEBUG
+                VoipLibLogLevel.TRACE -> DEBUG
+                VoipLibLogLevel.MESSAGE -> INFO
+                VoipLibLogLevel.WARNING -> WARNING
+                VoipLibLogLevel.ERROR -> ERROR
+                VoipLibLogLevel.FATAL -> ERROR
             }
         )
 }

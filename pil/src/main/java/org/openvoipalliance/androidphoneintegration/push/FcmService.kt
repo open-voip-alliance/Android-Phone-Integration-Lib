@@ -49,7 +49,7 @@ internal class FcmService : FirebaseMessagingService() {
         // When booted from cold we often don't have network connectivity immediately,
         // this can cause issues. So if we detect this situation we will just continually wait
         // for the network to come back.
-        awaitConnectivity(remoteMessage, middleware) {
+        whenNetworkReachable(remoteMessage, middleware) {
             log("Continuing to register")
 
             pil.phoneLibHelper.register { success ->
@@ -74,7 +74,7 @@ internal class FcmService : FirebaseMessagingService() {
     /**
      * Wait for connectivity by continuously checking if the network is reachable in a loop.
      */
-    private fun awaitConnectivity(
+    private fun whenNetworkReachable(
         remoteMessage: RemoteMessage,
         middleware: Middleware,
         callback: () -> Unit,
