@@ -1,33 +1,32 @@
 package org.openvoipalliance.voiplib
 
 import android.Manifest.permission.RECORD_AUDIO
-import android.content.Context
 import androidx.annotation.RequiresPermission
+import org.linphone.core.Factory
 import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.voiplib.config.Config
 import org.openvoipalliance.voiplib.model.Call
 import org.openvoipalliance.voiplib.model.RegistrationState
+import org.openvoipalliance.voiplib.repository.LinphoneCoreInstanceManager
 import org.openvoipalliance.voiplib.repository.call.controls.LinphoneSipActiveCallControlsRepository
 import org.openvoipalliance.voiplib.repository.call.session.LinphoneSipSessionRepository
-import org.openvoipalliance.voiplib.repository.initialise.LinphoneSipInitialiseRepository
 import org.openvoipalliance.voiplib.repository.registration.LinphoneSipRegisterRepository
 
 typealias RegistrationCallback = (RegistrationState) -> Unit
 
-class VoIPLib private constructor(private val context: Context) {
-    private val sipInitialiseRepository: LinphoneSipInitialiseRepository by di.koin.inject()
+class VoIPLib {
     private val sipRegisterRepository: LinphoneSipRegisterRepository by di.koin.inject()
-
     private val sipCallControlsRepository: LinphoneSipActiveCallControlsRepository by di.koin.inject()
     private val sipSessionRepository: LinphoneSipSessionRepository by di.koin.inject()
-
+    private val linphoneCoreInstanceManager: LinphoneCoreInstanceManager by di.koin.inject()
 
     /**
      * This needs to be called whenever this library needs to initialise. Without it, no other calls
      * can be done.
      */
     fun initialise(config: Config): VoIPLib {
-        sipInitialiseRepository.initialise(config)
+        Factory.instance()
+        linphoneCoreInstanceManager.initialiseLinphone(config)
         return this
     }
 
@@ -36,7 +35,10 @@ class VoIPLib private constructor(private val context: Context) {
      *
      */
     val isInitialised: Boolean
-        get() = sipInitialiseRepository.isInitialised()
+        get() = linphoneCoreInstanceManager.state.initialised
+
+    val isNetworkReachable
+        get() = linphoneCoreInstanceManager.safeLinphoneCore?.isNetworkReachable ?: false
 
     /**
      * This registers your user on SIP. You need this before placing a call.
@@ -45,38 +47,6 @@ class VoIPLib private constructor(private val context: Context) {
     fun register(callback: RegistrationCallback): VoIPLib {
         sipRegisterRepository.register(callback)
         return this
-    }
-
-    /**
-     * Refreshes the configuration by destroying and then re-initialising the library.
-     *
-     */
-    fun refreshConfig(config: Config) {
-        destroy()
-        initialise(config)
-    }
-
-    /**
-     * Get the currently used config.
-     *
-     */
-    val currentConfig by lazy { sipInitialiseRepository.currentConfig() }
-
-    /**
-     * This performs a direct swap of the current config without any restarts, not all
-     * changes may take affect.
-     *
-     * It is recommended you use the copy function after getting the currentConfig.
-     */
-    fun swapConfig(config: Config) = sipInitialiseRepository.swapConfig(config)
-
-    /**
-     * Destroy this library completely.
-     *
-     */
-    fun destroy() {
-        unregister()
-        sipInitialiseRepository.destroy()
     }
 
     /**
@@ -98,7 +68,7 @@ class VoIPLib private constructor(private val context: Context) {
      * is waking from the background.
      *
      */
-    fun wake() = sipInitialiseRepository.wake()
+    fun wake() = linphoneCoreInstanceManager.safeLinphoneCore?.ensureRegistered()
 
     /**
      * Whether or not the microphone is currently muted.
@@ -119,18 +89,9 @@ class VoIPLib private constructor(private val context: Context) {
      * Return the current version of the underlying voip library.
      *
      */
-    fun version() = sipInitialiseRepository.version()
+    fun version() = linphoneCoreInstanceManager.safeLinphoneCore?.version ?: ""
 
-    companion object {
-        private var instance: VoIPLib? = null
-
-        @JvmStatic
-        fun getInstance(context: Context): VoIPLib {
-            if (instance != null) return instance as VoIPLib
-
-            return VoIPLib(context.applicationContext).also {
-                instance = it
-            }
-        }
+    fun refreshRegistration() {
+        linphoneCoreInstanceManager.safeLinphoneCore?.refreshRegisters()
     }
 }

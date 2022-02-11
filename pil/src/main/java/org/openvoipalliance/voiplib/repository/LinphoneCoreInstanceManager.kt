@@ -93,9 +93,11 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
 
     private fun applyPreStartConfiguration(core:Core) = core.apply {
         addListener(this@LinphoneCoreInstanceManager)
-        core.config.apply {
-            setBool("audio", "android_pause_calls_when_audio_focus_lost", false)
-        }
+        pauseCallsWhenAudioFocusLost = false
+        automaticNetworkStateMonitoring = true
+        registerOnlyWhenNetworkIsUp = true
+        keepAlivePeriod = 30000
+        enableKeepAlive(true)
         isPushNotificationEnabled = false
         transports = transports.apply {
             udpPort = Port.DISABLED.value

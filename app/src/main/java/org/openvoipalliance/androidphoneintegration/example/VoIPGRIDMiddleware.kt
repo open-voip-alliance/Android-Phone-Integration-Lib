@@ -13,6 +13,7 @@ import java.io.IOException
 
 class VoIPGRIDMiddleware(private val context: Context) : Middleware {
 
+    private var handling: String? = null
     private val prefs by lazy {
         PreferenceManager.getDefaultSharedPreferences(context)
     }
@@ -78,6 +79,18 @@ class VoIPGRIDMiddleware(private val context: Context) : Middleware {
                 }
             }
         )
+    }
+
+    override fun inspect(remoteMessage: RemoteMessage): Boolean {
+        val key = remoteMessage.data["unique_key"]!!
+        
+        if (handling == key) {
+            return false
+        }
+        
+        return true.also {
+            handling = key
+        }
     }
 
     override fun tokenReceived(token: String) {
