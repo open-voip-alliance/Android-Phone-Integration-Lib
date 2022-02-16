@@ -4,10 +4,10 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
+import android.provider.ContactsContract
+import android.provider.ContactsContract.PhoneLookup.DISPLAY_NAME
+import android.provider.ContactsContract.PhoneLookup.PHOTO_URI
 import androidx.core.content.ContextCompat
-import contacts.core.Contacts
-import contacts.core.equalTo
-import contacts.core.or
 import org.openvoipalliance.androidphoneintegration.helpers.identifier
 import org.openvoipalliance.voiplib.model.Call
 
@@ -27,24 +27,43 @@ internal class Contacts(private val context: Context) {
         }
     }
 
-    private fun find(number: String): Contact? {
-        if (!hasPermission) return null
+    private fun find(number: String) = if (hasPermission) {
+        queryAndroidContactsDatabase(number)
+    } else {
+        null
+    }
 
-        val contact = Contacts(context)
-            .query()
-            .where {
-                (Phone.Number equalTo number) or (Phone.NormalizedNumber equalTo number)
-            }
-            .include {
-                setOf(Contact.PhotoUri, Contact.DisplayNamePrimary)
-            }
-            .limit(1)
-            .find()
-            .firstOrNull() ?: return null
+    private fun queryAndroidContactsDatabase(phoneNumber: String): Contact? {
+        val cursor = context.contentResolver.query(
+            Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(phoneNumber),
+            ),
+            arrayOf(
+                DISPLAY_NAME,
+                PHOTO_URI,
+            ),
+            null,
+            null,
+            null,
+        ) ?: return null
 
-        if (contact.displayNamePrimary.isNullOrBlank()) return null
+        return if (cursor.moveToFirst()) {
+            val displayName = cursor.getString(0)
+            val photoUri = cursor.getString(1)
 
-        return Contact(contact.displayNamePrimary!!, contact.photoUri)
+            if (displayName.isNullOrBlank()) return null
+
+            Contact(
+                displayName,
+                when {
+                    photoUri.isNullOrBlank() -> null
+                    else -> Uri.parse(photoUri)
+                }
+            )
+        } else {
+            null
+        }.also { cursor.close() }
     }
 
     private val hasPermission: Boolean
