@@ -49,7 +49,10 @@ internal class Contacts(private val context: Context) {
         ) ?: return null
 
         return if (cursor.moveToFirst()) {
+            val displayName = cursor.getString(0)
             val photoUri = cursor.getString(1)
+
+            if (displayName.isNullOrBlank()) return null
 
             Contact(
                 cursor.getString(0),
