@@ -84,10 +84,14 @@ internal class LinphoneSipRegisterRepository(
     }
 
     private fun createAuthInfo(auth: Auth) =
-        Factory.instance().createAuthInfo(auth.username, auth.username, auth.password,
-            null, null, "${auth.domain}:${auth.port}").apply {
-            algorithm = null
-        }
+        Factory.instance().createAuthInfo(
+            auth.username,
+            auth.username,
+            auth.password,
+            null,
+            null,
+            auth.domain
+        )
 
     private fun createAccount(
         core: Core,
@@ -98,7 +102,9 @@ internal class LinphoneSipRegisterRepository(
         core.createAccountParams().apply {
             identityAddress = core.interpretUrl("sip:$name@$domain:$port")
             isRegisterEnabled = true
-            serverAddress = core.interpretUrl("sip:$domain:$port")
+            // [transport=tls] must be included or you will experience intermittent certification
+            // verification issues - especially when changing networks.
+            serverAddress = core.interpretUrl("sip:$domain;transport=tls")
         }
     )
 
