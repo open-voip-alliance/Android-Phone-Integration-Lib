@@ -55,7 +55,7 @@ internal class Contacts(private val context: Context) {
             if (displayName.isNullOrBlank()) return null
 
             Contact(
-                cursor.getString(0),
+                displayName,
                 when {
                     photoUri.isNullOrBlank() -> null
                     else -> Uri.parse(photoUri)
