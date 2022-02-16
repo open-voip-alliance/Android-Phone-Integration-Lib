@@ -63,8 +63,7 @@ internal class Contacts(private val context: Context) {
             )
         } else {
             null
-        }
-            .also { cursor.close() }
+        }.also { cursor.close() }
     }
 
     private val hasPermission: Boolean
