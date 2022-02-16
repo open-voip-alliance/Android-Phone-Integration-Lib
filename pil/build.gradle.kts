@@ -25,7 +25,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("com.takwolf.android:foreback:0.1.1")
-    implementation("com.github.vestrel00:contacts-android:0.1.10")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
     implementation("io.insert-koin:koin-android:2.2.2")
     implementation("com.google.code.gson:gson:2.8.9")
