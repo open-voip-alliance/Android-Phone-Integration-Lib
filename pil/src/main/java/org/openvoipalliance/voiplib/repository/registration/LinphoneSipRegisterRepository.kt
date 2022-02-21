@@ -108,16 +108,11 @@ internal class LinphoneSipRegisterRepository(
         }
     )
 
-    fun unregister() {
-        val core = linphoneCoreInstanceManager.safeLinphoneCore ?: return
-
-        core.clearAccounts()
-
-        core.authInfoList.forEach {
-            core.removeAuthInfo(it)
-        }
-
-        core.defaultAccount = null
+    fun unregister() = linphoneCoreInstanceManager.safeLinphoneCore?.apply {
+        clearAccounts()
+        clearAllAuthInfo()
+    }.also {
+        log("Unregister complete")
     }
 
     private inner class RegistrationListener : SimpleCoreListener {
