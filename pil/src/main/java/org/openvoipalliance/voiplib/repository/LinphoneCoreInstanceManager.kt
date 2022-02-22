@@ -19,8 +19,6 @@ import java.io.FileOutputStream
 import java.util.*
 import org.linphone.core.Call as LinphoneCall
 
-private const val LINPHONE_DEBUG_TAG = "SIMPLE_LINPHONE"
-
 internal class LinphoneCoreInstanceManager(private val context: Context, private val dns: Dns): SimpleCoreListener, LoggingServiceListener {
 
     internal val state = CoreState()
@@ -51,10 +49,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
     private val filesToPublish = mapOf(
         R.raw.ringback to "ringback.wav"
     )
-
-    init {
-        Factory.instance().setDebugMode(false, LINPHONE_DEBUG_TAG)
-    }
 
     fun initializeLinphone(config: Config) {
         this.voipLibConfig = config
@@ -104,6 +98,8 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
             tcpPort = Port.DISABLED.value
             tlsPort = Port.RANDOM.value
         }
+        isIpv6Enabled = false
+        isDnsSearchEnabled = false
         mediaEncryption = MediaEncryption.SRTP
         isMediaEncryptionMandatory = true
         setUserAgent(voipLibConfig.userAgent, null)
