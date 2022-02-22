@@ -53,7 +53,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
     )
 
     init {
-        Factory.instance().setDebugMode(false, LINPHONE_DEBUG_TAG)
+        Factory.instance().setDebugMode(true, LINPHONE_DEBUG_TAG)
     }
 
     fun initializeLinphone(config: Config) {
@@ -76,7 +76,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
     @Synchronized
     @Throws(Exception::class)
     private fun startLibLinphone() {
-        logging.setLogLevel(Warning)
+        logging.setLogLevel(Debug)
 
         voipLibConfig.logListener.let { logging.addListener(this) }
 
@@ -104,6 +104,8 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
             tcpPort = Port.DISABLED.value
             tlsPort = Port.RANDOM.value
         }
+        isIpv6Enabled = false
+        isDnsSearchEnabled = false
         mediaEncryption = MediaEncryption.SRTP
         isMediaEncryptionMandatory = true
         setUserAgent(voipLibConfig.userAgent, null)
