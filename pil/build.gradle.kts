@@ -20,6 +20,7 @@ android {
 
 dependencies {
     api("com.google.firebase:firebase-messaging-ktx:21.0.1")
+    api("com.google.firebase:firebase-messaging-directboot:20.2.0")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
     implementation("androidx.core:core-ktx:1.7.0")
@@ -28,7 +29,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
     implementation("io.insert-koin:koin-android:2.2.2")
     implementation("com.google.code.gson:gson:2.8.9")
-    implementation("com.google.firebase:firebase-messaging-directboot:20.2.0")
 
     testImplementation("junit:junit:4.+")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
