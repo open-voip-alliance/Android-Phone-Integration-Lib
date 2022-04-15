@@ -45,6 +45,7 @@
 
         <service
             android:name=".push.FcmService"
+            android:directBootAware="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
