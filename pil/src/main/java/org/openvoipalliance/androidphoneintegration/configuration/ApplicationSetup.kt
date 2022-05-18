@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration.configuration
 
 import android.app.Activity
 import android.app.Application
+import android.app.PendingIntent
 import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.logging.Logger
 import org.openvoipalliance.androidphoneintegration.push.Middleware
@@ -58,7 +59,7 @@ data class ApplicationSetup(
      * notification.
      *
      */
-    val onMissedCallNotificationPressed: (() -> Unit)? = null
+    val onMissedCallNotificationPressed: PendingIntent? = null
 ) {
     enum class AutomaticallyLaunchCallActivity {
         // Activities will never be automatically launched (they will still be launched via direct user input)
