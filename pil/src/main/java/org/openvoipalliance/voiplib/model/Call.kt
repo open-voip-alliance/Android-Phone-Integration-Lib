@@ -48,7 +48,7 @@ class Call(val linphoneCall: LinphoneCall) {
 
     val callId: String
         get() = try {
-            linphoneCall.callLog.callId
+            linphoneCall.callLog.callId ?: ""
         } catch (e: NullPointerException) {
             "unknown"
         }

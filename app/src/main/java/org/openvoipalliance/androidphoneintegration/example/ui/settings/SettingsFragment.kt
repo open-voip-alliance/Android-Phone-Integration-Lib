@@ -127,6 +127,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>("voipgrid_middleware_register")?.setOnPreferenceClickListener {
             GlobalScope.launch {
+                if (VoIPGRIDMiddleware.token == null) {
+                    Toast.makeText(this@SettingsFragment.context, "No push token", Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+
                 val message = if (voIPGRIDMiddleware.register()) "Registered!" else "Registration failed..."
 
                 if (activity == null || activity?.isFinishing == true) return@launch
