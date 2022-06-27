@@ -6,7 +6,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
 import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.call.Call
-import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver
 
 internal class MissedCallNotification: Notification() {
     override val channelId = CHANNEL_ID
@@ -52,9 +51,7 @@ internal class MissedCallNotification: Notification() {
             setAutoCancel(true)
             setCategory(android.app.Notification.CATEGORY_STATUS)
             priority = PRIORITY_MIN
-            setContentIntent(
-                createActionIntent(NotificationButtonReceiver.Action.MISSED_CALL_NOTIFICATION_PRESSED, pil.app.application)
-            )
+            setContentIntent(pil.app.onMissedCallNotificationPressed)
         }.build()
 
         notificationManger.notify(notificationId, notification)
