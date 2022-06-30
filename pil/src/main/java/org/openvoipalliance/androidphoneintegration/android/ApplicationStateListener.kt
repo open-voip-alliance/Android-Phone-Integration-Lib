@@ -1,17 +1,15 @@
 package org.openvoipalliance.androidphoneintegration
 
-import android.app.Activity
-import com.takwolf.android.foreback.Foreback
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import android.util.Log
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import org.openvoipalliance.androidphoneintegration.call.CallState
 import org.openvoipalliance.androidphoneintegration.helpers.startCallActivity
 
-internal class ApplicationStateListener(private val pil: PIL) : Foreback.Listener {
+internal class ApplicationStateListener(private val pil: PIL) : DefaultLifecycleObserver {
 
-    override fun onApplicationEnterForeground(activity: Activity?) {
+    override fun onStart(owner: LifecycleOwner) {
+        isInForeground = true
         pil.writeLog("Application has entered the foreground")
 
         if (pil.calls.active?.state == CallState.CONNECTED) {
@@ -25,7 +23,12 @@ internal class ApplicationStateListener(private val pil: PIL) : Foreback.Listene
         }
     }
 
-    override fun onApplicationEnterBackground(activity: Activity?) {
+    override fun onStop(owner: LifecycleOwner) {
+        isInForeground = false
         pil.writeLog("Application has entered the background")
+    }
+
+    companion object {
+        var isInForeground = false
     }
 }
