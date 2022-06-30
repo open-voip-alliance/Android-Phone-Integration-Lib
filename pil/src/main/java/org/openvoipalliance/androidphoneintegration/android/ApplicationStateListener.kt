@@ -1,6 +1,5 @@
 package org.openvoipalliance.androidphoneintegration
 
-import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import org.openvoipalliance.androidphoneintegration.call.CallState
