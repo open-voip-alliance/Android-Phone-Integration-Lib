@@ -1,6 +1,6 @@
 package org.openvoipalliance.androidphoneintegration
 
-import com.takwolf.android.foreback.Foreback
+import androidx.lifecycle.ProcessLifecycleOwner
 import org.openvoipalliance.androidphoneintegration.configuration.ApplicationSetup
 import org.openvoipalliance.androidphoneintegration.configuration.Auth
 import org.openvoipalliance.androidphoneintegration.configuration.Preferences
@@ -29,8 +29,7 @@ class Builder internal constructor() {
     }
 
     private fun setupApplicationBackgroundListeners(pil: PIL) {
-        Foreback.init(pil.app.application)
-        Foreback.registerListener(ApplicationStateListener(pil))
+        ProcessLifecycleOwner.get().lifecycle.addObserver(ApplicationStateListener(pil))
     }
 }
 

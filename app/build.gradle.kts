@@ -58,7 +58,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
     implementation("androidx.preference:preference-ktx:1.1.1")
-    implementation("com.android.volley:volley:1.1.1")
+    implementation("com.android.volley:volley:1.2.1")
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
 }
