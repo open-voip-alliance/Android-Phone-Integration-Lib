@@ -117,15 +117,16 @@ class Connection internal constructor(
         calls.activeVoipLibCall?.let {
             val callAudioState = state ?: callAudioState
 
-            log("Updating route based on CallAudioState: [${callAudioState.route.asRouteString}]")
+            log("Updating route based on CallAudioState: [${callAudioState?.route?.asRouteString}]")
 
-            phoneLib.microphoneMuted = callAudioState.isMuted
+            phoneLib.microphoneMuted = callAudioState?.isMuted ?: false
 
-            when (callAudioState.route) {
+            when (callAudioState?.route) {
                 CallAudioState.ROUTE_EARPIECE -> phoneLib.actions(it).routeAudioToEarpiece(it)
                 CallAudioState.ROUTE_SPEAKER -> phoneLib.actions(it).routeAudioToSpeaker(it)
                 CallAudioState.ROUTE_BLUETOOTH -> phoneLib.actions(it).routeAudioToBluetooth(it)
                 CallAudioState.ROUTE_WIRED_HEADSET -> phoneLib.actions(it).routeAudioToHeadset(it)
+                else -> phoneLib.actions(it).routeAudioToEarpiece(it)
             }
 
             pil.events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
