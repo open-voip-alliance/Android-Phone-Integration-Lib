@@ -126,7 +126,7 @@ class Connection internal constructor(
                 CallAudioState.ROUTE_SPEAKER -> phoneLib.actions(it).routeAudioToSpeaker(it)
                 CallAudioState.ROUTE_BLUETOOTH -> phoneLib.actions(it).routeAudioToBluetooth(it)
                 CallAudioState.ROUTE_WIRED_HEADSET -> phoneLib.actions(it).routeAudioToHeadset(it)
-                else -> phoneLib.actions(it).routeAudioToSpeaker(it)
+                else -> phoneLib.actions(it).routeAudioToEarpiece(it)
             }
 
             pil.events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
