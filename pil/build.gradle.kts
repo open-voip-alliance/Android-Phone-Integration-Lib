@@ -24,6 +24,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.4.1")
+    implementation("androidx.media:media:1.2.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
     implementation("io.insert-koin:koin-android:2.2.2")
     implementation("com.google.code.gson:gson:2.8.9")
