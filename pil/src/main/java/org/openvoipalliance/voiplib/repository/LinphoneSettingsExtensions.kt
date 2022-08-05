@@ -8,13 +8,14 @@ import org.linphone.core.Core
  * a config file.
  */
 private enum class Category(val value: String) {
-    SIP("sip"), AUDIO("audio")
+    SIP("sip"), AUDIO("audio"),
 }
 
 private const val AUTO_NET_STATE_MON = "auto_net_state_mon"
 private const val PAUSE_CALLS_FOCUS_LOST = "android_pause_calls_when_audio_focus_lost"
 private const val REGISTER_ONLY_WHEN_NETWORK_UP = "register_only_when_network_is_up"
 private const val KEEPALIVE_PERIOD = "keepalive_period"
+private const val DISABLE_AUDIO_FOCUS_REQUESTS = "android_disable_audio_focus_requests"
 
 /**
  * Automatically handle and re-invite when network connectivity changes.
@@ -38,3 +39,7 @@ var Core.registerOnlyWhenNetworkIsUp: Boolean
 var Core.keepAlivePeriod: Int
     get() = config.getInt(Category.SIP.value, KEEPALIVE_PERIOD, 0)
     set(value) = config.setInt(Category.SIP.value, KEEPALIVE_PERIOD, value)
+
+var Core.disableAudioFocusRequests: Boolean
+    get() = config.getBool(Category.AUDIO.value, DISABLE_AUDIO_FOCUS_REQUESTS, false)
+    set(value) = config.setBool(Category.AUDIO.value, DISABLE_AUDIO_FOCUS_REQUESTS, value)
