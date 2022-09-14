@@ -163,6 +163,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     internal val isStarted: Boolean
         get() = isPreparedToStart
 
+    fun performEchoCancellationCalibration() = voipLib.beginEchoCancellation()
+
     /**
      * Attempt to boot and register to see if user credentials are correct. This can be used
      * to check the user's credentials after they have supplied them.

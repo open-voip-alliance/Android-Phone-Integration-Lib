@@ -130,10 +130,17 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
     private fun applyPostStartConfiguration(core: Core) = core.apply {
         useInfoForDtmf = true
         useRfc2833ForDtmf = true
-        isEchoCancellationEnabled = true
         isAdaptiveRateControlEnabled = true
         isRtpBundleEnabled = false
         isAudioAdaptiveJittcompEnabled = true
+
+        if (hasBuiltinEchoCanceller()) {
+            isEchoCancellationEnabled = false
+            log("Built-in echo cancellation detected, disabling software.")
+        } else {
+            isEchoCancellationEnabled = true
+            log("This device does not have built-in echo cancellation, enabled software.")
+        }
     }
 
     /**
