@@ -165,7 +165,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
 
     fun performEchoCancellationCalibration() {
         log("Beginning echo cancellation calibration")
-        voipLib.beginEchoCancellation()
+        voipLib.startEchoCancellerCalibration()
     }
 
     /**
