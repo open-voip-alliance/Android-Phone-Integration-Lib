@@ -125,6 +125,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
 
+        findPreference<Preference>("echo_cancellation_calibration")?.setOnPreferenceClickListener {
+            pil.performEchoCancellationCalibration()
+            true
+        }
+
         findPreference<Preference>("voipgrid_middleware_register")?.setOnPreferenceClickListener {
             GlobalScope.launch {
                 if (VoIPGRIDMiddleware.token == null) {

@@ -89,6 +89,11 @@
             app:defaultValue="false"
             app:key="use_application_provided_ringtone"
             app:title="Use Application Ringtone"/>
+        <Preference
+            app:key="echo_cancellation_calibration"
+            app:title="Begin Echo Cancellation Calibration"
+            app:enabled="true">
+        </Preference>
     </PreferenceCategory>
 
 </PreferenceScreen>
