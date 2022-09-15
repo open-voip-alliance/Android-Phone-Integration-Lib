@@ -1,6 +1,7 @@
 package org.openvoipalliance.androidphoneintegration.audio
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
@@ -8,7 +9,9 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.telecom.CallAudioState.*
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import org.openvoipalliance.androidphoneintegration.call.Calls
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.log
@@ -18,15 +21,13 @@ import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.model.Codec
 
 class AudioManager internal constructor(
-    context: Context,
+    private val context: Context,
     private val phoneLib: VoIPLib,
     private val androidCallFramework: AndroidCallFramework,
     private val events: EventsManager,
     private val audioManager: AudioManager,
+    private val calls: Calls,
 ) {
-
-    val availableCodecs = arrayOf(Codec.OPUS, Codec.ILBC, Codec.G729, Codec.SPEEX)
-
     var isMicrophoneMuted: Boolean
         get() = phoneLib.microphoneMuted
         private set(value) {
@@ -50,6 +51,20 @@ class AudioManager internal constructor(
         }
 
         connection.setAudioRoute(pilRouteToNativeRoute(route))
+
+        // The echo limiter is a brute-force method to prevent echo, it should only be used
+        // when it is really necessary, such as when the user is using the phone's speaker.
+        if (route == AudioRoute.SPEAKER) {
+            calls.forEach {
+                it.linphoneCall.isEchoLimiterEnabled = true
+                it.linphoneCall.isEchoCancellationEnabled = false
+            }
+        } else {
+            calls.forEach {
+                it.linphoneCall.isEchoLimiterEnabled = false
+                it.linphoneCall.isEchoCancellationEnabled = true
+            }
+        }
 
         if (route != AudioRoute.SPEAKER) return
 
@@ -77,9 +92,15 @@ class AudioManager internal constructor(
      *  Route audio to a specific bluetooth device.
      *
      */
+    @SuppressLint("MissingPermission")
     fun routeAudio(route: BluetoothAudioRoute) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             log("Android version too low to route audio to specific bluetooth device")
+            return
+        }
+
+        if (hasBluetoothPermission) {
+            log("[BLUETOOTH_CONNECT] is missing, unable to route to specific BT device")
             return
         }
 
@@ -152,12 +173,14 @@ class AudioManager internal constructor(
         )
     }
 
+    @SuppressLint("MissingPermission")
     private fun bluetoothAudioRouteName(connection: Connection): String? = when {
         !hasBluetoothPermission -> null
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> connection.callAudioState.activeBluetoothDevice?.name
         else -> null
     }
 
+    @SuppressLint("MissingPermission")
     private fun bluetoothAudioRoutes(connection: Connection): List<BluetoothAudioRoute> {
         val bluetoothRoutes = mutableListOf<BluetoothAudioRoute>()
 
@@ -174,7 +197,8 @@ class AudioManager internal constructor(
         return bluetoothRoutes
     }
 
-    private val hasBluetoothPermission = when {
+    private val hasBluetoothPermission
+        get() = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
             ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
         else -> true

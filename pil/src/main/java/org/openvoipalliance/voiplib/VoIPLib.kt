@@ -95,4 +95,8 @@ class VoIPLib {
     fun refreshRegistration() {
         linphoneCoreInstanceManager.safeLinphoneCore?.refreshRegisters()
     }
+
+    fun startEchoCancellerCalibration() {
+        linphoneCoreInstanceManager.safeLinphoneCore?.startEchoCancellerCalibration()
+    }
 }

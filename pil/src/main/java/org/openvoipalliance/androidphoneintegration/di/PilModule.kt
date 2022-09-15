@@ -50,7 +50,7 @@ val pilModule = module {
 
     single { CallActions(get(), get(), get(), get()) }
 
-    single { AudioManager(androidContext(), get(), get(), get(), get()) }
+    single { AudioManager(androidContext(), get(), get(), get(), get(), get()) }
 
     single { EventsManager(get()) }
 
