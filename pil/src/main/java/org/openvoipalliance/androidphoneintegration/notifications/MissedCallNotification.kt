@@ -40,7 +40,7 @@ internal class MissedCallNotification: Notification() {
         val subtitle = context.resources.getQuantityString(
             R.plurals.notification_missed_call_subtitle,
             count,
-            if (hasActiveNotification) count else call.remotePartyHeading,
+            if (hasActiveNotification) count else call.prettyRemoteParty,
         )
 
         val notification = NotificationCompat.Builder(pil.app.application, channelId).apply {
