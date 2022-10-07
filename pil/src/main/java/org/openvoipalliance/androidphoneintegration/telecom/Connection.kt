@@ -119,8 +119,6 @@ class Connection internal constructor(
 
             log("Updating route based on CallAudioState: [${callAudioState?.route?.asRouteString}]")
 
-            phoneLib.microphoneMuted = callAudioState?.isMuted ?: false
-
             when (callAudioState?.route) {
                 CallAudioState.ROUTE_EARPIECE -> phoneLib.actions(it).routeAudioToEarpiece(it)
                 CallAudioState.ROUTE_SPEAKER -> phoneLib.actions(it).routeAudioToSpeaker(it)
