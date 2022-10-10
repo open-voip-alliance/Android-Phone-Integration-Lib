@@ -51,6 +51,7 @@ internal class PlatformIntegrator(
         }
 
         is CallEnded -> {
+            pil.audio.unmute()
             androidCallFramework.connection?.setDisconnected(DisconnectCause(DisconnectCause.REMOTE))
             androidCallFramework.connection?.destroy()
             androidCallFramework.connection = null
