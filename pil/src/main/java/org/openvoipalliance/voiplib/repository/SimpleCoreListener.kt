@@ -146,18 +146,17 @@ internal interface SimpleCoreListener : CoreListener {
         message: String
     ) {}
 
-    override fun onConferenceInfoOnParticipantError(
+    override fun onPushNotificationReceived(core: Core, payload: String?) {}
+
+    override fun onMessagesReceived(
         core: Core,
-        conferenceInfo: ConferenceInfo,
-        participant: Address,
-        error: ConferenceInfoError?,
+        chatRoom: ChatRoom,
+        messages: Array<out ChatMessage>
     ) {}
 
-    override fun onConferenceInfoOnSent(core: Core, conferenceInfo: ConferenceInfo) {}
+    override fun onCallGoclearAckSent(core: Core, call: Call) {}
 
-    override fun onConferenceInfoOnParticipantSent(
-        core: Core,
-        conferenceInfo: ConferenceInfo,
-        participant: Address,
-    ) {}
+    override fun onConferenceInfoReceived(core: Core, conferenceInfo: ConferenceInfo) {}
+
+    override fun onNotifySent(core: Core, linphoneEvent: Event, body: Content) {}
 }
