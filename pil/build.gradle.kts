@@ -35,7 +35,7 @@ dependencies {
     androidTestImplementation("org.mockito:mockito-android:+")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
-    embed("org.linphone.minimal:linphone-sdk-android:5.1.58")
+    embed("org.linphone.minimal:linphone-sdk-android:5.2.20")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
