@@ -1,6 +1,9 @@
 package org.openvoipalliance.androidphoneintegration.service
 
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
@@ -11,6 +14,7 @@ import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
 import org.openvoipalliance.androidphoneintegration.notifications.CallNotification
 import java.util.*
+
 
 internal class VoIPService : CoreService(), PILEventListener {
 
@@ -26,7 +30,7 @@ internal class VoIPService : CoreService(), PILEventListener {
 
     private val callEventLoop = object : Runnable {
         override fun run() {
-            if (pil.calls.active != null)
+            if (pil.calls.isInCall)
                 pil.events.broadcast(Event.CallSessionEvent.CallDurationUpdated::class)
             else
                 stopSelf()
@@ -40,15 +44,31 @@ internal class VoIPService : CoreService(), PILEventListener {
     }
 
     override fun showForegroundServiceNotification() {
-        callNotification.build(display = true)
+        val notification = callNotification.build().build()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val types = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_PHONE_CALL
+            } else {
+                FOREGROUND_SERVICE_TYPE_PHONE_CALL
+            }
+
+            startForeground(callNotification.notificationId, notification, types)
+        } else {
+            startForeground(callNotification.notificationId, notification)
+        }
+
+        pil.androidCallFramework.connection?.updateCurrentRouteBasedOnAudioState()
     }
 
     override fun hideForegroundServiceNotification() {
         callNotification.cancel()
+        stopForeground(true)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+
         pil.events.listen(this)
 
         pil.writeLog("Starting the VoIP Service and creating notification channels")
@@ -60,8 +80,9 @@ internal class VoIPService : CoreService(), PILEventListener {
         ).apply { acquire(2 * 60 * 60 * 1000) }
 
         handler.post(callEventLoop)
+        showForegroundServiceNotification()
 
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY
     }
 
     override fun onDestroy() {
@@ -69,6 +90,7 @@ internal class VoIPService : CoreService(), PILEventListener {
         pil.writeLog("Stopping VoIPService")
 
         timer?.cancel()
+        handler.removeCallbacks(callEventLoop)
         wakeLock?.let {
             if (it.isHeld) {
                 it.release()
@@ -78,6 +100,7 @@ internal class VoIPService : CoreService(), PILEventListener {
         }
 
         pil.events.stopListening(this)
+        hideForegroundServiceNotification()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -88,6 +111,10 @@ internal class VoIPService : CoreService(), PILEventListener {
 
     override fun onEvent(event: Event) {
         callNotification.update(pil.calls.active ?: return)
+
+        if (event is Event.CallSessionEvent.CallConnected) {
+            showForegroundServiceNotification()
+        }
     }
 
     companion object {
