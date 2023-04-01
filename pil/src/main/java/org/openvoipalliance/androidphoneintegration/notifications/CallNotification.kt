@@ -37,16 +37,18 @@ internal class CallNotification : Notification() {
         )
     }
 
-    fun build(display: Boolean = false): NotificationCompat.Builder =
+    fun build(): NotificationCompat.Builder =
         NotificationCompat.Builder(context, channelId)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentTitle(context.getString(R.string.notification_default_title))
             .setContentText(context.getString(R.string.notification_default_subtitle))
             .setSmallIcon(R.drawable.ic_service)
-            .setShowWhen(false)
+            .setWhen(System.currentTimeMillis())
+            .setShowWhen(true)
             .setColorized(true)
             .setOngoing(true)
             .setAutoCancel(false)
+            .setCategory(android.app.Notification.CATEGORY_SERVICE)
             .setColor(context.getColor(R.color.notification_background))
             .addAction(
                 R.drawable.ic_service,
@@ -58,11 +60,7 @@ internal class CallNotification : Notification() {
                 0,
                 Intent(context, pil.app.activities.call),
                 PendingIntent.FLAG_IMMUTABLE
-            )).also {
-                if (display) {
-                    notificationManger.notify(notificationId, it.build())
-                }
-            }
+            ))
 
     companion object {
         private const val NOTIFICATION_ID = 341
