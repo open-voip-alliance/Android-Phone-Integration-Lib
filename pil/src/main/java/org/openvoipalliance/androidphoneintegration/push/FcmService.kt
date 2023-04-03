@@ -34,12 +34,6 @@ internal class FcmService : FirebaseMessagingService() {
 
         log("Received FCM push message")
 
-        if (androidCallFramework.isInCall) {
-            log("Currently in call, rejecting incoming call")
-            middleware.respond(remoteMessage, false, IN_CALL)
-            return
-        }
-
         if (!androidCallFramework.canHandleIncomingCall) {
             log("The android call framework cannot handle incoming call, responding as unavailable")
             middleware.respond(remoteMessage, false, REJECTED_BY_ANDROID_TELECOM_FRAMEWORK)
