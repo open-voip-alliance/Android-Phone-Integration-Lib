@@ -72,13 +72,7 @@ internal class VoIPService : CoreService(), PILEventListener {
         pil.events.listen(this)
 
         pil.writeLog("Starting the VoIP Service and creating notification channels")
-
-        wakeLock = powerManager.newWakeLock(
-            PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK
-                    or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-            "Vialer::ProximitySensor"
-        ).apply { acquire(2 * 60 * 60 * 1000) }
-
+        enableProximitySensor()
         handler.post(callEventLoop)
         showForegroundServiceNotification()
 
@@ -91,6 +85,22 @@ internal class VoIPService : CoreService(), PILEventListener {
 
         timer?.cancel()
         handler.removeCallbacks(callEventLoop)
+        disableProximitySensor()
+        pil.events.stopListening(this)
+        hideForegroundServiceNotification()
+    }
+
+    private fun enableProximitySensor() {
+        if (wakeLock != null) return;
+
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK
+                    or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "Vialer::ProximitySensor"
+        ).apply { acquire(2 * 60 * 60 * 1000) }
+    }
+
+    private fun disableProximitySensor() {
         wakeLock?.let {
             if (it.isHeld) {
                 it.release()
@@ -98,9 +108,6 @@ internal class VoIPService : CoreService(), PILEventListener {
 
             wakeLock = null
         }
-
-        pil.events.stopListening(this)
-        hideForegroundServiceNotification()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
