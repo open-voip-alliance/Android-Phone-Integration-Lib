@@ -79,10 +79,11 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
             currentCall.outputAudioDevice = it
         }
 
-        if (types.shouldAdjustAudioInput) {
-            findAudioDeviceForRoute(types, Capabilities.CapabilityRecord)?.let {
-                currentCall.inputAudioDevice = it
-            }
+        findAudioDeviceForRoute(
+            if (types.shouldUseSpecificAudioInput) types else listOf(AudioDevice.Type.Microphone),
+            Capabilities.CapabilityRecord,
+        )?.let {
+            currentCall.inputAudioDevice = it
         }
     }
 
@@ -186,7 +187,9 @@ internal class LinphoneSipActiveCallControlsRepository(private val linphoneCoreI
 private val List<AudioDevice.Type>.displayName
     get() = joinToString(separator = ", ") { it.name }
 
-private val List<AudioDevice.Type>.shouldAdjustAudioInput
+// We only want to look for a specific audio input when it's one of these, otherwise we always
+// just want to fallback to the phone's microphone.
+private val List<AudioDevice.Type>.shouldUseSpecificAudioInput
     get() = first() in listOf(
         AudioDevice.Type.Headset,
         AudioDevice.Type.Headphones,
