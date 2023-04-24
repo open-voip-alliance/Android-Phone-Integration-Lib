@@ -64,6 +64,7 @@ class Connection internal constructor(
     @SuppressLint("MissingPermission")
     override fun onReject() {
         callExists {
+            setDisconnected(DisconnectCause(DisconnectCause.BUSY))
             phoneLib.actions(it).decline(Reason.Busy)
             destroy()
         }
