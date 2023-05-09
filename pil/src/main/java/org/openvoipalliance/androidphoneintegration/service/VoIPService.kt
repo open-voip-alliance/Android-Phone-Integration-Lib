@@ -1,5 +1,7 @@
 package org.openvoipalliance.androidphoneintegration.service
 
+import android.app.Notification
+import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
@@ -13,6 +15,7 @@ import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
 import org.openvoipalliance.androidphoneintegration.notifications.CallNotification
+import org.openvoipalliance.androidphoneintegration.notifications.IncomingCallNotification
 import java.util.*
 
 
@@ -22,6 +25,7 @@ internal class VoIPService : CoreService(), PILEventListener {
 
     private val callNotification: CallNotification by di.koin.inject()
     private val powerManager by lazy { getSystemService(PowerManager::class.java) }
+    private val notificationManger: NotificationManager by di.koin.inject()
 
     private var timer: Timer? = null
     private var wakeLock: PowerManager.WakeLock? = null
@@ -44,8 +48,14 @@ internal class VoIPService : CoreService(), PILEventListener {
     }
 
     override fun showForegroundServiceNotification() {
-        val notification = callNotification.build().build()
+        val notification = callNotification.build()
 
+        showForegroundNotification(notification, callNotification.notificationId)
+
+        pil.androidCallFramework.connection?.updateCurrentRouteBasedOnAudioState()
+    }
+
+    private fun showForegroundNotification(notification: Notification, id: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val types = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_PHONE_CALL
@@ -53,12 +63,10 @@ internal class VoIPService : CoreService(), PILEventListener {
                 FOREGROUND_SERVICE_TYPE_PHONE_CALL
             }
 
-            startForeground(callNotification.notificationId, notification, types)
+            startForeground(id, notification, types)
         } else {
-            startForeground(callNotification.notificationId, notification)
+            startForeground(id, notification)
         }
-
-        pil.androidCallFramework.connection?.updateCurrentRouteBasedOnAudioState()
     }
 
     override fun hideForegroundServiceNotification() {
@@ -91,7 +99,7 @@ internal class VoIPService : CoreService(), PILEventListener {
     }
 
     private fun enableProximitySensor() {
-        if (wakeLock != null) return;
+        if (wakeLock != null) return
 
         wakeLock = powerManager.newWakeLock(
             PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK
@@ -116,8 +124,25 @@ internal class VoIPService : CoreService(), PILEventListener {
         pil.calls.forEach { _ -> pil.actions.end() }
     }
 
+    private fun updateNotification() {
+        // We'll check if we have an active incoming call notification, and if we do use that
+        // instead of the ongoing call notification.
+        val incomingCallNotification = notificationManger.activeNotifications.firstOrNull {
+            it.id == IncomingCallNotification.NOTIFICATION_ID
+        }
+
+        if (incomingCallNotification != null) {
+            showForegroundNotification(
+                incomingCallNotification.notification,
+                IncomingCallNotification.NOTIFICATION_ID,
+            )
+        } else {
+            callNotification.update(pil.calls.active ?: return)
+        }
+    }
+
     override fun onEvent(event: Event) {
-        callNotification.update(pil.calls.active ?: return)
+        updateNotification()
 
         if (event is Event.CallSessionEvent.CallConnected) {
             showForegroundServiceNotification()
