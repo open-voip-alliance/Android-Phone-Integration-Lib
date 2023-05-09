@@ -42,8 +42,6 @@ internal class CallNotification : Notification() {
                 setWhen(System.currentTimeMillis() - (call.duration * 1000))
                 setShowWhen(true)
                 setOngoing(true)
-                setColor(context.getColor(R.color.notification_background))
-                setColorized(true)
                 setCategory(android.app.Notification.CATEGORY_CALL)
                 setContentIntent(PendingIntent.getActivity(
                     context,
