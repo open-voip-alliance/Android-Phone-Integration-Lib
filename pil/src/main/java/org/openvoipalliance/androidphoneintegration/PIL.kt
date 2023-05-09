@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.telecom.Connection
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
