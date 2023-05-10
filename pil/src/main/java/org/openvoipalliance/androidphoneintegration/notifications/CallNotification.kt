@@ -41,7 +41,7 @@ internal class CallNotification : Notification() {
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    private fun createOngoingCallStyle(call: Call) =
+    private fun buildNotificationStyle(call: Call) =
         android.app.Notification.CallStyle.forOngoingCall(
             call.toPerson(),
             createActionIntent(
@@ -58,7 +58,7 @@ internal class CallNotification : Notification() {
         setShowWhen(true)
         setOngoing(true)
         setUsesChronometer(true)
-        style = createOngoingCallStyle(call)
+        style = buildNotificationStyle(call)
     }.build()
 
     private fun buildLegacyNotification(call: Call?) =

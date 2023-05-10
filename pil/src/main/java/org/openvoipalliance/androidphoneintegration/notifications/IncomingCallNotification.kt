@@ -90,7 +90,7 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    private fun createIncomingCallStyle(call: Call) =
+    private fun buildNotificationStyle(call: Call) =
         android.app.Notification.CallStyle.forIncomingCall(
             call.toPerson(),
             createActionIntent(NotificationButtonReceiver.Action.DECLINE, pil.app.application),
@@ -106,7 +106,7 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
     ) = buildBaseCallNotification(context, channelId).apply {
         setFullScreenIntent(createFullScreenIntent(call), true)
         setOnlyAlertOnce(setOnlyAlertOnce)
-        style = createIncomingCallStyle(call)
+        style = buildNotificationStyle(call)
     }.build()
 
     private fun buildLegacyNotification(
