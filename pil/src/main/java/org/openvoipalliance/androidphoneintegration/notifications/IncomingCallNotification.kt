@@ -13,6 +13,7 @@ import android.provider.MediaStore
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import androidx.annotation.ColorRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import org.openvoipalliance.androidphoneintegration.R
@@ -24,7 +25,7 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
     Notification() {
 
     override val channelId = INCOMING_CALLS_CHANNEL_ID
-    override val notificationId = NOTIFICATION_ID
+    override val notificationId = 2435
 
     override fun createNotificationChannel() {
         val channel = NotificationChannel(
@@ -56,7 +57,20 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
     fun notify(call: Call, setOnlyAlertOnce: Boolean = false) {
         log("Starting using CHANNEL: $channelId")
         createNotificationChannel()
+        notificationManger.notify(notificationId, build(call, setOnlyAlertOnce))
+        incomingCallRinger.start()
+    }
 
+    fun build(call: Call, setOnlyAlertOnce: Boolean = false): android.app.Notification =
+        createNotificationChannel().run {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                buildCallStyleNotification(call, setOnlyAlertOnce)
+            } else {
+                buildLegacyNotification(call, setOnlyAlertOnce)
+            }
+        }
+
+    private fun createFullScreenIntent(call: Call): PendingIntent? {
         val fullScreenIntent = Intent(context, pil.app.activities.incomingCall).apply {
             putExtra("is_incoming", true)
             putExtra("remote_party_heading", call.remotePartyHeading)
@@ -67,66 +81,67 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
             flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION or Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
-        val fullScreenPendingIntent = PendingIntent.getActivity(
+        return PendingIntent.getActivity(
             context,
             0,
             fullScreenIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
+    }
 
-        val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            android.app.Notification.Builder(context, channelId).apply {
-                setFullScreenIntent(fullScreenPendingIntent, true)
-                setOnlyAlertOnce(setOnlyAlertOnce)
-                setSmallIcon(R.drawable.ic_service)
-                style = android.app.Notification.CallStyle.forIncomingCall(
-                    call.toPerson(),
-                    createActionIntent(NotificationButtonReceiver.Action.DECLINE,
-                        pil.app.application),
-                    createActionIntent(NotificationButtonReceiver.Action.ANSWER,
-                        pil.app.application),
-                )
-                    .setAnswerButtonColorHint(context.getColor(R.color.incoming_call_notification_answer_color))
-                    .setDeclineButtonColorHint(context.getColor(R.color.incoming_call_notification_decline_color))
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun buildNotificationStyle(call: Call) =
+        android.app.Notification.CallStyle.forIncomingCall(
+            call.toPerson(),
+            createActionIntent(NotificationButtonReceiver.Action.DECLINE, pil.app.application),
+            createActionIntent(NotificationButtonReceiver.Action.ANSWER, pil.app.application),
+        )
+            .setAnswerButtonColorHint(context.getColor(R.color.incoming_call_notification_answer_color))
+            .setDeclineButtonColorHint(context.getColor(R.color.incoming_call_notification_decline_color))
 
-                setCategory(android.app.Notification.CATEGORY_CALL)
-            }.build()
-        } else {
-            NotificationCompat.Builder(context, channelId).apply {
-                setFullScreenIntent(fullScreenPendingIntent, true)
-                setOnlyAlertOnce(setOnlyAlertOnce)
-                setSmallIcon(R.drawable.ic_service)
-                call.contact?.imageUri?.let {
-                    context.imageUriToBitmap(it)?.let { bitmap ->
-                        setLargeIcon(bitmap)
-                    }
-                }
-                setContentTitle(call.prettyRemoteParty)
-                setCategory(android.app.Notification.CATEGORY_CALL)
-                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                setContentText(context.getString(R.string.notification_incoming_context_text))
-                priority = NotificationCompat.PRIORITY_HIGH
-                addAction(
-                    R.drawable.ic_service,
-                    context.createColoredActionText(R.string.notification_answer_action,
-                        R.color.incoming_call_notification_answer_color),
-                    createActionIntent(NotificationButtonReceiver.Action.ANSWER,
-                        pil.app.application)
-                )
-                addAction(
-                    R.drawable.ic_service,
-                    context.createColoredActionText(R.string.notification_decline_action,
-                        R.color.incoming_call_notification_decline_color),
-                    createActionIntent(NotificationButtonReceiver.Action.DECLINE,
-                        pil.app.application)
-                )
-            }.build().also {
-                it.flags = it.flags or android.app.Notification.FLAG_INSISTENT
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun buildCallStyleNotification(
+        call: Call,
+        setOnlyAlertOnce: Boolean = false,
+    ) = buildBaseCallNotification(context, channelId).apply {
+        setFullScreenIntent(createFullScreenIntent(call), true)
+        setOnlyAlertOnce(setOnlyAlertOnce)
+        style = buildNotificationStyle(call)
+    }.build()
+
+    private fun buildLegacyNotification(
+        call: Call,
+        setOnlyAlertOnce: Boolean = false,
+    ) = NotificationCompat.Builder(context, channelId).apply {
+        setFullScreenIntent(createFullScreenIntent(call), true)
+        setOnlyAlertOnce(setOnlyAlertOnce)
+        setSmallIcon(R.drawable.ic_service)
+        call.contact?.imageUri?.let {
+            context.imageUriToBitmap(it)?.let { bitmap ->
+                setLargeIcon(bitmap)
             }
         }
-
-        notificationManger.notify(notificationId, notification)
-        incomingCallRinger.start()
+        setContentTitle(call.prettyRemoteParty)
+        setCategory(android.app.Notification.CATEGORY_CALL)
+        setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        setContentText(context.getString(R.string.notification_incoming_context_text))
+        priority = NotificationCompat.PRIORITY_HIGH
+        addAction(
+            R.drawable.ic_service,
+            context.createColoredActionText(R.string.notification_answer_action,
+                R.color.incoming_call_notification_answer_color),
+            createActionIntent(NotificationButtonReceiver.Action.ANSWER,
+                pil.app.application)
+        )
+        addAction(
+            R.drawable.ic_service,
+            context.createColoredActionText(R.string.notification_decline_action,
+                R.color.incoming_call_notification_decline_color),
+            createActionIntent(NotificationButtonReceiver.Action.DECLINE,
+                pil.app.application)
+        )
+    }.build().also {
+        it.flags = it.flags or android.app.Notification.FLAG_INSISTENT
     }
 
     override fun cancel() {
@@ -141,7 +156,6 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
         private const val INCOMING_CALLS_CHANNEL_ID = "Incoming Calls"
         private const val CANCEL_INCOMING_CALL_ACTION =
             "org.openvoipalliance.androidphoneintegration.INCOMING_CALL_CANCEL"
-        const val NOTIFICATION_ID = 676
     }
 }
 
