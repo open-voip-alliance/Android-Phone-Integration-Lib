@@ -15,7 +15,7 @@ internal abstract class Notification {
     protected val notificationManger: NotificationManager by di.koin.inject()
 
     protected abstract val channelId: String
-    protected abstract val notificationId: Int
+    abstract val notificationId: Int
 
     abstract fun createNotificationChannel()
 
