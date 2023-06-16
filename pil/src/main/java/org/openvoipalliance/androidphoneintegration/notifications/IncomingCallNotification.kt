@@ -16,6 +16,11 @@ import androidx.annotation.ColorRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.androidphoneintegration.call.Call
 import org.openvoipalliance.androidphoneintegration.logWithContext
@@ -147,7 +152,27 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
     override fun cancel() {
         super.cancel()
         incomingCallRinger.stop()
+        repeatBroadcastToEnsureIncomingCallActivityIsCancelled()
+    }
+
+    /**
+     * We want to send this broadcast a few times to make sure the incoming call screen has been
+     * properly cancelled, otherwise we might encounter a race-condition.
+     *
+     */
+    private fun repeatBroadcastToEnsureIncomingCallActivityIsCancelled() {
         context.sendBroadcast(Intent(CANCEL_INCOMING_CALL_ACTION))
+
+        CoroutineScope(IO).launch {
+            repeat(10) {
+                if (pil.calls.isInCall) return@repeat
+
+                CoroutineScope(Main).launch {
+                    repeatBroadcastToEnsureIncomingCallActivityIsCancelled()
+                }
+                delay(300)
+            }
+        }
     }
 
     private fun log(message: String) = logWithContext(message, "INCOMING-CALL-NOTIFICATION")
