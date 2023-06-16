@@ -168,7 +168,7 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
                 if (pil.calls.isInCall) return@repeat
 
                 CoroutineScope(Main).launch {
-                    repeatBroadcastToEnsureIncomingCallActivityIsCancelled()
+                    context.sendBroadcast(Intent(CANCEL_INCOMING_CALL_ACTION))
                 }
                 delay(300)
             }
