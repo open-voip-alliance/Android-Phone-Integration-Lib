@@ -12,6 +12,7 @@ data class Call(
     val isOnHold: Boolean,
     val uuid: String,
     val mos: Float,
+    val currentMos: Float,
     val contact: Contact?,
     val callId: String,
     val reason: String,
