@@ -189,6 +189,36 @@ internal class LinphoneSipRegisterRepository(
             }
         }
 
+        override fun onCallReceiveMasterKeyChanged(core: Core, call: Call, masterKey: String?) {
+            log("onCallReceiveMasterKeyChanged: Not implemented")
+        }
+
+        override fun onCallSendMasterKeyChanged(core: Core, call: Call, masterKey: String?) {
+            log("onCallSendMasterKeyChanged: Not implemented")
+        }
+
+        override fun onChatRoomSessionStateChanged(
+            core: Core,
+            chatRoom: ChatRoom,
+            state: Call.State?,
+            message: String
+        ) {
+            log("onChatRoomSessionStateChanged: Not implemented")
+        }
+
+        override fun onSubscribeReceived(
+            core: Core,
+            linphoneEvent: Event,
+            subscribeEvent: String,
+            body: Content?
+        ) {
+            log("onSubscribeReceived: Not implemented")
+        }
+
+        override fun onPreviewDisplayErrorOccurred(core: Core, errorCode: Int) {
+            log("onPreviewDisplayErrorOccurred: Not implemented")
+        }
+
         private fun hasExceededTimeout(startTime: Long): Boolean =
             (startTime + registrationTimeoutMs) < currentTime
 

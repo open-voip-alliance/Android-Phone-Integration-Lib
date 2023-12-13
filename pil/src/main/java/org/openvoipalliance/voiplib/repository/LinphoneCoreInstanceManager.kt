@@ -19,12 +19,11 @@ import java.io.FileOutputStream
 import java.util.*
 import org.linphone.core.Call as LinphoneCall
 
-internal class LinphoneCoreInstanceManager(private val context: Context, private val dns: Dns): SimpleCoreListener, LoggingServiceListener {
+internal class LinphoneCoreInstanceManager(private val context: Context): SimpleCoreListener, LoggingServiceListener {
 
     internal val state = CoreState()
 
-    lateinit var voipLibConfig: Config
-        internal set
+    private lateinit var voipLibConfig: Config
 
     private var linphoneCore: Core? = null
 
@@ -205,7 +204,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         core.videoPayloadTypes.forEach { it.enable(false) }
 
         core.audioPayloadTypes.forEach {
-            it.enable(codecs.contains(Codec.valueOf(it.mimeType.toUpperCase(Locale.ROOT))))
+            it.enable(codecs.contains(Codec.valueOf(it.mimeType.uppercase(Locale.ROOT))))
         }
 
         log("Disabled codecs: " + core.audioPayloadTypes.filter { !it.enabled() }.joinToString(", ") { it.mimeType })
@@ -247,6 +246,35 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
     override fun onAudioDevicesListUpdated(core: Core) =
         voipLibConfig.callListener.availableAudioDevicesUpdated()
 
+    override fun onCallReceiveMasterKeyChanged(
+        core: Core,
+        call: org.linphone.core.Call,
+        masterKey: String?
+    ) {
+        Log.e(TAG, "onCallReceiveMasterKeyChanged: Not implemented")
+    }
+
+    override fun onCallSendMasterKeyChanged(
+        core: Core,
+        call: org.linphone.core.Call,
+        masterKey: String?
+    ) {
+        Log.e(TAG, "onCallSendMasterKeyChanged: Not implemented")
+    }
+
+    override fun onChatRoomSessionStateChanged(
+        core: Core,
+        chatRoom: ChatRoom,
+        state: org.linphone.core.Call.State?,
+        message: String
+    ) {
+        Log.e(TAG, "onChatRoomSessionStateChanged: Not implemented")
+    }
+
+    override fun onPreviewDisplayErrorOccurred(core: Core, errorCode: Int) {
+        Log.e(TAG, "onPreviewDisplayErrorOccurred: Not implemented")
+    }
+
     override fun onTransferStateChanged(lc: Core, transfered: org.linphone.core.Call, newCallState: org.linphone.core.Call.State) {
         voipLibConfig.callListener.attendedTransferMerged(Call(transfered))
     }
@@ -282,6 +310,15 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         }
     }
 
+    override fun onSubscribeReceived(
+        core: Core,
+        linphoneEvent: Event,
+        subscribeEvent: String,
+        body: Content?
+    ) {
+        Log.e(TAG, "onSubscribeReceived: Not yet implemented")
+    }
+
     override fun onLogMessageWritten(service: LoggingService, domain: String, lev: org.linphone.core.LogLevel, message: String) {
         GlobalScope.launch(Dispatchers.IO) {
             voipLibConfig.logListener?.onLogMessageWritten(when (lev) {
@@ -293,16 +330,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
                 Fatal -> LogLevel.FATAL
             }, message)
         }
-    }
-
-    @Synchronized
-    fun destroy() {
-        state.destroyed = true
-        Factory.instance().loggingService.removeListener(this@LinphoneCoreInstanceManager)
-        linphoneCore?.isNetworkReachable = false
-        linphoneCore?.stop()
-        linphoneCore?.removeListener(this@LinphoneCoreInstanceManager)
-        linphoneCore = null
     }
 
     companion object {
