@@ -26,13 +26,6 @@ internal interface SimpleCoreListener : CoreListener {
 
     override fun onMessageReceivedUnableDecrypt(lc: Core, room: ChatRoom, message: ChatMessage) {}
 
-    override fun onSubscribeReceived(
-        lc: Core,
-        lev: Event,
-        subscribeEvent: String,
-        body: Content,
-    ) {}
-
     override fun onMessageSent(lc: Core, room: ChatRoom, message: ChatMessage) {}
 
     override fun onNotifyPresenceReceivedForUriOrTel(
