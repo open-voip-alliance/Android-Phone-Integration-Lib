@@ -19,12 +19,11 @@ import java.io.FileOutputStream
 import java.util.*
 import org.linphone.core.Call as LinphoneCall
 
-internal class LinphoneCoreInstanceManager(private val context: Context, private val dns: Dns): SimpleCoreListener, LoggingServiceListener {
+internal class LinphoneCoreInstanceManager(private val context: Context): SimpleCoreListener, LoggingServiceListener {
 
     internal val state = CoreState()
 
-    lateinit var voipLibConfig: Config
-        internal set
+    private lateinit var voipLibConfig: Config
 
     private var linphoneCore: Core? = null
 
@@ -205,7 +204,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
         core.videoPayloadTypes.forEach { it.enable(false) }
 
         core.audioPayloadTypes.forEach {
-            it.enable(codecs.contains(Codec.valueOf(it.mimeType.toUpperCase(Locale.ROOT))))
+            it.enable(codecs.contains(Codec.valueOf(it.mimeType.uppercase(Locale.ROOT))))
         }
 
         log("Disabled codecs: " + core.audioPayloadTypes.filter { !it.enabled() }.joinToString(", ") { it.mimeType })
@@ -331,16 +330,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context, private
                 Fatal -> LogLevel.FATAL
             }, message)
         }
-    }
-
-    @Synchronized
-    fun destroy() {
-        state.destroyed = true
-        Factory.instance().loggingService.removeListener(this@LinphoneCoreInstanceManager)
-        linphoneCore?.isNetworkReachable = false
-        linphoneCore?.stop()
-        linphoneCore?.removeListener(this@LinphoneCoreInstanceManager)
-        linphoneCore = null
     }
 
     companion object {
