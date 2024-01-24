@@ -25,7 +25,7 @@ internal class AndroidCallFramework(
         handle,
         BuildConfig.LIBRARY_PACKAGE_NAME,
     )
-        .setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED)
+        .setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED or PhoneAccount.CAPABILITY_PLACE_EMERGENCY_CALLS)
         .build()
 
     init {
