@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration.di
 
 import android.app.NotificationManager
 import android.telecom.TelecomManager
+import android.telephony.TelephonyManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import org.openvoipalliance.androidphoneintegration.PIL
@@ -63,6 +64,8 @@ val pilModule = module {
     single { androidContext().getSystemService(NotificationManager::class.java) }
 
     single { androidContext().getSystemService(android.media.AudioManager::class.java) }
+
+    single { androidContext().getSystemService(TelephonyManager::class.java) }
 
     single { IncomingCallNotification(get()) }
 
