@@ -1,8 +1,12 @@
 package org.openvoipalliance.androidphoneintegration
 
 import android.Manifest
+import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
-import android.telecom.Connection
+import android.net.Uri
+import android.os.Build
+import android.telephony.TelephonyManager
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.android.PlatformIntegrator
 import org.openvoipalliance.androidphoneintegration.audio.AudioManager
@@ -38,6 +42,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     internal val logManager: LogManager by di.koin.inject()
     internal val notifications: NotificationManager by di.koin.inject()
     internal val voipLibEventTranslator: VoipLibEventTranslator by di.koin.inject()
+    internal val telephonyManager: TelephonyManager by di.koin.inject()
 
     val actions: CallActions by di.koin.inject()
     val audio: AudioManager by di.koin.inject()
@@ -79,6 +84,12 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     fun call(number: String) {
         log("Attempting to make outgoing call")
 
+        if (isEmergencyNumber(number)) {
+            log("$number appears to be an emergency number, opening it in the native dialer")
+            app.startCallInNativeDialer(number)
+            return
+        }
+
         if (androidCallFramework.isInCall) {
             log("Currently in call and so cannot proceed with another", LogLevel.ERROR)
             events.broadcast(OutgoingCallSetupFailed(IN_CALL))
@@ -92,6 +103,12 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         }
 
         androidCallFramework.placeCall(number)
+    }
+
+    private fun isEmergencyNumber(number: String) = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        telephonyManager.isEmergencyNumber(number)
+    } else {
+        false
     }
 
     /**
@@ -231,3 +248,9 @@ val Auth?.isNullOrInvalid: Boolean
     } else {
         !this.isValid
     }
+
+fun ApplicationSetup.startCallInNativeDialer(number: String) {
+    application.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$number")).apply {
+        flags = FLAG_ACTIVITY_NEW_TASK
+    })
+}
