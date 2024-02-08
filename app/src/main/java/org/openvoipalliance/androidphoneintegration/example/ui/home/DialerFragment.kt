@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_dialer.*
 import org.openvoipalliance.androidphoneintegration.PIL
+import org.openvoipalliance.androidphoneintegration.contacts.SupplementaryContact
 import org.openvoipalliance.androidphoneintegration.events.Event
 import org.openvoipalliance.androidphoneintegration.events.PILEventListener
 import org.openvoipalliance.androidphoneintegration.example.R
@@ -66,6 +67,10 @@ class DialerFragment : Fragment(), PILEventListener {
 
         dialer.onCallListener = Dialer.OnCallListener { number ->
             requestCallingPermissions()
+            pil.preferences = pil.preferences.copy(supplementaryContacts = setOf(
+                SupplementaryContact(name = "Supplementary Contact", number = number)
+            ))
+
             if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PERMISSION_GRANTED) {
                 pil.call(number)
             }

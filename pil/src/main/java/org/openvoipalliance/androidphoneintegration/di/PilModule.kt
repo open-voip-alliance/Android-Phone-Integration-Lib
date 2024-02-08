@@ -11,6 +11,7 @@ import org.openvoipalliance.androidphoneintegration.audio.AudioManager
 import org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator
 import org.openvoipalliance.androidphoneintegration.call.*
 import org.openvoipalliance.androidphoneintegration.call.Calls.Companion.MAX_CALLS
+import org.openvoipalliance.androidphoneintegration.configuration.Preferences
 import org.openvoipalliance.androidphoneintegration.contacts.Contacts
 import org.openvoipalliance.androidphoneintegration.events.EventsManager
 import org.openvoipalliance.androidphoneintegration.helpers.VoIPLibHelper
@@ -29,6 +30,10 @@ import org.openvoipalliance.voiplib.repository.registration.LinphoneSipRegisterR
 
 fun getModules() = listOf(pilModule)
 
+// Resolves the current preferences from the [PIL] that doesn't require depending on the whole
+// [PIL] object.
+typealias CurrentPreferencesResolver = () -> Preferences
+
 val pilModule = module {
 
     single {
@@ -41,11 +46,13 @@ val pilModule = module {
 
     single { CallFactory(get()) }
 
-    single { Contacts(androidContext()) }
+    single { Contacts(androidContext(), get()) }
 
     single { PlatformIntegrator(get(), get(), get()) }
 
     single { PIL.instance }
+
+    factory <CurrentPreferencesResolver>{ {get<PIL>().preferences}  }
 
     single { VoIPLib() }
 
