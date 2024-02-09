@@ -6,10 +6,10 @@ import org.openvoipalliance.voiplib.model.Codec
 data class Preferences(
     val codecs: Array<Codec>,
     val useApplicationProvidedRingtone: Boolean,
-    val supplementaryContacts: Set<SupplementaryContact>,
+    val supplementaryContacts: Set<SupplementaryContact> = setOf(),
 ) {
     companion object {
-        val DEFAULT = Preferences(arrayOf(Codec.OPUS), false, setOf())
+        val DEFAULT = Preferences(arrayOf(Codec.OPUS), false)
     }
 
     override fun equals(other: Any?): Boolean {
