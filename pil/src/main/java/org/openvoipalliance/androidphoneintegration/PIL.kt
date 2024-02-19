@@ -28,6 +28,7 @@ import org.openvoipalliance.androidphoneintegration.push.TokenFetcher
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.voiplib.VoIPLib
 import org.openvoipalliance.voiplib.config.Config
+import org.openvoipalliance.voiplib.model.Codec
 import org.openvoipalliance.voiplib.model.RegistrationState.FAILED
 import org.openvoipalliance.voiplib.model.RegistrationState.REGISTERED
 import kotlin.coroutines.resume
@@ -71,7 +72,7 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
             Config(
                 callListener = voipLibEventTranslator,
                 logListener = logManager,
-                codecs = preferences.codecs,
+                codecs = arrayOf(Codec.OPUS),
                 userAgent = app.userAgent
             )
         )
