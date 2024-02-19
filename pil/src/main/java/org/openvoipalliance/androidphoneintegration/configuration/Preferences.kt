@@ -1,27 +1,25 @@
 package org.openvoipalliance.androidphoneintegration.configuration
 
 import org.openvoipalliance.androidphoneintegration.contacts.SupplementaryContact
-import org.openvoipalliance.voiplib.model.Codec
 
 data class Preferences(
-    val codecs: Array<Codec>,
     val useApplicationProvidedRingtone: Boolean,
     val supplementaryContacts: Set<SupplementaryContact> = setOf(),
 ) {
     companion object {
-        val DEFAULT = Preferences(arrayOf(Codec.OPUS), false)
+        val DEFAULT = Preferences(useApplicationProvidedRingtone = false)
     }
 
     override fun equals(other: Any?): Boolean {
         if (other !is Preferences) return false
 
         return useApplicationProvidedRingtone == other.useApplicationProvidedRingtone
-                && codecs contentEquals other.codecs
+                && supplementaryContacts == other.supplementaryContacts
     }
 
     override fun hashCode(): Int {
-        var result = codecs.contentHashCode()
-        result = 31 * result + useApplicationProvidedRingtone.hashCode()
+        var result = useApplicationProvidedRingtone.hashCode()
+        result = 31 * result + supplementaryContacts.hashCode()
         return result
     }
 }
