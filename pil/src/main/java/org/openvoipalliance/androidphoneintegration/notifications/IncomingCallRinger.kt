@@ -64,7 +64,7 @@ class IncomingCallRinger(
     }
 
     private val audioFocusRequest by lazy {
-        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).run {
+        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE).run {
             setAudioAttributes(ringAttributes)
             setAcceptsDelayedFocusGain(false)
             setOnAudioFocusChangeListener(this@IncomingCallRinger.handler)
