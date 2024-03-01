@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
     id("com.android.library")
     kotlin("android")
@@ -45,13 +47,14 @@ val sourcesJar by tasks.registering(Jar::class) {
 
 afterEvaluate {
     publishing {
-        publications {
-            create<MavenPublication>("release") {
-                from(components.findByName("release"))
-
-                groupId = "org.openvoipalliance"
-                artifactId = "AndroidPlatformIntegration"
-
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = URI("https://maven.pkg.github.com/open-voip-alliance/Android-Phone-Integration-Lib")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
             }
         }
     }
