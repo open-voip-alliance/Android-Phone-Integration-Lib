@@ -10,6 +10,8 @@ plugins {
     id("kotlin-android")
 }
 
+version = "0.1.127"
+
 android {
     compileSdkVersion(31)
     defaultConfig {
@@ -45,27 +47,32 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(android.sourceSets.getByName("main").java.srcDirs)
 }
 
-afterEvaluate {
-    publishing {
-        repositories {
-            maven {
-                name = "GitHubPackages"
-                url = URI("https://maven.pkg.github.com/open-voip-alliance/Android-Phone-Integration-Lib")
-                credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
-                }
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = URI("https://maven.pkg.github.com/open-voip-alliance/Android-Phone-Integration-Lib")
+            group = "org.openvoipalliance"
+            credentials {
+                username = System.getenv("ACTOR_GITHUB")
+                password = System.getenv("TOKEN_GITHUB")
             }
+        }
+    }
+
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components.findByName("release"))
         }
     }
 }
 
 task("generateDummyGoogleServicesJsonFile") {
-        val file = File("app/google-services.json")
+        val file = File("${project.projectDir}/../app/google-services.json")
 
         if (file.exists()) return@task
 
-        val exampleFile = File("app/google-services.example")
+        val exampleFile = File("${project.projectDir}/../app/google-services.example")
 
         if (!exampleFile.exists()) {
             print("Example file does not exist, unable to make google-services.json file. Please add a ${exampleFile.path}.")
