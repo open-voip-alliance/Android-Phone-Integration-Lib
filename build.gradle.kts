@@ -20,6 +20,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
         maven {
             url = uri("https://linphone.org/maven_repository/")
         }

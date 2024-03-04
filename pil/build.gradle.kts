@@ -1,5 +1,3 @@
-import java.net.URI
-
 plugins {
     id("com.android.library")
     kotlin("android")
@@ -9,8 +7,6 @@ plugins {
     id("com.kezong.fat-aar")
     id("kotlin-android")
 }
-
-version = "0.1.128"
 
 android {
     compileSdkVersion(31)
@@ -47,43 +43,37 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(android.sourceSets.getByName("main").java.srcDirs)
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = URI("https://maven.pkg.github.com/open-voip-alliance/Android-Phone-Integration-Lib")
-            group = "org.openvoipalliance"
-            credentials {
-                username = System.getenv("ACTOR_GITHUB")
-                password = System.getenv("TOKEN_GITHUB")
-            }
-        }
-    }
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components.findByName("release"))
 
-    publications {
-        register<MavenPublication>("gpr") {
-            from(components.findByName("release"))
+                groupId = "org.openvoipalliance"
+                artifactId = "AndroidPlatformIntegration"
+
+            }
         }
     }
 }
 
 task("generateDummyGoogleServicesJsonFile") {
-        val file = File("${project.projectDir}/../app/google-services.json")
+    val file = File("app/google-services.json")
 
-        if (file.exists()) return@task
+    if (file.exists()) return@task
 
-        val exampleFile = File("${project.projectDir}/../app/google-services.example")
+    val exampleFile = File("app/google-services.example")
 
-        if (!exampleFile.exists()) {
-            print("Example file does not exist, unable to make google-services.json file. Please add a ${exampleFile.path}.")
-            return@task
-        }
+    if (!exampleFile.exists()) {
+        print("Example file does not exist, unable to make google-services.json file. Please add a ${exampleFile.path}.")
+        return@task
+    }
 
-        val newFile = exampleFile.copyTo(file, overwrite = true)
+    val newFile = exampleFile.copyTo(file, overwrite = true)
 
-        if (newFile.exists()) {
-            print("Created dummy google-services.json file.")
-        }
+    if (newFile.exists()) {
+        print("Created dummy google-services.json file.")
+    }
 }
 
 
