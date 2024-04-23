@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.telecom.CallAudioState.*
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.call.Calls
 import org.openvoipalliance.androidphoneintegration.events.Event
@@ -18,7 +17,6 @@ import org.openvoipalliance.androidphoneintegration.log
 import org.openvoipalliance.androidphoneintegration.telecom.AndroidCallFramework
 import org.openvoipalliance.androidphoneintegration.telecom.Connection
 import org.openvoipalliance.voiplib.VoIPLib
-import org.openvoipalliance.voiplib.model.Codec
 
 class AudioManager internal constructor(
     private val context: Context,
@@ -51,6 +49,8 @@ class AudioManager internal constructor(
         }
 
         connection.setAudioRoute(pilRouteToNativeRoute(route))
+
+        events.broadcast(Event.CallSessionEvent.AudioStateUpdated::class)
 
         // The echo limiter is a brute-force method to prevent echo, it should only be used
         // when it is really necessary, such as when the user is using the phone's speaker.
