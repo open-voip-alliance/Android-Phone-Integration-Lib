@@ -7,12 +7,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 34
 
     defaultConfig {
-        applicationId("org.openvoipalliance.androidplatformintegration")
-        minSdkVersion(26)
-        targetSdkVersion(31)
+        applicationId = "org.openvoipalliance.androidplatformintegration"
+        minSdk = 26
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

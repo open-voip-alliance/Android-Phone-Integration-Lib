@@ -3,16 +3,17 @@ plugins {
     kotlin("android")
     id("maven-publish")
     id("com.jfrog.bintray")
-    id("com.palantir.git-version") version "0.12.3"
+    id("com.palantir.git-version") version "3.0.0"
     id("com.kezong.fat-aar")
     id("kotlin-android")
 }
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 33
+
     defaultConfig {
-        minSdkVersion(26)
-        targetSdkVersion(31)
+        minSdk = 26
+        targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         createVersionInformation(this)
     }
@@ -35,7 +36,7 @@ dependencies {
     androidTestImplementation("org.mockito:mockito-android:+")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
-    embed("org.linphone.minimal:linphone-sdk-android:5.2.110")
+    embed("org.linphone.minimal:linphone-sdk-android:5.3.53")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {

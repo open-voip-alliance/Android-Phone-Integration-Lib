@@ -10,5 +10,6 @@ enum class Codec {
     OPUS,
     PCMU,
     PCMA,
-    SPEEX
+    SPEEX,
+    BV16
 }
