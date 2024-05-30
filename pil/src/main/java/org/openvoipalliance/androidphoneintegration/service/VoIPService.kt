@@ -50,8 +50,9 @@ internal class VoIPService : CoreService(), PILEventListener {
         callNotification.createNotificationChannel()
     }
 
-    override fun showForegroundServiceNotification() =
+    override fun showForegroundServiceNotification(isVideoCall: Boolean) {
         showForegroundNotification(callNotification.build(), callNotification.notificationId)
+    }
 
     private fun showForegroundNotification(notification: Notification, id: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -80,7 +81,7 @@ internal class VoIPService : CoreService(), PILEventListener {
         pil.writeLog("Starting the VoIP Service and creating notification channels")
         enableProximitySensor()
         handler.post(callEventLoop)
-        showForegroundServiceNotification()
+        showForegroundServiceNotification(false)
 
         return START_STICKY
     }
@@ -153,7 +154,7 @@ internal class VoIPService : CoreService(), PILEventListener {
         updateNotification()
 
         if (event is Event.CallSessionEvent.CallConnected) {
-            showForegroundServiceNotification()
+            showForegroundServiceNotification(false)
             pil.androidCallFramework.connection?.updateCurrentRouteBasedOnAudioState()
         }
     }

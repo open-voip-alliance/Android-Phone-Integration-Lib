@@ -9,10 +9,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion(31)
+    compileSdkVersion(33)
     defaultConfig {
         minSdkVersion(26)
-        targetSdkVersion(31)
+        targetSdkVersion(33)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         createVersionInformation(this)
     }
@@ -35,7 +35,7 @@ dependencies {
     androidTestImplementation("org.mockito:mockito-android:+")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
-    embed("org.linphone.minimal:linphone-sdk-android:5.2.110")
+    embed("org.linphone.minimal:linphone-sdk-android:5.3.53")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {

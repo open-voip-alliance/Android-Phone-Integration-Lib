@@ -51,8 +51,6 @@ internal interface SimpleCoreListener : CoreListener {
 
     override fun onEcCalibrationAudioUninit(lc: Core) {}
 
-    override fun onNotifyReceived(lc: Core, lev: Event, notifiedEvent: String, body: Content) {}
-
     override fun onCallEncryptionChanged(
         lc: Core,
         call: Call,
@@ -151,5 +149,41 @@ internal interface SimpleCoreListener : CoreListener {
 
     override fun onConferenceInfoReceived(core: Core, conferenceInfo: ConferenceInfo) {}
 
-    override fun onNotifySent(core: Core, linphoneEvent: Event, body: Content) {}
+    override fun onPreviewDisplayErrorOccurred(p0: Core, p1: Int) {}
+
+    override fun onNewMessageReaction(
+        p0: Core,
+        p1: ChatRoom,
+        p2: ChatMessage,
+        p3: ChatMessageReaction,
+    ) {}
+
+    override fun onReactionRemoved(p0: Core, p1: ChatRoom, p2: ChatMessage, p3: Address) {}
+
+    override fun onChatRoomSessionStateChanged(
+        p0: Core,
+        p1: ChatRoom,
+        p2: Call.State?,
+        p3: String,
+    ) {}
+
+    override fun onCallSendMasterKeyChanged(p0: Core, p1: Call, p2: String?) {}
+
+    override fun onCallReceiveMasterKeyChanged(p0: Core, p1: Call, p2: String?) {}
+
+    override fun onNotifySent(p0: Core, p1: Event, p2: Content?) {}
+
+    override fun onNotifyReceived(p0: Core, p1: Event, p2: String, p3: Content?) {}
+
+    override fun onSubscribeReceived(p0: Core, p1: Event, p2: String, p3: Content?) {}
+
+    override fun onPublishReceived(p0: Core, p1: Event, p2: String, p3: Content?) {}
+
+    override fun onDefaultAccountChanged(p0: Core, p1: Account?) {}
+
+    override fun onAccountAdded(p0: Core, p1: Account) {}
+
+    override fun onAccountRemoved(p0: Core, p1: Account) {}
+
+    override fun onNewAlertTriggered(p0: Core, p1: Alert) {}
 }
