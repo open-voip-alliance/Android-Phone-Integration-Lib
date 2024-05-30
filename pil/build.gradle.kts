@@ -3,16 +3,17 @@ plugins {
     kotlin("android")
     id("maven-publish")
     id("com.jfrog.bintray")
-    id("com.palantir.git-version") version "0.12.3"
+    id("com.palantir.git-version") version "3.0.0"
     id("com.kezong.fat-aar")
     id("kotlin-android")
 }
 
 android {
-    compileSdkVersion(33)
+    compileSdk = 33
+
     defaultConfig {
-        minSdkVersion(26)
-        targetSdkVersion(33)
+        minSdk = 26
+        targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         createVersionInformation(this)
     }

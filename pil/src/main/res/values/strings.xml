@@ -24,4 +24,8 @@
     <string name="notification_decline_action">Decline</string>
 
     <string name="notification_incoming_context_text">Ringing…</string>
+
+<!--    Seemingly these need to be present in the latest version of Linphone or it crashes.-->
+    <string name="linphone_sdk_version">5.3.53</string>
+    <string name="linphone_sdk_branch"></string>
 </resources>
