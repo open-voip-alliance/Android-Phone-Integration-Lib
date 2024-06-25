@@ -221,7 +221,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val username = prefs.getString("username", "") ?: ""
         val password = prefs.getString("password", "") ?: ""
         val domain = prefs.getString("domain", "") ?: ""
-        val port = (prefs.getString("port", "0") ?: "0").toInt()
+        val port = (prefs.getString("port", "0")?.takeIf { it.isNotEmpty() } ?: "0").toInt()
 
         if (username.isNotBlank() && password.isNotBlank() && domain.isNotBlank() && port != 0) {
             pil.auth = Auth(

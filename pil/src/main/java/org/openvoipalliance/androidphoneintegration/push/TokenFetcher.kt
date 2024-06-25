@@ -18,7 +18,14 @@ class TokenFetcher(private val middleware: Middleware?): OnCompleteListener<Stri
             return
         }
 
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(this)
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(this).addOnFailureListener {
+            it.message?.let { it1 ->
+                log(
+                    message = it1,
+                    LogLevel.ERROR
+                )
+            }
+        }
     }
 
     override fun onComplete(task: Task<String>) {

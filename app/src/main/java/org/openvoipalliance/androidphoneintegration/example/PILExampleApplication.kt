@@ -24,7 +24,7 @@ class PILExampleApplication : Application() {
         val username = prefs.getString("username", "") ?: ""
         val password = prefs.getString("password", "") ?: ""
         val domain = prefs.getString("domain", "") ?: ""
-        val port = (prefs.getString("port", "0") ?: "0").toInt()
+        val port = (prefs.getString("port", "0")?.takeIf { it.isNotEmpty() } ?: "0").toInt()
 
         val userAuth = Auth(
             username = username,
