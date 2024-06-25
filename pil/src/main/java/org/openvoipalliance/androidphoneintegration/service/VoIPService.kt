@@ -122,32 +122,13 @@ internal class VoIPService : CoreService(), PILEventListener {
         pil.writeLog("Task has been killed, ending calls and stopping pil.")
         pil.calls.forEach { _ -> pil.actions.end() }
     }
-
-    private val shouldShowIncomingCallNotification: Boolean
-        get() {
-            val call = pil.calls.active
-            return call != null
-                    && call.direction == CallDirection.INBOUND
-                    && listOf(
-                CallState.INITIALIZING,
-                CallState.RINGING,
-            ).contains(call.state) && pil.calls.inactive == null;
-        }
-
     private fun updateNotification() {
         val call = pil.calls.active
 
-        if (shouldShowIncomingCallNotification) {
-            showForegroundNotification(
-                incomingCallNotification.build(call!!),
-                incomingCallNotification.notificationId,
-            )
-        } else {
-            showForegroundNotification(
-                callNotification.build(call),
-                callNotification.notificationId,
-            )
-        }
+        showForegroundNotification(
+            callNotification.build(call),
+            callNotification.notificationId,
+        )
     }
 
     override fun onEvent(event: Event) {

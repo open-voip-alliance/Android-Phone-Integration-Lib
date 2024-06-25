@@ -5,7 +5,7 @@ import org.openvoipalliance.androidphoneintegration.log
 
 internal class NotificationManager(
     private val pil: PIL,
-    private val incomingCallNotification: IncomingCallNotification,
+    public val incomingCallNotification: IncomingCallNotification,
 ) {
 
     /**

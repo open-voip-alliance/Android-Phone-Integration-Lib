@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.openvoipalliance.androidphoneintegration.R
+import org.openvoipalliance.androidphoneintegration.android.SilenceIncomingCallReceiver
 import org.openvoipalliance.androidphoneintegration.call.Call
 import org.openvoipalliance.androidphoneintegration.logWithContext
 import org.openvoipalliance.androidphoneintegration.service.NotificationButtonReceiver
@@ -112,6 +113,14 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
         setFullScreenIntent(createFullScreenIntent(call), true)
         setOnlyAlertOnce(setOnlyAlertOnce)
         style = buildNotificationStyle(call)
+        setDeleteIntent(PendingIntent.getBroadcast(context, 0, Intent(
+            context,
+            SilenceIncomingCallReceiver::class.java
+        ).apply {
+            action =
+                SILENCE_INCOMING_CALL_ACTION
+        },
+            PendingIntent.FLAG_IMMUTABLE))
     }.build()
 
     private fun buildLegacyNotification(
@@ -181,6 +190,9 @@ internal class IncomingCallNotification(private val incomingCallRinger: Incoming
         private const val INCOMING_CALLS_CHANNEL_ID = "Incoming Calls"
         private const val CANCEL_INCOMING_CALL_ACTION =
             "org.openvoipalliance.androidphoneintegration.INCOMING_CALL_CANCEL"
+
+        private const val SILENCE_INCOMING_CALL_ACTION =
+            "org.openvoipalliance.androidphoneintegration.SILENCE_INCOMING_CALL_ACTION"
     }
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="org.openvoipalliance.androidphoneintegration" >
+    package="org.openvoipalliance.androidphoneintegration">
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -24,21 +24,29 @@
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="s" />
 
-    <application android:largeHeap="true" >
+    <application android:largeHeap="true">
+        <receiver
+            android:name=".android.SilenceIncomingCallReceiver"
+            android:enabled="true"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="org.openvoipalliance.androidphoneintegration.SILENCE_INCOMING_CALL_ACTION" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".telecom.ConnectionService"
-            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE">
             <intent-filter>
                 <action android:name="android.telecom.ConnectionService" />
             </intent-filter>
         </service>
-
         <service
             android:name=".service.VoIPService"
-            android:foregroundServiceType="phoneCall|microphone"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="phoneCall|microphone" />
 
         <receiver
             android:name=".service.NotificationButtonReceiver"
@@ -52,7 +60,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>
