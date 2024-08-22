@@ -56,13 +56,7 @@ internal class VoIPService : CoreService(), PILEventListener {
 
     private fun showForegroundNotification(notification: Notification, id: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val types = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                FOREGROUND_SERVICE_TYPE_MICROPHONE or FOREGROUND_SERVICE_TYPE_PHONE_CALL
-            } else {
-                FOREGROUND_SERVICE_TYPE_PHONE_CALL
-            }
-
-            startForeground(id, notification, types)
+            startForeground(id, notification, FOREGROUND_SERVICE_TYPE_PHONE_CALL)
         } else {
             startForeground(id, notification)
         }
