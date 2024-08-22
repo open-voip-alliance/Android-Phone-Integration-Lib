@@ -2,7 +2,6 @@ plugins {
     id("com.android.library")
     kotlin("android")
     id("maven-publish")
-    id("com.jfrog.bintray")
     id("com.palantir.git-version") version "3.0.0"
     id("com.kezong.fat-aar")
     id("kotlin-android")

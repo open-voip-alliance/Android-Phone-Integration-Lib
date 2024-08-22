@@ -10,7 +10,6 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:7.4.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${project.extra["kotlinVersion"]}")
-        classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
         classpath("com.google.gms:google-services:4.4.1")
         classpath("com.github.kezong:fat-aar:1.3.6")
     }
