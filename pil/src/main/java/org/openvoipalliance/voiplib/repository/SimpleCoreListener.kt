@@ -88,13 +88,6 @@ internal interface SimpleCoreListener : CoreListener {
 
     override fun onEcCalibrationAudioInit(lc: Core) {}
 
-    override fun onVersionUpdateCheckResultReceived(
-        lc: Core,
-        result: VersionUpdateCheckResult,
-        version: String,
-        url: String?,
-    ) {}
-
     override fun onRegistrationStateChanged(
         lc: Core,
         cfg: ProxyConfig,
@@ -186,4 +179,11 @@ internal interface SimpleCoreListener : CoreListener {
     override fun onAccountRemoved(p0: Core, p1: Account) {}
 
     override fun onNewAlertTriggered(p0: Core, p1: Alert) {}
+
+    override fun onVersionUpdateCheckResultReceived(
+        core: Core,
+        result: VersionUpdateCheckResult,
+        version: String?,
+        url: String?,
+    ) {}
 }
