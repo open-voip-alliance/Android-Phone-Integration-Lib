@@ -20,6 +20,10 @@ internal class NotificationButtonReceiver : BroadcastReceiver() {
 
         pil.notifications.dismissStale()
 
+        // We need to start the VoIP service here, or we don't have access to the microphone.
+        // See: https://developer.android.com/guide/components/foreground-services#bg-access-restriction-exemptions
+        context.startService(Intent(context, VoIPService::class.java))
+
         try {
             val action = valueOf(intent.action ?: "")
 

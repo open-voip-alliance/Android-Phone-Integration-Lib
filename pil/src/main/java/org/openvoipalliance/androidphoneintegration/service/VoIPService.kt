@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import org.linphone.core.tools.Log
 import org.linphone.core.tools.service.CoreService
 import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.call.CallDirection
@@ -62,7 +63,12 @@ internal class VoIPService : CoreService(), PILEventListener {
                 FOREGROUND_SERVICE_TYPE_PHONE_CALL
             }
 
-            startForeground(id, notification, types)
+            try {
+                startForeground(id, notification, types)
+            } catch (e: Exception) {
+                pil.writeLog("Can't start service as foreground! $e")
+            }
+
         } else {
             startForeground(id, notification)
         }
