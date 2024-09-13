@@ -10,7 +10,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.voipgrid.vialer"
+        applicationId = "org.openvoipalliance.androidplatformintegration"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
