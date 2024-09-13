@@ -2,6 +2,7 @@ package org.openvoipalliance.androidphoneintegration.example
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.preference.PreferenceManager
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,7 @@ class VoIPGRIDMiddleware(private val context: Context) : Middleware {
     suspend fun register(): Boolean = withContext(Dispatchers.IO) {
         val data = FormBody.Builder().apply {
             add("name", prefs.getString("voipgrid_username", "")!!)
-            add("token", token!!)
+            add("token", androidPushToken!!)
             add("sip_user_id", prefs.getString("username", "")!!)
             add("os_version", Build.VERSION.CODENAME)
             add("client_version", Build.VERSION.RELEASE)
@@ -33,12 +34,18 @@ class VoIPGRIDMiddleware(private val context: Context) : Middleware {
             .post(data)
             .build()
 
-        return@withContext client.newCall(request).execute().isSuccessful
+        val response = client.newCall(request).execute()
+
+        if (!response.isSuccessful) {
+            Log.e("Middleware", "Failed to register with middleware ${response.code} ${Build.VERSION.RELEASE}")
+        }
+
+        return@withContext response.isSuccessful
     }
 
     suspend fun unregister(): Boolean = withContext(Dispatchers.IO) {
         val data = FormBody.Builder().apply {
-            add("token", token!!)
+            add("token", androidPushToken!!)
             add("sip_user_id", prefs.getString("username", "")!!)
             add("app", context.packageName!!)
         }.build()
@@ -94,10 +101,10 @@ class VoIPGRIDMiddleware(private val context: Context) : Middleware {
     }
 
     override fun tokenReceived(token: String) {
-        Companion.token = token
+        androidPushToken = token
     }
 
     companion object {
-        var token: String? = null
+        var androidPushToken: String? = null
     }
 }

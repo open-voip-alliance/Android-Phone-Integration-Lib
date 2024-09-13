@@ -92,9 +92,8 @@ class VoIPLib {
     val version
         get() = linphoneCoreInstanceManager.safeLinphoneCore?.version ?: ""
 
-    fun refreshRegistration() {
-        linphoneCoreInstanceManager.safeLinphoneCore?.refreshRegisters()
-    }
+    fun processPushNotification(callId: String) =
+        linphoneCoreInstanceManager.safeLinphoneCore?.processPushNotification(callId)
 
     fun startEchoCancellerCalibration() {
         linphoneCoreInstanceManager.safeLinphoneCore?.startEchoCancellerCalibration()

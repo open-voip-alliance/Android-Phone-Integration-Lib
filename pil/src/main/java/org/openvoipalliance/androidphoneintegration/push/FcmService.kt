@@ -52,7 +52,14 @@ internal class FcmService : FirebaseMessagingService() {
         whenNetworkReachable(remoteMessage, middleware) {
             log("Continuing to register")
 
+            remoteMessage.data[pil.app.pushMessageCallIdKey]?.let { callId ->
+                log("Processing push notification using call id key ${pil.app.pushMessageCallIdKey}: $callId")
+                pil.phoneLibHelper.processPushNotification(callId)
+            }
+
             pil.phoneLibHelper.register { success ->
+                log("Registration has been completed, successful: $success")
+
                 when (success) {
                     true -> middleware.respond(remoteMessage, true)
                     false -> middleware.respond(remoteMessage, false, UNABLE_TO_REGISTER)

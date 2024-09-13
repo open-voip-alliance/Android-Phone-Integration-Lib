@@ -59,7 +59,13 @@ data class ApplicationSetup(
      * notification.
      *
      */
-    val onMissedCallNotificationPressed: PendingIntent? = null
+    val onMissedCallNotificationPressed: PendingIntent? = null,
+
+    /**
+     * The key in the push message data that contains the call id, this will help us setup the
+     * voip lib when we receive a push message.
+     */
+    val pushMessageCallIdKey: String = "unique_key",
 ) {
     enum class AutomaticallyLaunchCallActivity {
         // Activities will never be automatically launched (they will still be launched via direct user input)

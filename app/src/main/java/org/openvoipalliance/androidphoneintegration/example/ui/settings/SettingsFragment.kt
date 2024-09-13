@@ -3,6 +3,7 @@ package org.openvoipalliance.androidphoneintegration.example.ui.settings
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.text.InputType
 import android.widget.Toast
 import androidx.preference.*
@@ -28,6 +29,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private val voIPGRIDMiddleware by lazy { VoIPGRIDMiddleware(requireActivity()) }
 
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         loadFromFile()
         setPreferencesFromResource(R.xml.settings, rootKey)
@@ -35,9 +37,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             prefs.getString("username", "")
         }
 
-        findPreference<Preference>("voipgrid_middleware_token")?.summaryProvider = Preference.SummaryProvider<Preference> {
-            VoIPGRIDMiddleware.token
-        }
+        findPreference<Preference>("voipgrid_middleware_token")?.summary = VoIPGRIDMiddleware.androidPushToken
 
         findPreference<EditTextPreference>("voipgrid_username")?.summaryProvider = Preference.SummaryProvider<EditTextPreference> {
             prefs.getString("voipgrid_username", "")
@@ -132,7 +132,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>("voipgrid_middleware_register")?.setOnPreferenceClickListener {
             GlobalScope.launch {
-                if (VoIPGRIDMiddleware.token == null) {
+                if (Looper.myLooper() == null) {
+                    Looper.prepare();
+                }
+                if (VoIPGRIDMiddleware.androidPushToken == null) {
                     Toast.makeText(this@SettingsFragment.context, "No push token", Toast.LENGTH_LONG).show()
                     return@launch
                 }
@@ -263,6 +266,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onResume() {
         super.onResume()
+        PIL.instance.pushToken.request()
+        findPreference<Preference>("voipgrid_middleware_token")?.summary = VoIPGRIDMiddleware.androidPushToken
         updateAuthenticationStatus()
         updateVoipgridAuthenticationStatus()
     }

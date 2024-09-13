@@ -43,4 +43,6 @@ internal class VoIPLibHelper(
 
     private fun log(message: String, level: PilLogLevel = PilLogLevel.INFO) =
         logWithContext(message, "PHONE-LIB-HELPER", level)
+
+    fun processPushNotification(callId: String) = phoneLib.processPushNotification(callId)
 }

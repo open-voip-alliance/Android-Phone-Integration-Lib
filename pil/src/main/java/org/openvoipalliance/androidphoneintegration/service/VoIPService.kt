@@ -65,6 +65,7 @@ internal class VoIPService : CoreService(), PILEventListener {
 
             try {
                 startForeground(id, notification, types)
+                pil.writeLog("Service started as foreground with types $types")
             } catch (e: Exception) {
                 pil.writeLog("Can't start service as foreground! $e")
             }

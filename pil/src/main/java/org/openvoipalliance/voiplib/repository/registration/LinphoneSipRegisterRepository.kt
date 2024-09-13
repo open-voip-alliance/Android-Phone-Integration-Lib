@@ -36,6 +36,7 @@ internal class LinphoneSipRegisterRepository(
             callback(FAILED)
             return
         }
+        core.processPushNotification("asd")
 
         val auth = pil.auth ?: run {
             log("Unable to register with no auth", ERROR)
@@ -56,8 +57,10 @@ internal class LinphoneSipRegisterRepository(
         this.callback = callback
 
         if (core.accountList.isNotEmpty()) {
-            log("SIP account not found, re-registering.")
+            log("We are already registered, refreshing our registration")
             core.refreshRegisters()
+            core.iterate()
+            log("Registration refreshed")
             return
         }
 
@@ -100,11 +103,11 @@ internal class LinphoneSipRegisterRepository(
         port: String,
     ): Account = core.createAccount(
         core.createAccountParams().apply {
-            identityAddress = core.interpretUrl("sip:$name@$domain:$port")
+            identityAddress = core.interpretUrl("sip:$name@$domain:$port", false)
             isRegisterEnabled = true
             // [transport=tls] must be included or you will experience intermittent certification
             // verification issues - especially when changing networks.
-            serverAddress = core.interpretUrl("sip:$domain;transport=tls")
+            serverAddress = core.interpretUrl("sip:$domain;transport=tls", false)
         }
     )
 
@@ -178,7 +181,7 @@ internal class LinphoneSipRegisterRepository(
             // Queuing call of this method so we ensure that the callback is eventually invoked
             // even if there are no future registration updates.
             timer = Timer("Registration").also {
-                it.schedule(cleanUpDelay) {
+                it.schedule(CLEAN_UP_DELAY) {
                     onAccountRegistrationStateChanged(
                         core,
                         account,
@@ -220,7 +223,7 @@ internal class LinphoneSipRegisterRepository(
         }
 
         private fun hasExceededTimeout(startTime: Long): Boolean =
-            (startTime + registrationTimeoutMs) < currentTime
+            (startTime + REGISTRATION_TIMEOUT_MS) < currentTime
 
         private fun reset() {
             startTime = null
@@ -238,11 +241,11 @@ internal class LinphoneSipRegisterRepository(
         /**
          * The amount of time to wait before determining registration has failed.
          */
-        const val registrationTimeoutMs = 5000L
+        const val REGISTRATION_TIMEOUT_MS = 5000L
 
         /**
          * The time that we will wait before executing the method again to clean-up.
          */
-        const val cleanUpDelay = 1000L
+        const val CLEAN_UP_DELAY = 1000L
     }
 }
