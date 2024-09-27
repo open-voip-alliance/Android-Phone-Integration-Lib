@@ -90,15 +90,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
         disableAudioFocusRequests = true
         automaticNetworkStateMonitoring = true
         registerOnlyWhenNetworkIsUp = true
-        keepAlivePeriod = 30000
-        isKeepAliveEnabled = true
         isPushNotificationEnabled = false
-        transports = transports.apply {
-            udpPort = Port.DISABLED.value
-            tcpPort = Port.DISABLED.value
-            tlsPort = Port.RANDOM.value
-        }
-        isIpv6Enabled = false
         isDnsSearchEnabled = false
         mediaEncryption = MediaEncryption.SRTP
         isMediaEncryptionMandatory = true
@@ -110,28 +102,15 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
         isVideoCaptureEnabled = false
         isVideoDisplayEnabled = false
         isAutoIterateEnabled = true
-        uploadBandwidth = Bandwidth.INFINITE.value
-        downloadBandwidth = Bandwidth.INFINITE.value
-        mtu = 1300
-        guessHostname = true
-        incTimeout = 60
-        audioPort = Port.RANDOM.value
-        nortpTimeout = 30
-        avpfMode = AVPFMode.Disabled
         stunServer = voipLibConfig.stun
         natPolicy = natPolicy?.apply {
             isStunEnabled = voipLibConfig.stun?.isNotEmpty() == true
-            isUpnpEnabled = false
         }
-        audioJittcomp = 100
     }
 
     private fun applyPostStartConfiguration(core: Core) = core.apply {
-        useInfoForDtmf = true
         useRfc2833ForDtmf = true
         isAdaptiveRateControlEnabled = true
-        isRtpBundleEnabled = false
-        isAudioAdaptiveJittcompEnabled = true
 
         if (hasBuiltinEchoCanceller()) {
             isEchoCancellationEnabled = false
@@ -246,35 +225,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
     override fun onAudioDevicesListUpdated(core: Core) =
         voipLibConfig.callListener.availableAudioDevicesUpdated()
 
-    override fun onCallReceiveMasterKeyChanged(
-        core: Core,
-        call: org.linphone.core.Call,
-        masterKey: String?
-    ) {
-        Log.e(TAG, "onCallReceiveMasterKeyChanged: Not implemented")
-    }
-
-    override fun onCallSendMasterKeyChanged(
-        core: Core,
-        call: org.linphone.core.Call,
-        masterKey: String?
-    ) {
-        Log.e(TAG, "onCallSendMasterKeyChanged: Not implemented")
-    }
-
-    override fun onChatRoomSessionStateChanged(
-        core: Core,
-        chatRoom: ChatRoom,
-        state: org.linphone.core.Call.State?,
-        message: String
-    ) {
-        Log.e(TAG, "onChatRoomSessionStateChanged: Not implemented")
-    }
-
-    override fun onPreviewDisplayErrorOccurred(core: Core, errorCode: Int) {
-        Log.e(TAG, "onPreviewDisplayErrorOccurred: Not implemented")
-    }
-
     override fun onTransferStateChanged(lc: Core, transfered: org.linphone.core.Call, newCallState: org.linphone.core.Call.State) {
         voipLibConfig.callListener.attendedTransferMerged(Call(transfered))
     }
@@ -310,15 +260,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
         }
     }
 
-    override fun onSubscribeReceived(
-        core: Core,
-        linphoneEvent: Event,
-        subscribeEvent: String,
-        body: Content?
-    ) {
-        Log.e(TAG, "onSubscribeReceived: Not yet implemented")
-    }
-
     override fun onLogMessageWritten(service: LoggingService, domain: String, lev: org.linphone.core.LogLevel, message: String) {
         GlobalScope.launch(Dispatchers.IO) {
             voipLibConfig.logListener?.onLogMessageWritten(when (lev) {
@@ -342,14 +283,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
         var destroyed: Boolean = false
         val initialized: Boolean get() = linphoneCore != null && !destroyed
     }
-}
-
-enum class Port(val value: Int) {
-    DISABLED(0), RANDOM(-1)
-}
-
-enum class Bandwidth(val value: Int) {
-    INFINITE(0)
 }
 
 /**
