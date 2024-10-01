@@ -103,13 +103,17 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
         isVideoDisplayEnabled = false
         isAutoIterateEnabled = true
         stunServer = voipLibConfig.stun
+        mtu = 1300
+        guessHostname = true
+        autoAnswerReplacingCalls = true
+        pingWithOptions = false
         natPolicy = natPolicy?.apply {
             isStunEnabled = voipLibConfig.stun?.isNotEmpty() == true
         }
     }
 
     private fun applyPostStartConfiguration(core: Core) = core.apply {
-        useRfc2833ForDtmf = true
+        useInfoForDtmf = true
         isAdaptiveRateControlEnabled = true
 
         if (hasBuiltinEchoCanceller()) {

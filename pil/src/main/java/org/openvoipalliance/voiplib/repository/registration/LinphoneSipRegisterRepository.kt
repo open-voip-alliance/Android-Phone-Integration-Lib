@@ -108,6 +108,7 @@ internal class LinphoneSipRegisterRepository(
             // [transport=tls] must be included or you will experience intermittent certification
             // verification issues - especially when changing networks.
             serverAddress = core.interpretUrl("sip:$domain;transport=tls", false)
+            transport = TransportType.Tls
         }
     )
 
