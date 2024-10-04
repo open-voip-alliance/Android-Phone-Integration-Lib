@@ -110,6 +110,9 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
         natPolicy = natPolicy?.apply {
             isStunEnabled = voipLibConfig.stun?.isNotEmpty() == true
         }
+        // keepAlive MUST be set to FALSE otherwise there are issues with calls that aren't
+        // immediately answered. Test this fully if you change it.
+        isKeepAliveEnabled = false
     }
 
     private fun applyPostStartConfiguration(core: Core) = core.apply {
