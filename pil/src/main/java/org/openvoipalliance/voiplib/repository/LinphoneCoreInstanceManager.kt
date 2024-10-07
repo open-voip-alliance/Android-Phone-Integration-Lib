@@ -102,6 +102,7 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
         isVideoCaptureEnabled = false
         isVideoDisplayEnabled = false
         isAutoIterateEnabled = true
+        isIpv6Enabled = false
         stunServer = voipLibConfig.stun
         mtu = 1300
         guessHostname = true
