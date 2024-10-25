@@ -11,8 +11,6 @@ import okhttp3.*
 import org.openvoipalliance.androidphoneintegration.push.Middleware
 import org.openvoipalliance.androidphoneintegration.push.UnavailableReason
 import java.io.IOException
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 class VoIPGRIDMiddleware(private val context: Context) : Middleware {
 
