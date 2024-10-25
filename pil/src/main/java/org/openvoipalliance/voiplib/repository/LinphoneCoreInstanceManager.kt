@@ -9,6 +9,7 @@ import org.linphone.core.*
 import org.linphone.core.GlobalState.Off
 import org.linphone.core.GlobalState.On
 import org.linphone.core.LogLevel.*
+import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.R
 import org.openvoipalliance.voiplib.config.Config
 import org.openvoipalliance.voiplib.model.Call
@@ -69,8 +70,6 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
     @Synchronized
     @Throws(Exception::class)
     private fun startLibLinphone() {
-        logging.setLogLevel(Warning)
-
         voipLibConfig.logListener.let { logging.addListener(this) }
 
         this.linphoneCore = createLinphoneCore(context).also {
@@ -83,6 +82,12 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
 
         state.destroyed = false
     }
+
+    fun setLoggingLevel(enableAdvancedLogging: Boolean) = logging.setLogLevel(
+        when(enableAdvancedLogging) {
+            true -> Debug
+            false -> Warning
+        })
 
     private fun applyPreStartConfiguration(core:Core) = core.apply {
         addListener(this@LinphoneCoreInstanceManager)

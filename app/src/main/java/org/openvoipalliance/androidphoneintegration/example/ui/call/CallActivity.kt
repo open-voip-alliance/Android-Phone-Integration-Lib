@@ -82,7 +82,6 @@ class CallActivity : AppCompatActivity(), PILEventListener {
         }
 
         dtmfButton.setOnClickListener {
-
             val editText = EditText(this).apply {
                 inputType = InputType.TYPE_CLASS_NUMBER
             }
