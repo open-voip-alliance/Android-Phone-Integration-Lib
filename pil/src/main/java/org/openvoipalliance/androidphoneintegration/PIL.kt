@@ -61,6 +61,13 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
         }
 
     var preferences: Preferences = Preferences.DEFAULT
+        set(value) {
+            val previous = field
+            field = value
+            if (previous.enableAdvancedLogging != field.enableAdvancedLogging) {
+                voipLib.setAppropriateLogLevel()
+            }
+        }
 
     var auth: Auth? = null
 

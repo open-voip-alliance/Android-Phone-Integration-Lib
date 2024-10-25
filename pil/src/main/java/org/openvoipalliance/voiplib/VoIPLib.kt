@@ -3,6 +3,9 @@ package org.openvoipalliance.voiplib
 import android.Manifest.permission.RECORD_AUDIO
 import androidx.annotation.RequiresPermission
 import org.linphone.core.Factory
+import org.linphone.core.LogLevel.Debug
+import org.linphone.core.LogLevel.Warning
+import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.di.di
 import org.openvoipalliance.voiplib.config.Config
 import org.openvoipalliance.voiplib.model.Call
@@ -27,6 +30,7 @@ class VoIPLib {
     fun initialize(config: Config): VoIPLib {
         Factory.instance()
         linphoneCoreInstanceManager.initializeLinphone(config)
+        setAppropriateLogLevel()
         return this
     }
 
@@ -98,4 +102,6 @@ class VoIPLib {
     fun startEchoCancellerCalibration() {
         linphoneCoreInstanceManager.safeLinphoneCore?.startEchoCancellerCalibration()
     }
+
+    fun setAppropriateLogLevel() = linphoneCoreInstanceManager.setLoggingLevel(PIL.instance.preferences.enableAdvancedLogging)
 }
