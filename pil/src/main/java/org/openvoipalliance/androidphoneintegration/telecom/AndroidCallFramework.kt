@@ -3,14 +3,16 @@ package org.openvoipalliance.androidphoneintegration.telecom
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.telecom.*
+import androidx.core.content.ContextCompat
 import org.openvoipalliance.androidphoneintegration.BuildConfig
 import org.openvoipalliance.androidphoneintegration.call.Calls
 
 internal class AndroidCallFramework(
-    context: Context,
+    private val context: Context,
     private val calls: Calls,
     private val telecomManager: TelecomManager
 ) {
@@ -47,9 +49,12 @@ internal class AndroidCallFramework(
         )
     }
 
-    val isInCall
-        @SuppressLint("MissingPermission")
-        get() = telecomManager.isInCall
+    private val hasCallPermission: Boolean
+        get() = ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
+
+   val isInCall: Boolean
+       @SuppressLint("MissingPermission")
+       get() = if (hasCallPermission) telecomManager.isInCall else false
 
     val canMakeOutgoingCall
         get() = telecomManager.isOutgoingCallPermitted(handle)
