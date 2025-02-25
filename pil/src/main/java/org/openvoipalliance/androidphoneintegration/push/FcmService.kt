@@ -46,6 +46,12 @@ internal class FcmService : FirebaseMessagingService() {
             return
         }
 
+        if (androidCallFramework.isInCall) {
+            log("Currently in a GSM (or other app) call, responding as unavailable")
+            middleware.respond(remoteMessage, false, IN_CALL)
+            return
+        }
+
         // When booted from cold we often don't have network connectivity immediately,
         // this can cause issues. So if we detect this situation we will just continually wait
         // for the network to come back.
