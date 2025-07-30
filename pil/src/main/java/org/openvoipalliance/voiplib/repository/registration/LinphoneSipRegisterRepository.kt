@@ -219,6 +219,35 @@ internal class LinphoneSipRegisterRepository(
             log("onSubscribeReceived: Not implemented")
         }
 
+        override fun onRemainingNumberOfFileTransferChanged(
+            core: Core,
+            downloadCount: Int,
+            uploadCount: Int
+        ) {
+            log("onRemainingNumberOfFileTransferChanged: Not implemented")
+        }
+
+        override fun onReferReceived(
+            core: Core,
+            referToAddr: Address,
+            customHeaders: Headers,
+            content: Content?
+        ) {
+            log("onReferReceived: Not implemented")
+        }
+
+        override fun onMessageWaitingIndicationChanged(
+            core: Core,
+            lev: Event,
+            mwi: MessageWaitingIndication
+        ) {
+            log("onMessageWaitingIndicationChanged: Not implemented")
+        }
+
+        override fun onSnapshotTaken(core: Core, filePath: String) {
+            log("onSnapshotTaken: Not implemented")
+        }
+
         override fun onPreviewDisplayErrorOccurred(core: Core, errorCode: Int) {
             log("onPreviewDisplayErrorOccurred: Not implemented")
         }
