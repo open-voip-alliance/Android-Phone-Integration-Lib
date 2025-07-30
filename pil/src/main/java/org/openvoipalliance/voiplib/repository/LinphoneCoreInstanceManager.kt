@@ -238,6 +238,26 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
     override fun onAudioDevicesListUpdated(core: Core) =
         voipLibConfig.callListener.availableAudioDevicesUpdated()
 
+    override fun onRemainingNumberOfFileTransferChanged(
+        core: Core,
+        downloadCount: Int,
+        uploadCount: Int
+    ) {
+        log("onRemainingNumberOfFileTransferChanged: Not implemented")
+    }
+
+    override fun onMessageWaitingIndicationChanged(
+        core: Core,
+        lev: Event,
+        mwi: MessageWaitingIndication
+    ) {
+        log("onMessageWaitingIndicationChanged: Not implemented")
+    }
+
+    override fun onSnapshotTaken(core: Core, filePath: String) {
+        log("onSnapshotTaken: Not implemented")
+    }
+
     override fun onTransferStateChanged(lc: Core, transfered: org.linphone.core.Call, newCallState: org.linphone.core.Call.State) {
         voipLibConfig.callListener.attendedTransferMerged(Call(transfered))
     }
@@ -259,6 +279,15 @@ internal class LinphoneCoreInstanceManager(private val context: Context): Simple
 
         userData.pAssertedIdentity = linphoneCall.remoteParams?.getCustomHeader("P-Asserted-Identity")
         userData.remotePartyId = linphoneCall.remoteParams?.getCustomHeader("Remote-Party-ID")
+    }
+
+    override fun onReferReceived(
+        core: Core,
+        referToAddr: Address,
+        customHeaders: Headers,
+        content: Content?
+    ) {
+        TODO("Not yet implemented")
     }
 
     override fun onGlobalStateChanged(lc: Core, gstate: GlobalState, message: String) {

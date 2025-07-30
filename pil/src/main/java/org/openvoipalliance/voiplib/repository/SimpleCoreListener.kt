@@ -8,8 +8,6 @@ internal interface SimpleCoreListener : CoreListener {
 
     override fun onNetworkReachable(lc: Core, reachable: Boolean) {}
 
-    override fun onReferReceived(lc: Core, referTo: String) {}
-
     override fun onQrcodeFound(lc: Core, result: String?) {}
 
     override fun onGlobalStateChanged(lc: Core, gstate: GlobalState, message: String) {}
