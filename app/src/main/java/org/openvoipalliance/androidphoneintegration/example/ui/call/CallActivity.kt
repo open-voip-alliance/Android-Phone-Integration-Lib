@@ -92,10 +92,8 @@ class CallActivity : AppCompatActivity(), PILEventListener {
                 setPositiveButton("Send DTMF") { _, _ ->
                     val dtmf: String = editText.text.toString()
 
-                    if (dtmf.length > 1) {
-                        pil.actions.sendDtmf(dtmf)
-                    } else {
-                        pil.actions.sendDtmf(dtmf[0])
+                    dtmf.forEach { char ->
+                        pil.actions.sendDtmf(char)
                     }
                 }
                 setNegativeButton("Cancel") { _, _ ->
