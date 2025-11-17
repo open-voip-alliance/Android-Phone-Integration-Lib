@@ -33,16 +33,6 @@ class CallActions internal constructor(
     }
 
     /**
-     * Send a string of DTMF, no local tone will be played.
-     *
-     */
-    fun sendDtmf(dtmf: String) {
-        callExists {
-            phoneLib.actions(it).sendDtmf(dtmf)
-        }
-    }
-
-    /**
      * Send a single DTMF character.
      *
      * @param playToneLocally If true, will play the requested DTMF tone to the local user.
@@ -52,7 +42,9 @@ class CallActions internal constructor(
             localDtmfToneGenerator.play(dtmf)
         }
 
-        sendDtmf(dtmf.toString())
+        callExists {
+            phoneLib.actions(it).sendDtmf(dtmf.toString())
+        }
     }
 
     @SuppressLint("MissingPermission")

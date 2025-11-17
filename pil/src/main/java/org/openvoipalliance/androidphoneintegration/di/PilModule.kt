@@ -80,7 +80,7 @@ val pilModule = module {
 
     single { CallNotification() }
 
-    single { LocalDtmfToneGenerator(get()) }
+    single { LocalDtmfToneGenerator(androidContext()) }
 
     single { LogManager(get()) }
 
