@@ -51,6 +51,8 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     val calls: Calls by di.koin.inject()
     val pushToken = TokenFetcher(app.middleware)
 
+    private val localDtmfToneGenerator: org.openvoipalliance.androidphoneintegration.audio.LocalDtmfToneGenerator by di.koin.inject()
+
     val sessionState: CallSessionState
         get() = CallSessionState(calls.active, calls.inactive, audio.state)
 
@@ -192,6 +194,15 @@ class PIL internal constructor(internal val app: ApplicationSetup) {
     fun performEchoCancellationCalibration() {
         log("Beginning echo cancellation calibration")
         voipLib.startEchoCancellerCalibration()
+    }
+
+    /**
+     * Play a DTMF tone locally without sending it over the network.
+     *
+     * @param digit The DTMF digit to play ('0'-'9', '#', '*')
+     */
+    fun playToneLocally(digit: Char) {
+        localDtmfToneGenerator.play(digit)
     }
 
     /**

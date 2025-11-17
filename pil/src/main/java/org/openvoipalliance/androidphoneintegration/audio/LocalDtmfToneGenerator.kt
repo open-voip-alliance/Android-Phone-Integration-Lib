@@ -1,33 +1,38 @@
 package org.openvoipalliance.androidphoneintegration.audio
 
+import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
+import android.provider.Settings
 import java.util.*
 import kotlin.concurrent.schedule
 
-class LocalDtmfToneGenerator(private val audioManager: AudioManager) {
-
-    private val volume: Int
-        get() = audioManager.getStreamVolume(STREAM)
+class LocalDtmfToneGenerator(private val context: Context) {
 
     /**
-     * We use a timer to release the tone generator after the tone has finished,
-     * this will be cancelled every time a new tone has been requested.
-     *
+     * This is the native system setting that can be found under `Dialling keypad (sound)` (Samsung)
+     * or `Dial pad tones` (Stock Android)
      */
-    private var timer: TimerTask? = null
+    private val isDiallingKeypadSoundEnabled: Boolean
+        get() = Settings.System.getInt(
+            context.contentResolver,
+            Settings.System.DTMF_TONE_WHEN_DIALING,
+            1
+        ) != 0
 
     fun play(tone: Char) {
-        val toneGenerator = ToneGenerator(STREAM, volume)
+        val toneValue = convertCharacterToTone(tone) ?: return
 
-        toneGenerator.startTone(convertCharacterToTone(tone), TONE_DURATION)
+        if (!isDiallingKeypadSoundEnabled) {
+            return
+        }
 
-        timer = Timer().schedule((TONE_DURATION + 500).toLong()) {
-            toneGenerator.release()
+        ToneGenerator(STREAM, VOLUME_PERCENTAGE).apply {
+            startToneAndReleaseAfterPlayed(toneValue, DURATION)
         }
     }
 
-    private fun convertCharacterToTone(tone: Char): Int = when(tone) {
+    private fun convertCharacterToTone(tone: Char): Int? = when(tone) {
         '0' -> ToneGenerator.TONE_DTMF_0
         '1' -> ToneGenerator.TONE_DTMF_1
         '2' -> ToneGenerator.TONE_DTMF_2
@@ -38,17 +43,22 @@ class LocalDtmfToneGenerator(private val audioManager: AudioManager) {
         '7' -> ToneGenerator.TONE_DTMF_7
         '8' -> ToneGenerator.TONE_DTMF_8
         '9' -> ToneGenerator.TONE_DTMF_9
-        'a' -> ToneGenerator.TONE_DTMF_A
-        'b' -> ToneGenerator.TONE_DTMF_B
-        'c' -> ToneGenerator.TONE_DTMF_C
-        'd' -> ToneGenerator.TONE_DTMF_D
-        'p' -> ToneGenerator.TONE_DTMF_P
-        's' -> ToneGenerator.TONE_DTMF_S
-        else -> ToneGenerator.TONE_DTMF_0
+        '#' -> ToneGenerator.TONE_DTMF_P
+        '*' -> ToneGenerator.TONE_DTMF_S
+        else -> null
     }
 
     companion object {
-        const val TONE_DURATION = 250
-        const val STREAM = AudioManager.STREAM_VOICE_CALL
+        const val STREAM = AudioManager.STREAM_SYSTEM
+        const val DURATION = 150
+        const val VOLUME_PERCENTAGE = 50
+    }
+}
+
+fun ToneGenerator.startToneAndReleaseAfterPlayed(tone: Int, duration: Int) {
+    startTone(tone, duration)
+
+    Timer().schedule((duration + 500).toLong()) {
+        release()
     }
 }
