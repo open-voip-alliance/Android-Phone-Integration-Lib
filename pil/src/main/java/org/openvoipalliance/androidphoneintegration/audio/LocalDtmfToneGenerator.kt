@@ -49,9 +49,9 @@ class LocalDtmfToneGenerator(private val context: Context) {
     }
 
     companion object {
-        const val STREAM = AudioManager.STREAM_SYSTEM
+        const val STREAM = AudioManager.STREAM_DTMF
         const val DURATION = 150
-        const val VOLUME_PERCENTAGE = 50
+        const val VOLUME_PERCENTAGE = 100
     }
 }
 
