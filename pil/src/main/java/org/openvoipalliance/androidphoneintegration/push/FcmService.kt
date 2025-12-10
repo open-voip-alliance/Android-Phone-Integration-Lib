@@ -29,7 +29,7 @@ internal class FcmService : FirebaseMessagingService() {
 
         if (!middleware.inspect(remoteMessage)) {
             log("Client has inspected push message and determined this is not a call")
-            return
+            return super.onMessageReceived(remoteMessage)
         }
 
         log("Received FCM push message")
@@ -37,7 +37,6 @@ internal class FcmService : FirebaseMessagingService() {
         if (pil.calls.isInCall) {
             log("Currently in Vialer call, rejecting incoming call")
             middleware.respond(remoteMessage, false, IN_CALL)
-            return
         }
 
         if (!androidCallFramework.canHandleIncomingCall) {
