@@ -29,7 +29,7 @@ internal class FcmService : FirebaseMessagingService() {
 
         if (!middleware.inspect(remoteMessage)) {
             log("Client has inspected push message and determined this is not a call")
-            return
+            return super.onMessageReceived(remoteMessage)
         }
 
         log("Received FCM push message")
