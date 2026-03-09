@@ -32,7 +32,13 @@ class IncomingCallActivity : AppCompatActivity(), PILEventListener {
 
     override fun onResume() {
         super.onResume()
+        pil.events.listen(this)
         displayCall()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        pil.events.stopListening(this)
     }
 
     private fun displayCall() {

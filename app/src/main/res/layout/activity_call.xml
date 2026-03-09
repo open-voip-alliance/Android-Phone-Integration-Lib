@@ -22,7 +22,12 @@
             android:layout_height="wrap_content"
             android:text="Steven"
             android:textStyle="bold"
-            android:textSize="35sp"/>
+            android:textSize="35sp"
+            android:maxLines="1"
+            android:paddingHorizontal="24dp"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="12sp"
+            android:autoSizeMaxTextSize="35sp"/>
 
         <TextView
             android:id="@+id/callSubtitle"
@@ -93,23 +98,26 @@
         android:layout_marginTop="50dp"
         android:paddingHorizontal="10dp"
         android:stretchColumns="*"
+        android:shrinkColumns="*"
         app:layout_constraintTop_toBottomOf="@id/callHeadings">
 
         <TableRow>
 
             <Button
                 android:id="@+id/muteButton"
+                style="@style/callActionButton"
                 android:layout_marginHorizontal="10dp"
                 android:text="Mute" />
 
             <Button
                 android:id="@+id/holdButton"
+                style="@style/callActionButton"
                 android:layout_marginHorizontal="10dp"
                 android:text="Hold" />
 
-
             <Button
                 android:id="@+id/transferButton"
+                style="@style/callActionButton"
                 android:layout_marginHorizontal="10dp"
                 android:text="Transfer" />
         </TableRow>
@@ -118,18 +126,21 @@
 
             <Button
                 android:id="@+id/speakerButton"
+                style="@style/callActionButton"
                 android:layout_marginHorizontal="10dp"
                 android:text="Speaker"
                 android:enabled="false"/>
 
             <Button
                 android:id="@+id/earpieceButton"
+                style="@style/callActionButton"
                 android:layout_marginHorizontal="10dp"
                 android:text="Earpiece"
                 android:enabled="false"/>
 
             <Button
                 android:id="@+id/bluetoothButton"
+                style="@style/callActionButton"
                 android:layout_marginHorizontal="10dp"
                 android:text="Bluetooth"
                 android:enabled="false"/>
@@ -140,6 +151,7 @@
 
             <Button
                 android:id="@+id/dtmfButton"
+                style="@style/callActionButton"
                 android:layout_marginHorizontal="10dp"
                 android:text="DTMF"
                 android:enabled="true"/>

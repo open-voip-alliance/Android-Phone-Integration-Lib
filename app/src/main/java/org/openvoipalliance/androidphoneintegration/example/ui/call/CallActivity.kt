@@ -104,7 +104,11 @@ class CallActivity : AppCompatActivity(), PILEventListener {
 
     override fun onResume() {
         super.onResume()
-        lastEvent?.let { render(it) }
+        pil.events.listen(this)
+        lastEvent?.let { render(it) } ?: pil.calls.active?.let { call ->
+            callTitle.text = call.remotePartyHeading
+            callSubtitle.text = call.remotePartySubheading
+        }
     }
 
     override fun onDestroy() {
