@@ -21,7 +21,7 @@ allprojects {
         mavenCentral()
         maven("https://jitpack.io")
         maven {
-            url = uri("https://linphone.org/maven_repository/")
+            url = uri("https://download.linphone.org/maven_repository/")
         }
     }
 }
