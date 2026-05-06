@@ -9,6 +9,7 @@ import android.widget.TableLayout
 import androidx.core.view.children
 import androidx.core.view.forEach
 import kotlinx.android.synthetic.main.dialer.view.*
+import org.openvoipalliance.androidphoneintegration.PIL
 import org.openvoipalliance.androidphoneintegration.example.R
 import kotlin.properties.Delegates
 
@@ -35,6 +36,7 @@ class Dialer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = 
                 if (it is Button) {
                     it.setOnClickListener {
                         val button = it as Button
+                        PIL.instance.playToneLocally(button.text.first())
                         digits = "${digits}${button.text}"
                     }
                 }
