@@ -57,7 +57,7 @@ class VoIPGRIDMiddleware(private val context: Context) : Middleware {
         return@withContext client.newCall(request).execute().isSuccessful
     }
 
-    private fun createMiddlewareRequest(url: String = "https://vialerpush.voipgrid.nl/api/android-device/") = Request.Builder()
+    private fun createMiddlewareRequest(url: String = "https://vmex.eu-production.holodeck.voys.nl/api/android-device/") = Request.Builder()
         .url(url)
         .addHeader("Authorization", "Token ${prefs.getString("voipgrid_username", "")}:${prefs.getString("voipgrid_api_token", "")}")
 
@@ -73,7 +73,7 @@ class VoIPGRIDMiddleware(private val context: Context) : Middleware {
             add("sip_user_id", prefs.getString("username", "")!!)
         }.build()
 
-        val request = createMiddlewareRequest("https://vialerpush.voipgrid.nl/api/call-response/")
+        val request = createMiddlewareRequest("https://vmex.eu-production.holodeck.voys.nl/api/call-response/")
             .post(data)
             .build()
 
